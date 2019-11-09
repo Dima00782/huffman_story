@@ -3,6 +3,7 @@ cc_library(
     srcs = [],
     hdrs = [
         "byte_reader.h",
+        "byte_writer.h",
     ],
     visibility = ["//visibility:public"],
 )
