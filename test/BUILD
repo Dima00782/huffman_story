@@ -1,7 +1,7 @@
 cc_test(
     name = "unittest",
     srcs = [
-        "encryption_unittest.cc",
+        "huffman_tree_builder_unittest.cc",
         "string_io_unittest.cc",
     ],
     deps = [
