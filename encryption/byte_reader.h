@@ -6,7 +6,7 @@
 namespace encryption {
 
 class ByteReader {
-public:
+ public:
   virtual ~ByteReader() {}
 
   virtual std::optional<char> ReadByte() = 0;

@@ -8,14 +8,14 @@
 namespace string_io {
 
 class StringByteReader : public encryption::ByteReader {
-public:
+ public:
   StringByteReader(const std::string& data);
 
   ~StringByteReader() override = default;
 
   std::optional<char> ReadByte() override;
 
-private:
+ private:
   const std::string data_;
   std::string::const_iterator pos_;
 };

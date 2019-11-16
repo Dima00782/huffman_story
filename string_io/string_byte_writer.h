@@ -8,14 +8,14 @@
 namespace string_io {
 
 class StringByteWriter : public encryption::ByteWriter {
-public:
+ public:
   ~StringByteWriter() override = default;
 
   void WriteByte(char byte) override;
 
   std::string GetData() const;
 
-private:
+ private:
   std::string data_;
 };
 

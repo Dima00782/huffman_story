@@ -1,10 +1,10 @@
 #include "encryption/huffman_encryption.h"
 
+#include <cassert>
 #include <stack>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
-#include <cassert>
 
 namespace encryption {
 
@@ -18,7 +18,7 @@ std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader);
 
 HuffmanEncryption::HuffmanEncryption(std::unique_ptr<ByteReader> byte_reader,
                                      std::unique_ptr<ByteWriter> byte_writer)
-  : byte_writer_{std::move(byte_writer)} {
+    : byte_writer_{std::move(byte_writer)} {
   const auto text = ReadBytesToString(std::move(byte_reader));
   auto root = HuffmanTreeBuilder(text).GetRoot();
   Encrypt(std::move(root), text);
@@ -27,7 +27,8 @@ HuffmanEncryption::HuffmanEncryption(std::unique_ptr<ByteReader> byte_reader,
 namespace {
 std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader) {
   std::string result;
-  for (auto byte = byte_reader->ReadByte(); byte.has_value(); byte = byte_reader->ReadByte()) {
+  for (auto byte = byte_reader->ReadByte(); byte.has_value();
+       byte = byte_reader->ReadByte()) {
     result.push_back(*byte);
   }
 
@@ -35,7 +36,8 @@ std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader) {
 }
 }  // namespace
 
-void HuffmanEncryption::Encrypt(std::unique_ptr<TreeNode> root, std::string_view text) {
+void HuffmanEncryption::Encrypt(std::unique_ptr<TreeNode> root,
+                                std::string_view text) {
   WriteTree(root.get());
   WriteEncryptedText(root.get(), text);
 }
@@ -64,7 +66,8 @@ bool IsInnerNode(encryption::TreeNode* node) {
 }
 }  // namespace
 
-void HuffmanEncryption::WriteEncryptedText(TreeNode* root, std::string_view text) {
+void HuffmanEncryption::WriteEncryptedText(TreeNode* root,
+                                           std::string_view text) {
   const auto codes_by_symbol = BuildCodesMap(root);
 
   for (const auto symbol : text) {
@@ -106,12 +109,16 @@ std::unordered_map<char, std::string> BuildCodesMap(TreeNode* root) {
       continue;
     }
 
-    if (current_node->left_ && used.find(current_node->left_.get()) == used.end()) {
-      stack.push(NodeWithCode{current_node->left_.get(), current.code + kLeftTurnLabel});
+    if (current_node->left_ &&
+        used.find(current_node->left_.get()) == used.end()) {
+      stack.push(NodeWithCode{current_node->left_.get(),
+                              current.code + kLeftTurnLabel});
     }
 
-    if (current_node->right_ && used.find(current_node->right_.get()) == used.end()) {
-      stack.push(NodeWithCode{current_node->right_.get(), current.code + kRightTurnLabel});
+    if (current_node->right_ &&
+        used.find(current_node->right_.get()) == used.end()) {
+      stack.push(NodeWithCode{current_node->right_.get(),
+                              current.code + kRightTurnLabel});
     }
 
     used.insert(current_node);

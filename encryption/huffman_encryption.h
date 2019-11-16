@@ -11,9 +11,11 @@
 namespace encryption {
 
 class HuffmanEncryption {
-public:
-  HuffmanEncryption(std::unique_ptr<ByteReader> byte_reader, std::unique_ptr<ByteWriter> byte_writer);
-private:
+ public:
+  HuffmanEncryption(std::unique_ptr<ByteReader> byte_reader,
+                    std::unique_ptr<ByteWriter> byte_writer);
+
+ private:
   void Encrypt(std::unique_ptr<TreeNode> root, std::string_view text);
   void WriteTree(TreeNode* root);
   void WriteEncryptedText(TreeNode* root, std::string_view text);

@@ -18,7 +18,7 @@ TEST(StringReader, Read) {
 TEST(StringWriter, Write) {
   const std::string kTestString = "Hello";
   string_io::StringByteWriter string_byte_writer;
-  
+
   for (const auto symbol : kTestString) {
     string_byte_writer.WriteByte(symbol);
   }

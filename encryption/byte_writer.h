@@ -4,7 +4,7 @@
 namespace encryption {
 
 class ByteWriter {
-public:
+ public:
   virtual ~ByteWriter() {}
 
   virtual void WriteByte(char byte) = 0;
