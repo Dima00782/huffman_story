@@ -1,4 +1,4 @@
-#include "encryption/huffman_tree_builder.h"
+#include "encryption/huffman_tree/huffman_tree_builder.h"
 
 #include <algorithm>
 #include <unordered_map>

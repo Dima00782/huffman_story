@@ -3,9 +3,10 @@
 
 #include "encryption/byte_reader.h"
 #include "encryption/byte_writer.h"
-#include "encryption/huffman_tree_builder.h"
+#include "encryption/huffman_tree/huffman_tree_builder.h"
 
 #include <memory>
+#include <string_view>
 
 namespace encryption {
 

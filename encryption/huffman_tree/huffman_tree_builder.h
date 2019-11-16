@@ -4,8 +4,6 @@
 #include <memory>
 #include <string_view>
 
-#include "encryption/byte_reader.h"
-
 namespace encryption {
 
 struct TreeNode {

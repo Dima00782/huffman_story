@@ -1,10 +1,10 @@
 #include <string>
 
+#include "encryption/huffman_tree/huffman_tree_builder.h"
 #include "gtest/gtest.h"
-#include "encryption/huffman_tree_builder.h"
 
 bool IsInnerNode(encryption::TreeNode* node) {
-  return node->left_ && node->right_ && node->key_.empty();
+  return node->left_ && node->right_;
 }
 
 bool IsLeafNode(encryption::TreeNode* node) {
