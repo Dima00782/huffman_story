@@ -1,23 +1,18 @@
 #include "encryption/huffman_tree/huffman_tree_builder.h"
 
 #include <algorithm>
+#include <climits>
+#include <cstdint>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "bits_manipulation/bits_manipulation.h"
+
 namespace encryption {
 
 namespace {
-
-std::unordered_map<char, uint32_t> CountChars(std::string_view text) {
-  std::unordered_map<char, uint32_t> char_count;
-  for (const auto byte : text) {
-    ++char_count[byte];
-  }
-
-  return char_count;
-}
-
+std::unordered_map<char, uint32_t> CountChars(std::string_view text);
 }  // namespace
 
 TreeNode::TreeNode(const std::string& key,
@@ -33,7 +28,7 @@ HuffmanTreeBuilder::HuffmanTreeBuilder(std::string_view text) {
   if (text.empty()) {
     return;
   }
-  
+
   const auto char_count = CountChars(text);
 
   std::vector<std::unique_ptr<TreeNode>> nodes;
@@ -65,6 +60,17 @@ HuffmanTreeBuilder::HuffmanTreeBuilder(std::string_view text) {
 
   root_ = std::move(nodes.back());
 }
+
+namespace {
+std::unordered_map<char, uint32_t> CountChars(std::string_view text) {
+  std::unordered_map<char, uint32_t> char_count;
+  for (const auto byte : text) {
+    ++char_count[byte];
+  }
+
+  return char_count;
+}
+}  // namespace
 
 std::unique_ptr<TreeNode> HuffmanTreeBuilder::GetRoot() {
   return std::move(root_);

@@ -5,19 +5,22 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
+
+#include "bits_manipulation/bits_manipulation.h"
 
 namespace encryption {
 
 namespace {
 
-std::unordered_map<char, std::string> BuildCodesMap(TreeNode* root);
+std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root);
 bool IsInnerNode(encryption::TreeNode* node);
 std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader);
 
 }  // namespace
 
 HuffmanEncryption::HuffmanEncryption(std::unique_ptr<ByteReader> byte_reader,
-                                     std::unique_ptr<ByteWriter> byte_writer)
+                                     std::unique_ptr<BitWriter> byte_writer)
     : byte_writer_{std::move(byte_writer)} {
   const auto text = ReadBytesToString(std::move(byte_reader));
   auto root = HuffmanTreeBuilder(text).GetRoot();
@@ -43,16 +46,17 @@ void HuffmanEncryption::Encrypt(std::unique_ptr<TreeNode> root,
 }
 
 void HuffmanEncryption::WriteTree(TreeNode* root) {
-  constexpr char kInnerNodeLabel = '0';
-  constexpr char kLeafNodeLabel = '1';
+  constexpr bool kInnerNodeBitLabel = false;
+  constexpr bool kLeafNodeBitLabel = true;
 
   if (!root) {
     return;
   }
 
-  const char node_label = IsInnerNode(root) ? kInnerNodeLabel : kLeafNodeLabel;
-  byte_writer_->WriteByte(node_label);
-  if (node_label == kLeafNodeLabel) {
+  const auto node_label =
+      IsInnerNode(root) ? kInnerNodeBitLabel : kLeafNodeBitLabel;
+  byte_writer_->WriteBit(node_label);
+  if (node_label == kLeafNodeBitLabel) {
     byte_writer_->WriteByte(root->key_.back());
   }
 
@@ -71,38 +75,38 @@ void HuffmanEncryption::WriteEncryptedText(TreeNode* root,
   const auto codes_by_symbol = BuildCodesMap(root);
 
   for (const auto symbol : text) {
-    auto code_iter = codes_by_symbol.find(symbol);
-    assert(code_iter != codes_by_symbol.cend());
-    for (const auto& byte : code_iter->second) {
-      byte_writer_->WriteByte(byte);
+    const auto code_iter = codes_by_symbol.find(symbol);
+    assert(code_iter != codes_by_symbol.end());
+    for (const auto bit : code_iter->second) {
+      byte_writer_->WriteBit(bit);
     }
   }
 }
 
 namespace {
-std::unordered_map<char, std::string> BuildCodesMap(TreeNode* root) {
-  constexpr char kLeftTurnLabel = '0';
-  constexpr char kRightTurnLabel = '1';
-  std::unordered_map<char, std::string> codes;
+std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
+  constexpr bool kTurnLeftBitLabel = false;
+  constexpr bool kTurnRightBitLabel = true;
+  std::unordered_map<char, std::vector<bool>> codes;
 
   if (!root) {
     return codes;
   }
 
   if (!root->left_ && !root->right_) {
-    codes[root->key_.back()] = std::string(1, kLeftTurnLabel);
+    codes[root->key_.back()] = std::vector<bool>(1, kTurnLeftBitLabel);
     return codes;
   }
 
   struct NodeWithCode {
     TreeNode* node;
-    std::string code;
+    std::vector<bool> code;
   };
 
   std::unordered_set<const TreeNode*> used;
   std::stack<NodeWithCode> stack;
 
-  stack.push(NodeWithCode{root, root->key_});
+  stack.push(NodeWithCode{root, std::vector<bool>()});
 
   while (!stack.empty()) {
     const auto current = stack.top();
@@ -120,14 +124,16 @@ std::unordered_map<char, std::string> BuildCodesMap(TreeNode* root) {
 
     if (current_node->left_ &&
         used.find(current_node->left_.get()) == used.end()) {
-      stack.push(NodeWithCode{current_node->left_.get(),
-                              current.code + kLeftTurnLabel});
+      auto code = current.code;
+      code.push_back(kTurnLeftBitLabel);
+      stack.push(NodeWithCode{current_node->left_.get(), std::move(code)});
     }
 
     if (current_node->right_ &&
         used.find(current_node->right_.get()) == used.end()) {
-      stack.push(NodeWithCode{current_node->right_.get(),
-                              current.code + kRightTurnLabel});
+      auto code = current.code;
+      code.push_back(kTurnRightBitLabel);
+      stack.push(NodeWithCode{current_node->right_.get(), std::move(code)});
     }
 
     used.insert(current_node);

@@ -1,5 +1,5 @@
-#ifndef STRING_IO_STRING_READER_H_
-#define STRING_IO_STRING_READER_H_
+#ifndef STRING_IO_STRING_BYTE_READER_H_
+#define STRING_IO_STRING_BYTE_READER_H_
 
 #include <string>
 
@@ -22,4 +22,4 @@ class StringByteReader : public encryption::ByteReader {
 
 }  // namespace string_io
 
-#endif  // STRING_IO_STRING_READER_H_
+#endif  // STRING_IO_STRING_BYTE_READER_H_
