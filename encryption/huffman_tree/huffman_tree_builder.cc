@@ -30,6 +30,10 @@ TreeNode::TreeNode(const std::string& key,
       right_{std::move(right)} {}
 
 HuffmanTreeBuilder::HuffmanTreeBuilder(std::string_view text) {
+  if (text.empty()) {
+    return;
+  }
+  
   const auto char_count = CountChars(text);
 
   std::vector<std::unique_ptr<TreeNode>> nodes;

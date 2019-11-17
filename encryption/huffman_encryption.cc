@@ -85,6 +85,15 @@ std::unordered_map<char, std::string> BuildCodesMap(TreeNode* root) {
   constexpr char kRightTurnLabel = '1';
   std::unordered_map<char, std::string> codes;
 
+  if (!root) {
+    return codes;
+  }
+
+  if (!root->left_ && !root->right_) {
+    codes[root->key_.back()] = std::string(1, kLeftTurnLabel);
+    return codes;
+  }
+
   struct NodeWithCode {
     TreeNode* node;
     std::string code;
