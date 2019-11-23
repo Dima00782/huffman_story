@@ -13,18 +13,22 @@ namespace encryption {
 
 namespace {
 
+constexpr bool kInnerNodeBitLabel = false;
+constexpr bool kLeafNodeBitLabel = true;
+
 std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root);
 bool IsInnerNode(encryption::TreeNode* node);
 std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader);
 
 }  // namespace
 
-HuffmanEncryption::HuffmanEncryption(std::unique_ptr<ByteReader> byte_reader,
-                                     std::unique_ptr<BitWriter> byte_writer)
-    : byte_writer_{std::move(byte_writer)} {
-  const auto text = ReadBytesToString(std::move(byte_reader));
+void HuffmanEncryption::Encrypt(std::unique_ptr<ByteReader> input,
+                                std::unique_ptr<BitWriter> output) {
+  output_ = std::move(output);
+  const auto text = ReadBytesToString(std::move(input));
   auto root = HuffmanTreeBuilder(text).GetRoot();
-  Encrypt(std::move(root), text);
+  WriteTreeInPrefixForm(root.get());
+  WriteEncryptedText(root.get(), text);
 }
 
 namespace {
@@ -39,29 +43,20 @@ std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader) {
 }
 }  // namespace
 
-void HuffmanEncryption::Encrypt(std::unique_ptr<TreeNode> root,
-                                std::string_view text) {
-  WriteTree(root.get());
-  WriteEncryptedText(root.get(), text);
-}
-
-void HuffmanEncryption::WriteTree(TreeNode* root) {
-  constexpr bool kInnerNodeBitLabel = false;
-  constexpr bool kLeafNodeBitLabel = true;
-
+void HuffmanEncryption::WriteTreeInPrefixForm(TreeNode* root) {
   if (!root) {
     return;
   }
 
   const auto node_label =
       IsInnerNode(root) ? kInnerNodeBitLabel : kLeafNodeBitLabel;
-  byte_writer_->WriteBit(node_label);
+  output_->WriteBit(node_label);
   if (node_label == kLeafNodeBitLabel) {
-    byte_writer_->WriteByte(root->key_.back());
+    output_->WriteByte(root->key_.back());
   }
 
-  WriteTree(root->left_.get());
-  WriteTree(root->right_.get());
+  WriteTreeInPrefixForm(root->left_.get());
+  WriteTreeInPrefixForm(root->right_.get());
 }
 
 namespace {
@@ -78,7 +73,7 @@ void HuffmanEncryption::WriteEncryptedText(TreeNode* root,
     const auto code_iter = codes_by_symbol.find(symbol);
     assert(code_iter != codes_by_symbol.end());
     for (const auto bit : code_iter->second) {
-      byte_writer_->WriteBit(bit);
+      output_->WriteBit(bit);
     }
   }
 }

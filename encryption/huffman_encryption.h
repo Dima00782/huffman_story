@@ -12,15 +12,13 @@ namespace encryption {
 
 class HuffmanEncryption {
  public:
-  HuffmanEncryption(std::unique_ptr<ByteReader> byte_reader,
-                    std::unique_ptr<BitWriter> byte_writer);
+  void Encrypt(std::unique_ptr<ByteReader> input, std::unique_ptr<BitWriter> output);
 
  private:
-  void Encrypt(std::unique_ptr<TreeNode> root, std::string_view text);
-  void WriteTree(TreeNode* root);
+  void WriteTreeInPrefixForm(TreeNode* root);
   void WriteEncryptedText(TreeNode* root, std::string_view text);
 
-  std::unique_ptr<BitWriter> byte_writer_;
+  std::unique_ptr<BitWriter> output_;
 };
 
 }  // namespace encryption

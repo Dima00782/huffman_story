@@ -8,8 +8,9 @@ std::string CompressText(const std::string& text) {
   auto string_reader = std::make_unique<string_io::StringByteReader>(text);
   auto string_writer = std::make_unique<string_io::StringBitWriter>();
   auto* string_writer_ptr = string_writer.get();
-  encryption::HuffmanEncryption huffman_encryption(std::move(string_reader),
-                                                   std::move(string_writer));
+  encryption::HuffmanEncryption huffman_encryption;
+  huffman_encryption.Encrypt(std::move(string_reader),
+                             std::move(string_writer));
   return string_writer_ptr->GetData();
 }
 
