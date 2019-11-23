@@ -31,6 +31,9 @@ void HuffmanEncryption::Encrypt(std::unique_ptr<ByteReader> input,
   WriteEncryptedText(root.get(), text);
 }
 
+void HuffmanEncryption::Decrypt(std::unique_ptr<ByteReader> input,
+                                std::unique_ptr<BitWriter> output) {}
+
 namespace {
 std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader) {
   std::string result;

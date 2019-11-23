@@ -12,7 +12,10 @@ namespace encryption {
 
 class HuffmanEncryption {
  public:
-  void Encrypt(std::unique_ptr<ByteReader> input, std::unique_ptr<BitWriter> output);
+  void Encrypt(std::unique_ptr<ByteReader> input,
+               std::unique_ptr<BitWriter> output);
+  void Decrypt(std::unique_ptr<ByteReader> input,
+               std::unique_ptr<BitWriter> output);
 
  private:
   void WriteTreeInPrefixForm(TreeNode* root);

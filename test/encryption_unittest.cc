@@ -4,41 +4,55 @@
 #include "string_io/string_bit_writer.h"
 #include "string_io/string_byte_reader.h"
 
-std::string CompressText(const std::string& text) {
-  auto string_reader = std::make_unique<string_io::StringByteReader>(text);
-  auto string_writer = std::make_unique<string_io::StringBitWriter>();
-  auto* string_writer_ptr = string_writer.get();
-  encryption::HuffmanEncryption huffman_encryption;
-  huffman_encryption.Encrypt(std::move(string_reader),
-                             std::move(string_writer));
-  return string_writer_ptr->GetData();
+std::string EncryptText(const std::string& text) {
+  auto string_input = std::make_unique<string_io::StringByteReader>(text);
+  auto string_output = std::make_unique<string_io::StringBitWriter>();
+
+  auto* string_output_ptr = string_output.get();
+  encryption::HuffmanEncryption huffman;
+  huffman.Encrypt(std::move(string_input), std::move(string_output));
+  return string_output_ptr->GetData();
+}
+
+std::string DecryptText(const std::string& text) {
+  auto string_input = std::make_unique<string_io::StringByteReader>(text);
+  auto string_output = std::make_unique<string_io::StringBitWriter>();
+
+  auto* string_output_ptr = string_output.get();
+  encryption::HuffmanEncryption huffman;
+  huffman.Decrypt(std::move(string_input), std::move(string_output));
+  return string_output_ptr->GetData();
 }
 
 TEST(Encryption, NoSymbols) {
-  const std::string kTestInputString = "";
-  const std::string kTestOutput = "";
+  constexpr char kTestInputString[] = "";
+  constexpr char kTestOutput[] = "";
 
-  EXPECT_EQ(CompressText(kTestInputString), kTestOutput);
+  EXPECT_EQ(EncryptText(kTestInputString), kTestOutput);
+  EXPECT_EQ(DecryptText(kTestOutput), kTestInputString);
 }
 
 TEST(Encryption, OneSymbol) {
-  const std::string kTestInputString = "a";
-  EXPECT_EQ(CompressText(kTestInputString),
-            bits_manipulation::InBinaryForm(0b1'01100001'0000000));
+  constexpr char kTestInputString[] = "a";
+  const auto test_output =
+      bits_manipulation::InBinaryForm(0b1'01100001'0000000);
+
+  EXPECT_EQ(EncryptText(kTestInputString), test_output);
+  EXPECT_EQ(DecryptText(test_output), kTestInputString);
 }
 
 TEST(Encryption, TwoSymbols) {
-  const std::string kTestInputString = "aaabb";
+  constexpr char kTestInputString[] = "aaabb";
 
-  EXPECT_EQ(CompressText(kTestInputString),
+  EXPECT_EQ(EncryptText(kTestInputString),
             bits_manipulation::InBinaryForm(0b01'01100010'1'01100) +
                 static_cast<char>(0b001'11100));
 }
 
 TEST(Encryption, ThreeSymbols) {
-  const std::string kTestInputString = "aaaabbc";
+  constexpr char kTestInputString[] = "aaaabbc";
 
-  EXPECT_EQ(CompressText(kTestInputString),
+  EXPECT_EQ(EncryptText(kTestInputString),
             bits_manipulation::InBinaryForm(0b001'01100011'1'0110) +
                 bits_manipulation::InBinaryForm(0b0010'1'01100001'111) +
                 static_cast<char>(0b10101000));
