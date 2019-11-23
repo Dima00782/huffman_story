@@ -89,11 +89,7 @@ std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
   constexpr bool kTurnRightBitLabel = true;
   std::unordered_map<char, std::vector<bool>> codes;
 
-  if (!root) {
-    return codes;
-  }
-
-  if (!root->left_ && !root->right_) {
+  if (root && !root->left_ && !root->right_) {
     codes[root->key_.back()] = std::vector<bool>(1, kTurnLeftBitLabel);
     return codes;
   }
