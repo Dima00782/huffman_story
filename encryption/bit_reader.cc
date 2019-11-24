@@ -8,7 +8,7 @@ namespace encryption {
 
 std::optional<char> BitReader::ReadByte() {
   char byte = '\0';
-  for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
+  for (uint8_t bit_pos = 0u; bit_pos < CHAR_BIT; ++bit_pos) {
     const auto bit_value = ReadBit();
     if (!bit_value.has_value()) {
       return std::nullopt;

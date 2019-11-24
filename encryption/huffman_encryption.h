@@ -6,6 +6,8 @@
 #include "encryption/huffman_tree/huffman_tree_builder.h"
 
 #include <memory>
+#include <optional>
+#include <deque>
 #include <string_view>
 
 namespace encryption {
@@ -27,6 +29,15 @@ class HuffmanEncryption {
   void WriteBit(bool enabled);
   void WriteByte(char byte);
   void WriteAlignment();
+
+  std::optional<bool> ReadBit();
+  std::optional<char> ReadByte();
+
+  void PopulateQueue();
+  void RemoveUnusedBitsInLastByte();
+
+  std::deque<bool> look_ahead_queue_;
+  bool is_last_bit_met_{false};
 
   uint8_t alignment_{0u};
   std::unique_ptr<BitReader> input_;
