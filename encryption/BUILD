@@ -1,11 +1,12 @@
 cc_library(
     name = "huffman_encryption",
     srcs = [
+        "bit_reader.cc",
         "bit_writer.cc",
         "huffman_encryption.cc",
     ],
     hdrs = [
-        "byte_reader.h",
+        "bit_reader.h",
         "bit_writer.h",
         "huffman_encryption.h",
     ],

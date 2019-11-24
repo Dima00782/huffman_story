@@ -1,11 +1,11 @@
 #include "bits_manipulation/bits_manipulation.h"
 #include "encryption/huffman_encryption.h"
 #include "gtest/gtest.h"
+#include "string_io/string_bit_reader.h"
 #include "string_io/string_bit_writer.h"
-#include "string_io/string_byte_reader.h"
 
 std::string EncryptText(const std::string& text) {
-  auto string_input = std::make_unique<string_io::StringByteReader>(text);
+  auto string_input = std::make_unique<string_io::StringBitReader>(text);
   auto string_output = std::make_unique<string_io::StringBitWriter>();
 
   auto* string_output_ptr = string_output.get();
@@ -15,7 +15,7 @@ std::string EncryptText(const std::string& text) {
 }
 
 std::string DecryptText(const std::string& text) {
-  auto string_input = std::make_unique<string_io::StringByteReader>(text);
+  auto string_input = std::make_unique<string_io::StringBitReader>(text);
   auto string_output = std::make_unique<string_io::StringBitWriter>();
 
   auto* string_output_ptr = string_output.get();

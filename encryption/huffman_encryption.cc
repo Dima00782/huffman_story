@@ -18,11 +18,11 @@ constexpr bool kLeafNodeBitLabel = true;
 
 std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root);
 bool IsInnerNode(encryption::TreeNode* node);
-std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader);
+std::string ReadBytesToString(std::unique_ptr<BitReader> byte_reader);
 
 }  // namespace
 
-void HuffmanEncryption::Encrypt(std::unique_ptr<ByteReader> input,
+void HuffmanEncryption::Encrypt(std::unique_ptr<BitReader> input,
                                 std::unique_ptr<BitWriter> output) {
   output_ = std::move(output);
   const auto text = ReadBytesToString(std::move(input));
@@ -31,11 +31,8 @@ void HuffmanEncryption::Encrypt(std::unique_ptr<ByteReader> input,
   WriteEncryptedText(root.get(), text);
 }
 
-void HuffmanEncryption::Decrypt(std::unique_ptr<ByteReader> input,
-                                std::unique_ptr<BitWriter> output) {}
-
 namespace {
-std::string ReadBytesToString(std::unique_ptr<ByteReader> byte_reader) {
+std::string ReadBytesToString(std::unique_ptr<BitReader> byte_reader) {
   std::string result;
   for (auto byte = byte_reader->ReadByte(); byte.has_value();
        byte = byte_reader->ReadByte()) {
@@ -136,5 +133,8 @@ std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
   return codes;
 }
 }  // namespace
+
+void HuffmanEncryption::Decrypt(std::unique_ptr<BitReader> input,
+                                std::unique_ptr<BitWriter> output) {}
 
 }  // namespace encryption
