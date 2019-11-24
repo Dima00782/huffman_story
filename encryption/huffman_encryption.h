@@ -18,9 +18,13 @@ class HuffmanEncryption {
                std::unique_ptr<BitWriter> output);
 
  private:
+  std::unique_ptr<TreeNode> ReadTreeInPrefixForm();
   void WriteTreeInPrefixForm(TreeNode* root);
+  
+  void DecryptText(TreeNode* root);
   void WriteEncryptedText(TreeNode* root, std::string_view text);
 
+  std::unique_ptr<BitReader> input_;
   std::unique_ptr<BitWriter> output_;
 };
 

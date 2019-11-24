@@ -16,8 +16,12 @@ namespace {
 constexpr bool kInnerNodeBitLabel = false;
 constexpr bool kLeafNodeBitLabel = true;
 
+constexpr bool kTurnLeftBitLabel = false;
+constexpr bool kTurnRightBitLabel = true;
+
 std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root);
 bool IsInnerNode(encryption::TreeNode* node);
+bool IsLeafNode(encryption::TreeNode* node);
 std::string ReadBytesToString(std::unique_ptr<BitReader> byte_reader);
 
 }  // namespace
@@ -80,8 +84,6 @@ void HuffmanEncryption::WriteEncryptedText(TreeNode* root,
 
 namespace {
 std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
-  constexpr bool kTurnLeftBitLabel = false;
-  constexpr bool kTurnRightBitLabel = true;
   std::unordered_map<char, std::vector<bool>> codes;
 
   if (root && !root->left_ && !root->right_) {
@@ -135,6 +137,59 @@ std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
 }  // namespace
 
 void HuffmanEncryption::Decrypt(std::unique_ptr<BitReader> input,
-                                std::unique_ptr<BitWriter> output) {}
+                                std::unique_ptr<BitWriter> output) {
+  input_ = std::move(input);
+  output_ = std::move(output);
+  auto root = ReadTreeInPrefixForm();
+  DecryptText(root.get());
+}
+
+std::unique_ptr<TreeNode> HuffmanEncryption::ReadTreeInPrefixForm() {
+  const auto bit = input_->ReadBit();
+  if (!bit.has_value()) {
+    return nullptr;
+  }
+
+  if (*bit == kLeafNodeBitLabel) {
+    const auto symbol = input_->ReadByte();
+    assert(symbol.has_value());
+    return std::make_unique<TreeNode>(std::string(1, *symbol), 0, nullptr,
+                                      nullptr);
+  }
+
+  assert(*bit == kInnerNodeBitLabel);
+  auto node = std::make_unique<TreeNode>("", 0, nullptr, nullptr);
+  node->left_ = std::move(ReadTreeInPrefixForm());
+  node->right_ = std::move(ReadTreeInPrefixForm());
+  return node;
+}
+
+void HuffmanEncryption::DecryptText(TreeNode* root) {
+  if (!root) {
+    return;
+  }
+
+  auto* current_node = root;
+  for (auto bit = input_->ReadBit(); bit.has_value(); bit = input_->ReadBit()) {
+    if (IsLeafNode(current_node)) {
+      output_->WriteByte(current_node->key_.back());
+      continue;
+    }
+
+    if (*bit == kTurnLeftBitLabel) {
+      current_node = current_node->left_.get();
+      continue;
+    }
+
+    assert(*bit == kTurnRightBitLabel);
+    current_node = current_node->right_.get();
+  }
+}
+
+namespace {
+bool IsLeafNode(encryption::TreeNode* node) {
+  return !node->left_ && !node->right_;
+}
+}  // namespace
 
 }  // namespace encryption
