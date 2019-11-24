@@ -10,7 +10,7 @@ namespace bits_manipulation {
 bool IsBitEnabled(char byte, uint8_t pos);
 char SetBitInByte(char byte, uint8_t pos, bool enabled);
 std::vector<bool> ByteToBits(char byte);
-std::string InBinaryForm(uint16_t number);
+std::string TwoByteNumberAsTwoCharString(uint16_t number);
 
 }  // namespace bits_manipulation
 

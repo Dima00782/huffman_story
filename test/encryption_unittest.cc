@@ -34,26 +34,27 @@ TEST(Encryption, NoSymbols) {
 
 TEST(Encryption, OneSymbol) {
   constexpr char kTestInputString[] = "a";
-  const auto test_output =
-      bits_manipulation::InBinaryForm(0b1'01100001'0000000);
+  const auto expected_output =
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'0'110'000);
 
-  EXPECT_EQ(EncryptText(kTestInputString), test_output);
-  EXPECT_EQ(DecryptText(test_output), kTestInputString);
+  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
 }
 
 TEST(Encryption, TwoSymbols) {
   constexpr char kTestInputString[] = "aaabb";
+  const auto expected_output =
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b01'01100010'1'01100) +
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b001'11100'000'00000);
 
-  EXPECT_EQ(EncryptText(kTestInputString),
-            bits_manipulation::InBinaryForm(0b01'01100010'1'01100) +
-                static_cast<char>(0b001'11100));
+  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
 }
 
 TEST(Encryption, ThreeSymbols) {
   constexpr char kTestInputString[] = "aaaabbc";
+  const auto expected_output =
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b001'01100011'1'0110) +
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b0010'1'01100001'111) +
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b1010100'001'000000);
 
-  EXPECT_EQ(EncryptText(kTestInputString),
-            bits_manipulation::InBinaryForm(0b001'01100011'1'0110) +
-                bits_manipulation::InBinaryForm(0b0010'1'01100001'111) +
-                static_cast<char>(0b10101000));
+  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
 }

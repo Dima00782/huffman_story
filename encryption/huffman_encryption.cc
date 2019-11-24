@@ -1,6 +1,8 @@
 #include "encryption/huffman_encryption.h"
 
 #include <cassert>
+#include <climits>
+#include <cmath>
 #include <stack>
 #include <unordered_map>
 #include <unordered_set>
@@ -31,8 +33,13 @@ void HuffmanEncryption::Encrypt(std::unique_ptr<BitReader> input,
   output_ = std::move(output);
   const auto text = ReadBytesToString(std::move(input));
   auto root = HuffmanTreeBuilder(text).GetRoot();
+
+  alignment_ = 0u;
   WriteTreeInPrefixForm(root.get());
   WriteEncryptedText(root.get(), text);
+  if (!text.empty()) {
+    WriteAlignment();
+  }
 }
 
 namespace {
@@ -54,13 +61,22 @@ void HuffmanEncryption::WriteTreeInPrefixForm(TreeNode* root) {
 
   const auto node_label =
       IsInnerNode(root) ? kInnerNodeBitLabel : kLeafNodeBitLabel;
-  output_->WriteBit(node_label);
+  WriteBit(node_label);
   if (node_label == kLeafNodeBitLabel) {
-    output_->WriteByte(root->key_.back());
+    WriteByte(root->key_.back());
   }
 
   WriteTreeInPrefixForm(root->left_.get());
   WriteTreeInPrefixForm(root->right_.get());
+}
+
+void HuffmanEncryption::WriteBit(bool enabled) {
+  output_->WriteBit(enabled);
+  alignment_ = (alignment_ + 1) % CHAR_BIT;
+}
+
+void HuffmanEncryption::WriteByte(char byte) {
+  output_->WriteByte(byte);
 }
 
 namespace {
@@ -77,8 +93,22 @@ void HuffmanEncryption::WriteEncryptedText(TreeNode* root,
     const auto code_iter = codes_by_symbol.find(symbol);
     assert(code_iter != codes_by_symbol.end());
     for (const auto bit : code_iter->second) {
-      output_->WriteBit(bit);
+      WriteBit(bit);
     }
+  }
+}
+
+void HuffmanEncryption::WriteAlignment() {
+  alignment_ = (CHAR_BIT - alignment_) % CHAR_BIT;
+  assert(alignment_ < CHAR_BIT);
+
+  const auto num_bits_for_alignment = static_cast<uint8_t>(std::log2(CHAR_BIT));
+  assert(num_bits_for_alignment > 0);
+  assert((alignment_ >> num_bits_for_alignment) == 0u);
+
+  for (uint8_t bit_pos = 1u; bit_pos <= num_bits_for_alignment; ++bit_pos) {
+    auto bit_value = (alignment_ >> (num_bits_for_alignment - bit_pos)) & 1u;
+    output_->WriteBit(bit_value == 1u);
   }
 }
 
@@ -141,7 +171,7 @@ void HuffmanEncryption::Decrypt(std::unique_ptr<BitReader> input,
   input_ = std::move(input);
   output_ = std::move(output);
   auto root = ReadTreeInPrefixForm();
-  DecryptText(root.get());
+  WriteDecryptedText(root.get());
 }
 
 std::unique_ptr<TreeNode> HuffmanEncryption::ReadTreeInPrefixForm() {
@@ -164,7 +194,7 @@ std::unique_ptr<TreeNode> HuffmanEncryption::ReadTreeInPrefixForm() {
   return node;
 }
 
-void HuffmanEncryption::DecryptText(TreeNode* root) {
+void HuffmanEncryption::WriteDecryptedText(TreeNode* root) {
   if (!root) {
     return;
   }
@@ -172,7 +202,7 @@ void HuffmanEncryption::DecryptText(TreeNode* root) {
   auto* current_node = root;
   for (auto bit = input_->ReadBit(); bit.has_value(); bit = input_->ReadBit()) {
     if (IsLeafNode(current_node)) {
-      output_->WriteByte(current_node->key_.back());
+      WriteByte(current_node->key_.back());
       continue;
     }
 

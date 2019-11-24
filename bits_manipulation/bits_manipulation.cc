@@ -25,7 +25,7 @@ std::vector<bool> ByteToBits(char byte) {
   return bits;
 }
 
-std::string InBinaryForm(uint16_t number) {
+std::string TwoByteNumberAsTwoCharString(uint16_t number) {
   return std::string{static_cast<char>(number >> CHAR_BIT),
                      static_cast<char>(number)};
 }
