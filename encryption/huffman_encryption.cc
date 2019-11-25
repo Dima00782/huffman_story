@@ -280,8 +280,9 @@ void HuffmanEncryption::RemoveUnusedBitsInLastByte() {
     look_ahead_queue_.pop_back();
   }
 
-  if (num_unused_bits_in_last_byte == '\0') {
-    num_unused_bits_in_last_byte = CHAR_BIT;
+  // Additional byte has used.
+  if (num_unused_bits_in_last_byte < kNumBitsForStoringAlignment) {
+    num_unused_bits_in_last_byte += CHAR_BIT;
   }
 
   num_unused_bits_in_last_byte -= kNumBitsForStoringAlignment;

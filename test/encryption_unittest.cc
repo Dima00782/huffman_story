@@ -59,4 +59,5 @@ TEST(Encryption, ThreeSymbols) {
       bits_manipulation::TwoByteNumberAsTwoCharString(0b1010100'000000001);
 
   EXPECT_EQ(EncryptText(kTestInputString), expected_output);
+  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
 }
