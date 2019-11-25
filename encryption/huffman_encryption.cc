@@ -10,6 +10,9 @@
 #include <vector>
 
 #include "bits_manipulation/bits_manipulation.h"
+#include "encryption/bit_reader.h"
+#include "encryption/bit_writer.h"
+#include "encryption/huffman_tree/huffman_tree_builder.h"
 
 namespace encryption {
 

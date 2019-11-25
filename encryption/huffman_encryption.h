@@ -1,16 +1,16 @@
 #ifndef ENCRYPTION_HUFFMAN_ENCRYPTION_H_
 #define ENCRYPTION_HUFFMAN_ENCRYPTION_H_
 
-#include "encryption/bit_reader.h"
-#include "encryption/bit_writer.h"
-#include "encryption/huffman_tree/huffman_tree_builder.h"
-
+#include <deque>
 #include <memory>
 #include <optional>
-#include <deque>
 #include <string_view>
 
 namespace encryption {
+
+class BitWriter;
+class BitReader;
+struct TreeNode;
 
 class HuffmanEncryption {
  public:
