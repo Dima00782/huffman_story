@@ -52,13 +52,15 @@ int main(int argc, char* argv[]) {
 
   const std::filesystem::path file_path{argv[2]};
   if (!std::filesystem::is_regular_file(file_path)) {
-    std::cout << "passed file is not a regular file: " << file_path << std::endl;
+    std::cout << "passed file is not a regular file: " << file_path
+              << std::endl;
     return 0;
   }
 
   if (action_flag == 'c') {
     std::ifstream input{file_path, std::ios::binary};
-    const std::string content{(std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>()};
+    const std::string content{(std::istreambuf_iterator<char>(input)),
+                              std::istreambuf_iterator<char>()};
     const auto encrypted_data = EncryptText(content);
     std::filesystem::path compressed_file_name = file_path.filename();
     compressed_file_name += ".huf";
@@ -72,9 +74,11 @@ int main(int argc, char* argv[]) {
     }
 
     std::ifstream input{file_path, std::ios::binary};
-    const std::string content{(std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>()};
+    const std::string content{(std::istreambuf_iterator<char>(input)),
+                              std::istreambuf_iterator<char>()};
     const auto encrypted_data = DecryptText(content);
-    std::filesystem::path compressed_file_name = file_path.filename().replace_extension("");
+    std::filesystem::path compressed_file_name =
+        file_path.filename().replace_extension("");
     std::ofstream output{compressed_file_name, std::ios::binary};
     output.write(encrypted_data.c_str(), encrypted_data.size());
   }
