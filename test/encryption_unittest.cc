@@ -41,6 +41,53 @@ TEST(Encryption, OneSymbol) {
   EXPECT_EQ(DecryptText(expected_output), kTestInputString);
 }
 
+TEST(Encryption, TwoUnusedBitsInTheEnd) {
+  constexpr char kTestInputString[] = "aaaaa";
+  const auto expected_output =
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'00000'00) +
+      static_cast<char>(0b00000010);
+
+  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
+  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
+}
+
+TEST(Encryption, ThreeUnusedBitsInTheEnd) {
+  constexpr char kTestInputString[] = "aaaa";
+  const auto expected_output =
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'0000'011);
+
+  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
+  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
+}
+
+TEST(Encryption, FourUnusedBitsInTheEnd) {
+  constexpr char kTestInputString[] = "aaa";
+  const auto expected_output =
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'000'0100);
+
+  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
+  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
+}
+
+TEST(Encryption, FiveUnusedBitsInTheEnd) {
+  constexpr char kTestInputString[] = "aa";
+  const auto expected_output =
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'00'00101);
+
+  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
+  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
+}
+
+TEST(Encryption, SevenUnusedBitsInTheEnd) {
+  constexpr char kTestInputString[] = "aaaaaaaa";
+  const auto expected_output =
+      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'0000000) +
+      static_cast<char>(0b0'0000111);
+
+  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
+  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
+}
+
 TEST(Encryption, TwoSymbols) {
   constexpr char kTestInputString[] = "aaabb";
   const auto expected_output =
