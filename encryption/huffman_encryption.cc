@@ -12,6 +12,7 @@
 #include "bits_manipulation/bits_manipulation.h"
 #include "encryption/bit_reader.h"
 #include "encryption/bit_writer.h"
+#include "encryption/byte_aligned_bit_reader.h"
 #include "encryption/huffman_tree/huffman_tree_builder.h"
 
 namespace encryption {
@@ -179,33 +180,20 @@ std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
 
 void HuffmanEncryption::Decrypt(std::unique_ptr<BitReader> input,
                                 std::unique_ptr<BitWriter> output) {
-  input_ = std::move(input);
+  input_ = std::make_unique<ByteAlignedBitReader>(std::move(input));
   output_ = std::move(output);
-  is_last_bit_met_ = false;
-  PopulateQueue();
   auto root = ReadTreeInPrefixForm();
   WriteDecryptedText(root.get());
 }
 
-void HuffmanEncryption::PopulateQueue() {
-  constexpr uint32_t kMinimumQueueSize = 16u;
-  for (uint32_t i = 0u; i < kMinimumQueueSize; ++i) {
-    const auto bit = input_->ReadBit();
-    if (!bit.has_value()) {
-      return;
-    }
-    look_ahead_queue_.push_back(*bit);
-  }
-}
-
 std::unique_ptr<TreeNode> HuffmanEncryption::ReadTreeInPrefixForm() {
-  const auto bit = ReadBit();
+  const auto bit = input_->ReadBit();
   if (!bit.has_value()) {
     return nullptr;
   }
 
   if (*bit == kLeafNodeBitLabel) {
-    const auto symbol = ReadByte();
+    const auto symbol = input_->ReadByte();
     assert(symbol.has_value());
     return std::make_unique<TreeNode>(std::string(1, *symbol), 0, nullptr,
                                       nullptr);
@@ -218,26 +206,13 @@ std::unique_ptr<TreeNode> HuffmanEncryption::ReadTreeInPrefixForm() {
   return node;
 }
 
-std::optional<char> HuffmanEncryption::ReadByte() {
-  char byte = '\0';
-  for (uint8_t bit_pos = 0u; bit_pos < CHAR_BIT; ++bit_pos) {
-    const auto bit_value = ReadBit();
-    if (!bit_value.has_value()) {
-      return std::nullopt;
-    }
-    byte = bits_manipulation::SetBitInByte(byte, bit_pos, *bit_value);
-  }
-
-  return byte;
-}
-
 void HuffmanEncryption::WriteDecryptedText(TreeNode* root) {
   if (!root) {
     return;
   }
 
   auto* current_node = root;
-  for (auto bit = ReadBit(); bit; bit = ReadBit()) {
+  for (auto bit = input_->ReadBit(); bit; bit = input_->ReadBit()) {
     if (!IsLeafNode(current_node)) {
       if (*bit == kTurnLeftBitLabel) {
         current_node = current_node->left_.get();
@@ -251,47 +226,6 @@ void HuffmanEncryption::WriteDecryptedText(TreeNode* root) {
       WriteByte(current_node->key_.back());
       current_node = root;
     }
-  }
-}
-
-std::optional<bool> HuffmanEncryption::ReadBit() {
-  if (look_ahead_queue_.empty()) {
-    return std::nullopt;
-  }
-
-  const bool bit_value = look_ahead_queue_.front();
-  look_ahead_queue_.pop_front();
-
-  const auto bit = input_->ReadBit();
-  if (bit) {
-    look_ahead_queue_.push_back(*bit);
-  } else if (!is_last_bit_met_) {
-    is_last_bit_met_ = true;
-    RemoveUnusedBitsInLastByte();
-  }
-
-  return bit_value;
-}
-
-void HuffmanEncryption::RemoveUnusedBitsInLastByte() {
-  char num_unused_bits_in_last_byte = '\0';
-  for (uint8_t bit_pos = 1; bit_pos <= kNumBitsForStoringAlignment; ++bit_pos) {
-    const bool bit_enabled = look_ahead_queue_.back();
-    const uint8_t pos_from_end = CHAR_BIT - bit_pos;
-    num_unused_bits_in_last_byte = bits_manipulation::SetBitInByte(
-        num_unused_bits_in_last_byte, pos_from_end, bit_enabled);
-    look_ahead_queue_.pop_back();
-  }
-
-  // Additional byte has used.
-  if (num_unused_bits_in_last_byte < kNumBitsForStoringAlignment) {
-    num_unused_bits_in_last_byte += CHAR_BIT;
-  }
-
-  num_unused_bits_in_last_byte -= kNumBitsForStoringAlignment;
-  for (uint8_t unused_bit_id = 0; unused_bit_id < num_unused_bits_in_last_byte;
-       ++unused_bit_id) {
-    look_ahead_queue_.pop_back();
   }
 }
 

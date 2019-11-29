@@ -1,7 +1,6 @@
 #ifndef ENCRYPTION_HUFFMAN_ENCRYPTION_H_
 #define ENCRYPTION_HUFFMAN_ENCRYPTION_H_
 
-#include <deque>
 #include <memory>
 #include <optional>
 #include <string_view>
@@ -10,6 +9,7 @@ namespace encryption {
 
 class BitWriter;
 class BitReader;
+class ByteAlignedBitReader;
 struct TreeNode;
 
 class HuffmanEncryption {
@@ -30,17 +30,8 @@ class HuffmanEncryption {
   void WriteByte(char byte);
   void WriteAlignment();
 
-  std::optional<bool> ReadBit();
-  std::optional<char> ReadByte();
-
-  void PopulateQueue();
-  void RemoveUnusedBitsInLastByte();
-
-  std::deque<bool> look_ahead_queue_;
-  bool is_last_bit_met_{false};
-
+  std::unique_ptr<ByteAlignedBitReader> input_;
   uint8_t alignment_{0u};
-  std::unique_ptr<BitReader> input_;
   std::unique_ptr<BitWriter> output_;
 };
 

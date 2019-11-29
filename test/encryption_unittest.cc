@@ -1,4 +1,5 @@
 #include "bits_manipulation/bits_manipulation.h"
+#include "encryption/byte_aligned_bit_reader.h"
 #include "encryption/huffman_encryption.h"
 #include "gtest/gtest.h"
 #include "string_io/string_bit_reader.h"
