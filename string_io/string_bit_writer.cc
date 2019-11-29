@@ -7,11 +7,13 @@
 
 namespace string_io {
 
+StringBitWriter::StringBitWriter(std::string* buffer) : buffer_{buffer} {}
+
 void StringBitWriter::WriteBit(bool enabled) {
   bits_.push_back(enabled);
 }
 
-std::string StringBitWriter::GetData() const {
+StringBitWriter::~StringBitWriter() {
   const auto num_of_bytes =
       (bits_.size() / CHAR_BIT) + (bits_.size() % CHAR_BIT == 0 ? 0 : 1);
   std::string result_string(num_of_bytes, '\0');
@@ -23,7 +25,7 @@ std::string StringBitWriter::GetData() const {
     ++pos;
   }
 
-  return result_string;
+  *buffer_ += result_string;
 }
 
 }  // namespace string_io

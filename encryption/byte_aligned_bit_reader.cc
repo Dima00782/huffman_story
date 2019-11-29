@@ -14,7 +14,7 @@ constexpr uint8_t kNumBitsForStoringAlignment =
     static_cast<uint8_t>(std::log2(CHAR_BIT));
 
 constexpr uint32_t kMinimumQueueSize = 16u;
-}
+}  // namespace
 
 ByteAlignedBitReader::ByteAlignedBitReader(
     std::unique_ptr<BitReader> underlying_reader)

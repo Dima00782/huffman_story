@@ -45,35 +45,43 @@ TEST(StringReader, ReadBits) {
 
 TEST(StringWriter, WriteBytes) {
   const std::string kTestString = "Hello";
-  string_io::StringBitWriter string_bit_reader;
+  std::string buffer;
+  {
+    string_io::StringBitWriter bit_writer(&buffer);
 
-  for (const auto symbol : kTestString) {
-    string_bit_reader.WriteByte(symbol);
+    for (const auto symbol : kTestString) {
+      bit_writer.WriteByte(symbol);
+    }
   }
 
-  EXPECT_EQ(string_bit_reader.GetData(), kTestString);
+  EXPECT_EQ(buffer, kTestString);
 }
 
 TEST(StringReader, WriteBitsFullByte) {
   const std::string kTestString = "\xab";
-  string_io::StringBitWriter bit_writer;
+  std::string buffer;
+  {
+    string_io::StringBitWriter bit_writer(&buffer);
 
-  for (const auto symbol : kTestString) {
-    for (uint8_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
-      bit_writer.WriteBit(bits_manipulation::IsBitEnabled(symbol, bit_pos));
+    for (const auto symbol : kTestString) {
+      for (uint8_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
+        bit_writer.WriteBit(bits_manipulation::IsBitEnabled(symbol, bit_pos));
+      }
     }
   }
 
-  EXPECT_EQ(bit_writer.GetData(), kTestString);
+  EXPECT_EQ(buffer, kTestString);
 }
 
 TEST(StringReader, WriteBitsNotFullByte) {
   const std::string kTestString = "\xa0";
-  string_io::StringBitWriter bit_writer;
+  std::string buffer;
+  {
+    string_io::StringBitWriter bit_writer(&buffer);
 
-  bit_writer.WriteBit(true);
-  bit_writer.WriteBit(false);
-  bit_writer.WriteBit(true);
-
-  EXPECT_EQ(bit_writer.GetData(), kTestString);
+    bit_writer.WriteBit(true);
+    bit_writer.WriteBit(false);
+    bit_writer.WriteBit(true);
+  }
+  EXPECT_EQ(buffer, kTestString);
 }

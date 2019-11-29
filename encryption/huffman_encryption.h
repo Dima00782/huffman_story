@@ -9,7 +9,6 @@ namespace encryption {
 
 class BitWriter;
 class BitReader;
-class ByteAlignedBitReader;
 struct TreeNode;
 
 class HuffmanEncryption {
@@ -26,12 +25,7 @@ class HuffmanEncryption {
   void WriteDecryptedText(TreeNode* root);
   void WriteEncryptedText(TreeNode* root, std::string_view text);
 
-  void WriteBit(bool enabled);
-  void WriteByte(char byte);
-  void WriteAlignment();
-
-  std::unique_ptr<ByteAlignedBitReader> input_;
-  uint8_t alignment_{0u};
+  std::unique_ptr<BitReader> input_;
   std::unique_ptr<BitWriter> output_;
 };
 

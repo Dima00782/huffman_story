@@ -4,12 +4,14 @@ cc_library(
         "bit_reader.cc",
         "bit_writer.cc",
         "byte_aligned_bit_reader.cc",
+        "byte_aligned_bit_writer.cc",
         "huffman_encryption.cc",
     ],
     hdrs = [
         "bit_reader.h",
         "bit_writer.h",
         "byte_aligned_bit_reader.h",
+        "byte_aligned_bit_writer.h",
         "huffman_encryption.h",
     ],
     deps = [

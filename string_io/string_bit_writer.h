@@ -10,13 +10,13 @@ namespace string_io {
 
 class StringBitWriter : public encryption::BitWriter {
  public:
-  ~StringBitWriter() override = default;
+  explicit StringBitWriter(std::string* buffer);
+  ~StringBitWriter() override;
 
   void WriteBit(bool enabled) override;
 
-  std::string GetData() const;
-
  private:
+  std::string* buffer_;
   std::vector<bool> bits_;
 };
 

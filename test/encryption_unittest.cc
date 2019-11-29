@@ -1,28 +1,29 @@
 #include "bits_manipulation/bits_manipulation.h"
 #include "encryption/byte_aligned_bit_reader.h"
+#include "encryption/byte_aligned_bit_writer.h"
 #include "encryption/huffman_encryption.h"
 #include "gtest/gtest.h"
 #include "string_io/string_bit_reader.h"
 #include "string_io/string_bit_writer.h"
 
 std::string EncryptText(const std::string& text) {
+  std::string buffer;
   auto string_input = std::make_unique<string_io::StringBitReader>(text);
-  auto string_output = std::make_unique<string_io::StringBitWriter>();
+  auto string_output = std::make_unique<string_io::StringBitWriter>(&buffer);
 
-  auto* string_output_ptr = string_output.get();
-  encryption::HuffmanEncryption huffman;
-  huffman.Encrypt(std::move(string_input), std::move(string_output));
-  return string_output_ptr->GetData();
+  encryption::HuffmanEncryption().Encrypt(std::move(string_input),
+                                          std::move(string_output));
+  return buffer;
 }
 
 std::string DecryptText(const std::string& text) {
+  std::string buffer;
   auto string_input = std::make_unique<string_io::StringBitReader>(text);
-  auto string_output = std::make_unique<string_io::StringBitWriter>();
+  auto string_output = std::make_unique<string_io::StringBitWriter>(&buffer);
 
-  auto* string_output_ptr = string_output.get();
-  encryption::HuffmanEncryption huffman;
-  huffman.Decrypt(std::move(string_input), std::move(string_output));
-  return string_output_ptr->GetData();
+  encryption::HuffmanEncryption().Decrypt(std::move(string_input),
+                                          std::move(string_output));
+  return buffer;
 }
 
 TEST(Encryption, NoSymbols) {
