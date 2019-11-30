@@ -17,6 +17,7 @@ class ByteAlignedBitReader : public BitReader {
 
  private:
   void RemoveUnusedBitsInLastByte();
+  bool HasAdditionalByteUsed(uint8_t num_unused_bits_in_last_byte);
 
   std::unique_ptr<BitReader> underlying_reader_;
   std::deque<bool> look_ahead_queue_;

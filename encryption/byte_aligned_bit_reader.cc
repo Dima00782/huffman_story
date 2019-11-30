@@ -57,8 +57,7 @@ void ByteAlignedBitReader::RemoveUnusedBitsInLastByte() {
     look_ahead_queue_.pop_back();
   }
 
-  // Has additional byte used?
-  if (num_unused_bits_in_last_byte < kNumBitsForStoringAlignment) {
+  if (HasAdditionalByteUsed(num_unused_bits_in_last_byte)) {
     num_unused_bits_in_last_byte += CHAR_BIT;
   }
 
@@ -67,6 +66,11 @@ void ByteAlignedBitReader::RemoveUnusedBitsInLastByte() {
        ++unused_bit_id) {
     look_ahead_queue_.pop_back();
   }
+}
+
+bool ByteAlignedBitReader::HasAdditionalByteUsed(
+    uint8_t num_unused_bits_in_last_byte) {
+  return num_unused_bits_in_last_byte < kNumBitsForStoringAlignment;
 }
 
 }  // namespace encryption
