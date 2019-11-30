@@ -38,6 +38,12 @@ void CheckBitReaderForValues(const std::vector<bool>& values,
 }
 }  // namespace
 
+TEST(ByteAlignedBitReader, EmptyBits) {
+  encryption::ByteAlignedBitReader bit_reader{
+      std::make_unique<StringBitReader>("")};
+  EXPECT_FALSE(bit_reader.ReadBit());
+}
+
 TEST(ByteAlignedBitReader, OneUnsedBits) {
   encryption::ByteAlignedBitReader bit_reader{
       std::make_unique<StringBitReader>("01101010"
