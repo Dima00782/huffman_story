@@ -1,49 +1,42 @@
 #include "encryption/byte_aligned_bit_writer.h"
 #include "gtest/gtest.h"
 
-#include <memory>
-#include <string>
-#include <vector>
-
 namespace {
 class StringBitWriter : public encryption::BitWriter {
  public:
   explicit StringBitWriter(std::string* buffer) : buffer_{buffer} {}
 
-  void WriteBit(bool enabled) override {
-    const char symbol = enabled ? '1' : '0';
-    buffer_->push_back(symbol);
-  }
-
   ~StringBitWriter() override = default;
+
+  void WriteBit(bool enabled) override {
+    buffer_->push_back(enabled ? '1' : '0');
+  }
 
  private:
   std::string* buffer_;
 };
 }  // namespace
 
-TEST(ByteAlignedBitWriter, NoBits) {
+TEST(ByteAlignedBitWriter, EmptyBits) {
   std::string buffer;
   {
     encryption::ByteAlignedBitWriter bit_writer{
         std::make_unique<StringBitWriter>(&buffer)};
   }
-
   EXPECT_TRUE(buffer.empty());
 }
 
-TEST(ByteAlignedBitWriter, OneBit) {
+TEST(ByteAlignedBitWriter, SevenUnsedBits) {
   std::string buffer;
   {
     encryption::ByteAlignedBitWriter bit_writer{
         std::make_unique<StringBitWriter>(&buffer)};
     bit_writer.WriteBit(true);
   }
-
-  EXPECT_EQ("10000111", buffer);
+  EXPECT_EQ(buffer, "10000111");
 }
 
-TEST(ByteAlignedBitWriter, TwoBits) {
+TEST(ByteAlignedBitWriter, SixUnsedBits) {
   std::string buffer;
   {
     encryption::ByteAlignedBitWriter bit_writer{
@@ -51,24 +44,22 @@ TEST(ByteAlignedBitWriter, TwoBits) {
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
   }
-
-  EXPECT_EQ("01000110", buffer);
+  EXPECT_EQ(buffer, "01000110");
 }
 
-TEST(ByteAlignedBitWriter, ThreeBits) {
+TEST(ByteAlignedBitWriter, FiveUnsedBits) {
   std::string buffer;
   {
     encryption::ByteAlignedBitWriter bit_writer{
         std::make_unique<StringBitWriter>(&buffer)};
     bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
+    bit_writer.WriteBit(false);
   }
-
-  EXPECT_EQ("10100101", buffer);
+  EXPECT_EQ(buffer, "11000101");
 }
 
-TEST(ByteAlignedBitWriter, FourBits) {
+TEST(ByteAlignedBitWriter, FourUnsedBits) {
   std::string buffer;
   {
     encryption::ByteAlignedBitWriter bit_writer{
@@ -78,11 +69,10 @@ TEST(ByteAlignedBitWriter, FourBits) {
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(true);
   }
-
-  EXPECT_EQ("10110100", buffer);
+  EXPECT_EQ(buffer, "10110100");
 }
 
-TEST(ByteAlignedBitWriter, FiveBits) {
+TEST(ByteAlignedBitWriter, ThreeUnsedBits) {
   std::string buffer;
   {
     encryption::ByteAlignedBitWriter bit_writer{
@@ -90,14 +80,13 @@ TEST(ByteAlignedBitWriter, FiveBits) {
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
+    bit_writer.WriteBit(false);
   }
-
-  EXPECT_EQ("10101011", buffer);
+  EXPECT_EQ(buffer, "10110011");
 }
 
-TEST(ByteAlignedBitWriter, SixBits) {
+TEST(ByteAlignedBitWriter, TwoUnsedBits) {
   std::string buffer;
   {
     encryption::ByteAlignedBitWriter bit_writer{
@@ -105,18 +94,16 @@ TEST(ByteAlignedBitWriter, SixBits) {
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
+    bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(true);
+    bit_writer.WriteBit(false);
   }
-
-  EXPECT_EQ(
-      "10101100"
-      "00000010",
-      buffer);
+  EXPECT_EQ(buffer,
+            "10110000"
+            "00000010");
 }
 
-TEST(ByteAlignedBitWriter, SevenBits) {
+TEST(ByteAlignedBitWriter, OneUnsedBit) {
   std::string buffer;
   {
     encryption::ByteAlignedBitWriter bit_writer{
@@ -124,35 +111,12 @@ TEST(ByteAlignedBitWriter, SevenBits) {
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
+    bit_writer.WriteBit(false);
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
   }
-
-  EXPECT_EQ(
-      "10101010"
-      "00000001",
-      buffer);
-}
-
-TEST(ByteAlignedBitWriter, EightBits) {
-  std::string buffer;
-  {
-    encryption::ByteAlignedBitWriter bit_writer{
-        std::make_unique<StringBitWriter>(&buffer)};
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(true);
-  }
-
-  EXPECT_EQ(
-      "10101011"
-      "00000000",
-      buffer);
+  EXPECT_EQ(buffer,
+            "10110010"
+            "00000001");
 }

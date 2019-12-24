@@ -44,7 +44,7 @@ TEST(ByteAlignedBitReader, EmptyBits) {
   EXPECT_FALSE(bit_reader.ReadBit());
 }
 
-TEST(ByteAlignedBitReader, OneUnsedBits) {
+TEST(ByteAlignedBitReader, OneUnsedBit) {
   encryption::ByteAlignedBitReader bit_reader{
       std::make_unique<StringBitReader>("01101010"
                                         "00000001")};
