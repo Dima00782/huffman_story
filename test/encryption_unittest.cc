@@ -17,12 +17,12 @@ struct TestCase {
 class EncryptionAcceptanceTests : public ::testing::TestWithParam<TestCase> {
  public:
   std::string EncryptText(const std::string& text) {
-    auto string_input = std::make_shared<string_io::StringBitReader>(text);
+    auto string_input = std::make_shared<std::istringstream>(text);
     auto ostring_stream = std::make_shared<std::ostringstream>();
     {
       auto string_output =
           std::make_shared<char_adapters::CharOStreamAdapter>(ostring_stream);
-      encryption::HuffmanEncryption().Encrypt(string_input, string_output);
+      encryption::HuffmanEncrypt(string_input, string_output);
     }
     return ostring_stream->str();
   }
@@ -32,7 +32,7 @@ class EncryptionAcceptanceTests : public ::testing::TestWithParam<TestCase> {
     auto string_input = std::make_shared<char_adapters::CharIStreamAdapter>(
         std::make_shared<std::istringstream>(text));
     auto string_output = std::make_shared<string_io::StringBitWriter>(&buffer);
-    encryption::HuffmanEncryption().Decrypt(string_input, string_output);
+    encryption::HuffmanDecrypt(string_input, string_output);
     return buffer;
   }
 };

@@ -40,17 +40,13 @@ int main(int argc, char* argv[]) {
   }
 
   if (action_flag == 'c') {
-    std::ifstream input(file_path, std::ios::binary);
-    const std::string content{(std::istreambuf_iterator<char>(input)),
-                              std::istreambuf_iterator<char>()};
-
     std::filesystem::path compressed_file_name = file_path.filename();
     compressed_file_name += ".huf";
     auto output = std::make_shared<char_adapters::CharOStreamAdapter>(
         std::make_shared<std::ofstream>(compressed_file_name,
                                         std::ios::binary));
-    encryption::HuffmanEncryption().Encrypt(
-        std::make_shared<string_io::StringBitReader>(content),
+    encryption::HuffmanEncrypt(
+        std::make_shared<std::ifstream>(file_path, std::ios::binary),
         std::move(output));
   } else {
     assert(action_flag == 'd');
@@ -63,8 +59,7 @@ int main(int argc, char* argv[]) {
         std::make_shared<std::ifstream>(file_path, std::ios::binary));
     std::string buffer;
     auto string_output = std::make_shared<string_io::StringBitWriter>(&buffer);
-    encryption::HuffmanEncryption().Decrypt(std::move(input),
-                                            std::move(string_output));
+    encryption::HuffmanDecrypt(std::move(input), std::move(string_output));
 
     std::filesystem::path compressed_file_name =
         file_path.filename().replace_extension("");
