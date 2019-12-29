@@ -5,29 +5,11 @@
 #include <streambuf>
 #include <string>
 
+#include "char_streams_adapters/char_istream_adapter.h"
+#include "char_streams_adapters/char_ostream_adapter.h"
 #include "encryption/huffman_encryption.h"
 #include "string_io/string_bit_reader.h"
 #include "string_io/string_bit_writer.h"
-
-std::string EncryptText(const std::string& text) {
-  std::string buffer;
-  auto string_input = std::make_unique<string_io::StringBitReader>(text);
-  auto string_output = std::make_unique<string_io::StringBitWriter>(&buffer);
-
-  encryption::HuffmanEncryption().Encrypt(std::move(string_input),
-                                          std::move(string_output));
-  return buffer;
-}
-
-std::string DecryptText(const std::string& text) {
-  std::string buffer;
-  auto string_input = std::make_unique<string_io::StringBitReader>(text);
-  auto string_output = std::make_unique<string_io::StringBitWriter>();
-
-  encryption::HuffmanEncryption().Decrypt(std::move(string_input),
-                                          std::move(string_output));
-  return buffer;
-}
 
 int main(int argc, char* argv[]) {
   if (argc != 3) {
@@ -58,14 +40,18 @@ int main(int argc, char* argv[]) {
   }
 
   if (action_flag == 'c') {
-    std::ifstream input{file_path, std::ios::binary};
+    std::ifstream input(file_path, std::ios::binary);
     const std::string content{(std::istreambuf_iterator<char>(input)),
                               std::istreambuf_iterator<char>()};
-    const auto encrypted_data = EncryptText(content);
+
     std::filesystem::path compressed_file_name = file_path.filename();
     compressed_file_name += ".huf";
-    std::ofstream output{compressed_file_name, std::ios::binary};
-    output.write(encrypted_data.c_str(), encrypted_data.size());
+    auto output = std::make_shared<char_adapters::CharOStreamAdapter>(
+        std::make_shared<std::ofstream>(compressed_file_name,
+                                        std::ios::binary));
+    encryption::HuffmanEncryption().Encrypt(
+        std::make_shared<string_io::StringBitReader>(content),
+        std::move(output));
   } else {
     assert(action_flag == 'd');
     if (!file_path.has_extension() || file_path.extension() != ".huf") {
@@ -73,14 +59,17 @@ int main(int argc, char* argv[]) {
       return 0;
     }
 
-    std::ifstream input{file_path, std::ios::binary};
-    const std::string content{(std::istreambuf_iterator<char>(input)),
-                              std::istreambuf_iterator<char>()};
-    const auto encrypted_data = DecryptText(content);
+    auto input = std::make_shared<char_adapters::CharIStreamAdapter>(
+        std::make_shared<std::ifstream>(file_path, std::ios::binary));
+    std::string buffer;
+    auto string_output = std::make_shared<string_io::StringBitWriter>(&buffer);
+    encryption::HuffmanEncryption().Decrypt(std::move(input),
+                                            std::move(string_output));
+
     std::filesystem::path compressed_file_name =
         file_path.filename().replace_extension("");
     std::ofstream output{compressed_file_name, std::ios::binary};
-    output.write(encrypted_data.c_str(), encrypted_data.size());
+    output.write(buffer.c_str(), buffer.size());
   }
 
   return 0;

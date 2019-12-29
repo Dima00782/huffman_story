@@ -1,112 +1,62 @@
 #include "bits_manipulation/bits_manipulation.h"
-#include "encryption/byte_aligned_bit_reader.h"
-#include "encryption/byte_aligned_bit_writer.h"
+#include "char_streams_adapters/char_istream_adapter.h"
+#include "char_streams_adapters/char_ostream_adapter.h"
 #include "encryption/huffman_encryption.h"
 #include "gtest/gtest.h"
 #include "string_io/string_bit_reader.h"
 #include "string_io/string_bit_writer.h"
 
-std::string EncryptText(const std::string& text) {
-  std::string buffer;
-  auto string_input = std::make_unique<string_io::StringBitReader>(text);
-  auto string_output = std::make_unique<string_io::StringBitWriter>(&buffer);
+#include <iterator>
+#include <sstream>
 
-  encryption::HuffmanEncryption().Encrypt(std::move(string_input),
-                                          std::move(string_output));
-  return buffer;
+struct TestCase {
+  std::string input;
+  std::string expected_output;
+};
+
+class EncryptionAcceptanceTests : public ::testing::TestWithParam<TestCase> {
+ public:
+  std::string EncryptText(const std::string& text) {
+    auto string_input = std::make_shared<string_io::StringBitReader>(text);
+    auto ostring_stream = std::make_shared<std::ostringstream>();
+    {
+      auto string_output =
+          std::make_shared<char_adapters::CharOStreamAdapter>(ostring_stream);
+      encryption::HuffmanEncryption().Encrypt(string_input, string_output);
+    }
+    return ostring_stream->str();
+  }
+
+  std::string DecryptText(const std::string& text) {
+    std::string buffer;
+    auto string_input = std::make_shared<char_adapters::CharIStreamAdapter>(
+        std::make_shared<std::istringstream>(text));
+    auto string_output = std::make_shared<string_io::StringBitWriter>(&buffer);
+    encryption::HuffmanEncryption().Decrypt(string_input, string_output);
+    return buffer;
+  }
+};
+
+TEST_P(EncryptionAcceptanceTests, EncryptAndDecrypt) {
+  EXPECT_EQ(EncryptText(GetParam().input), GetParam().expected_output);
+  EXPECT_EQ(DecryptText(GetParam().expected_output), GetParam().input);
 }
 
-std::string DecryptText(const std::string& text) {
-  std::string buffer;
-  auto string_input = std::make_unique<string_io::StringBitReader>(text);
-  auto string_output = std::make_unique<string_io::StringBitWriter>(&buffer);
+constexpr char kTestOutput[] = {'\xb0', '\x86'};
 
-  encryption::HuffmanEncryption().Decrypt(std::move(string_input),
-                                          std::move(string_output));
-  return buffer;
-}
-
-TEST(Encryption, NoSymbols) {
-  constexpr char kTestInputString[] = "";
-  constexpr char kTestOutput[] = "";
-
-  EXPECT_EQ(EncryptText(kTestInputString), kTestOutput);
-  EXPECT_EQ(DecryptText(kTestOutput), kTestInputString);
-}
-
-TEST(Encryption, OneSymbol) {
-  constexpr char kTestInputString[] = "a";
-  const auto expected_output =
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'0'000110);
-
-  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
-  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
-}
-
-TEST(Encryption, TwoUnusedBitsInTheEnd) {
-  constexpr char kTestInputString[] = "aaaaa";
-  const auto expected_output =
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'00000'00) +
-      static_cast<char>(0b00000010);
-
-  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
-  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
-}
-
-TEST(Encryption, ThreeUnusedBitsInTheEnd) {
-  constexpr char kTestInputString[] = "aaaa";
-  const auto expected_output =
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'0000'011);
-
-  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
-  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
-}
-
-TEST(Encryption, FourUnusedBitsInTheEnd) {
-  constexpr char kTestInputString[] = "aaa";
-  const auto expected_output =
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'000'0100);
-
-  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
-  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
-}
-
-TEST(Encryption, FiveUnusedBitsInTheEnd) {
-  constexpr char kTestInputString[] = "aa";
-  const auto expected_output =
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'00'00101);
-
-  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
-  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
-}
-
-TEST(Encryption, SevenUnusedBitsInTheEnd) {
-  constexpr char kTestInputString[] = "aaaaaaaa";
-  const auto expected_output =
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b1'01100001'0000000) +
-      static_cast<char>(0b0'0000111);
-
-  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
-  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
-}
-
-TEST(Encryption, TwoSymbols) {
-  constexpr char kTestInputString[] = "aaabb";
-  const auto expected_output =
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b01'01100010'1'01100) +
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b001'11100'00000'000);
-
-  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
-  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
-}
-
-TEST(Encryption, ThreeSymbols) {
-  constexpr char kTestInputString[] = "aaaabbc";
-  const auto expected_output =
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b001'01100011'1'0110) +
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b0010'1'01100001'111) +
-      bits_manipulation::TwoByteNumberAsTwoCharString(0b1010100'000000001);
-
-  EXPECT_EQ(EncryptText(kTestInputString), expected_output);
-  EXPECT_EQ(DecryptText(expected_output), kTestInputString);
-}
+INSTANTIATE_TEST_CASE_P(
+    AcceptanceTests,
+    EncryptionAcceptanceTests,
+    ::testing::Values(
+        TestCase{"aaaaaaa",
+                 std::string("\xb0\x80\x00", 3)},  // Zero unused bits.
+        TestCase{"aaaaaa", std::string("\xb0\x80\x01", 3)},  // One unused bit.
+        TestCase{"aaaaa", std::string("\xb0\x80\x02", 3)},   // Two unused bits.
+        TestCase{"aaaa", std::string("\xb0\x83", 2)},  // Three unused bits.
+        TestCase{"aaa", std::string("\xb0\x84", 2)},   // Four unused bits.
+        TestCase{"aa", std::string("\xb0\x85", 2)},    // Five unused bits.
+        TestCase{"a", std::string("\xb0\x86", 2)},     // Six unused bits.
+        TestCase{"aaaaaaaa",
+                 std::string("\xb0\x80\x07", 3)},  // Seven unused bits.
+        TestCase{"aaabb", std::string("\x58\xac\x3c\x00", 4)},
+        TestCase{"aaaabbc", std::string("\x2c\x76\x2b\x0f\xa8\x01", 6)}));

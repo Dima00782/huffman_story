@@ -9,8 +9,6 @@
 
 #include "encryption/bit_reader.h"
 #include "encryption/bit_writer.h"
-#include "encryption/byte_aligned_bit_reader.h"
-#include "encryption/byte_aligned_bit_writer.h"
 #include "encryption/huffman_tree/huffman_tree_builder.h"
 
 namespace encryption {
@@ -26,13 +24,13 @@ constexpr bool kTurnRightBitLabel = true;
 std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root);
 bool IsInnerNode(encryption::TreeNode* node);
 bool IsLeafNode(encryption::TreeNode* node);
-std::string ReadBytesToString(std::unique_ptr<BitReader> byte_reader);
+std::string ReadBytesToString(std::shared_ptr<BitReader> byte_reader);
 
 }  // namespace
 
-void HuffmanEncryption::Encrypt(std::unique_ptr<BitReader> input,
-                                std::unique_ptr<BitWriter> output) {
-  output_ = std::make_unique<ByteAlignedBitWriter>(std::move(output));
+void HuffmanEncryption::Encrypt(std::shared_ptr<BitReader> input,
+                                std::shared_ptr<BitWriter> output) {
+  output_ = std::move(output);
   const auto text = ReadBytesToString(std::move(input));
   auto root = HuffmanTreeBuilder(text).GetRoot();
 
@@ -41,7 +39,7 @@ void HuffmanEncryption::Encrypt(std::unique_ptr<BitReader> input,
 }
 
 namespace {
-std::string ReadBytesToString(std::unique_ptr<BitReader> byte_reader) {
+std::string ReadBytesToString(std::shared_ptr<BitReader> byte_reader) {
   std::string result;
   for (auto byte = byte_reader->ReadByte(); byte.has_value();
        byte = byte_reader->ReadByte()) {
@@ -141,9 +139,9 @@ std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
 }
 }  // namespace
 
-void HuffmanEncryption::Decrypt(std::unique_ptr<BitReader> input,
-                                std::unique_ptr<BitWriter> output) {
-  input_ = std::make_unique<ByteAlignedBitReader>(std::move(input));
+void HuffmanEncryption::Decrypt(std::shared_ptr<BitReader> input,
+                                std::shared_ptr<BitWriter> output) {
+  input_ = std::move(input);
   output_ = std::move(output);
   auto root = ReadTreeInPrefixForm();
   WriteDecryptedText(root.get());

@@ -13,10 +13,10 @@ struct TreeNode;
 
 class HuffmanEncryption {
  public:
-  void Encrypt(std::unique_ptr<BitReader> input,
-               std::unique_ptr<BitWriter> output);
-  void Decrypt(std::unique_ptr<BitReader> input,
-               std::unique_ptr<BitWriter> output);
+  void Encrypt(std::shared_ptr<BitReader> input,
+               std::shared_ptr<BitWriter> output);
+  void Decrypt(std::shared_ptr<BitReader> input,
+               std::shared_ptr<BitWriter> output);
 
  private:
   std::unique_ptr<TreeNode> ReadTreeInPrefixForm();
@@ -25,8 +25,8 @@ class HuffmanEncryption {
   void WriteDecryptedText(TreeNode* root);
   void WriteEncryptedText(TreeNode* root, std::string_view text);
 
-  std::unique_ptr<BitReader> input_;
-  std::unique_ptr<BitWriter> output_;
+  std::shared_ptr<BitReader> input_;
+  std::shared_ptr<BitWriter> output_;
 };
 
 }  // namespace encryption

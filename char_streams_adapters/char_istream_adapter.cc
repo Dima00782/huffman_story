@@ -1,4 +1,4 @@
-#include "encryption/byte_aligned_bit_reader.h"
+#include "char_streams_adapters/char_istream_adapter.h"
 
 #include <cassert>
 #include <climits>
@@ -7,28 +7,35 @@
 
 #include "bits_manipulation/bits_manipulation.h"
 
-namespace encryption {
+namespace char_adapters {
 
 namespace {
 constexpr uint8_t kNumBitsForStoringAlignment =
     static_cast<uint8_t>(std::log2(CHAR_BIT));
 
 constexpr uint32_t kMinimumQueueSize = 16u;
+static_assert(kMinimumQueueSize % CHAR_BIT == 0,
+              "kMinimumQueueSize should be byte aligned.");
 }  // namespace
 
-ByteAlignedBitReader::ByteAlignedBitReader(
-    std::unique_ptr<BitReader> underlying_reader)
-    : underlying_reader_{std::move(underlying_reader)} {
-  for (uint32_t i = 0u; i < kMinimumQueueSize; ++i) {
-    const auto bit = underlying_reader_->ReadBit();
-    if (!bit.has_value()) {
+CharIStreamAdapter::CharIStreamAdapter(
+    std::shared_ptr<std::istream> underlying_reader)
+    : underlying_reader_{underlying_reader} {
+  for (uint32_t i = 0u; i < kMinimumQueueSize / CHAR_BIT; ++i) {
+    char byte = '\0';
+    if (!underlying_reader_->get(byte)) {
+      is_last_bit_met_ = true;
+      RemoveUnusedBitsInLastByte();
       return;
     }
-    look_ahead_queue_.push_back(*bit);
+    for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
+      const auto bit = bits_manipulation::IsBitEnabled(byte, bit_pos);
+      look_ahead_queue_.push_back(bit);
+    }
   }
 }
 
-std::optional<bool> ByteAlignedBitReader::ReadBit() {
+std::optional<bool> CharIStreamAdapter::ReadBit() {
   if (look_ahead_queue_.empty()) {
     return std::nullopt;
   }
@@ -36,9 +43,16 @@ std::optional<bool> ByteAlignedBitReader::ReadBit() {
   const bool bit_value = look_ahead_queue_.front();
   look_ahead_queue_.pop_front();
 
-  const auto bit = underlying_reader_->ReadBit();
-  if (bit) {
-    look_ahead_queue_.push_back(*bit);
+  if (look_ahead_queue_.size() >= kMinimumQueueSize) {
+    return bit_value;
+  }
+
+  char byte = '\0';
+  if (underlying_reader_->get(byte)) {
+    for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
+      const auto bit = bits_manipulation::IsBitEnabled(byte, bit_pos);
+      look_ahead_queue_.push_back(bit);
+    }
   } else if (!is_last_bit_met_) {
     is_last_bit_met_ = true;
     RemoveUnusedBitsInLastByte();
@@ -47,7 +61,7 @@ std::optional<bool> ByteAlignedBitReader::ReadBit() {
   return bit_value;
 }
 
-void ByteAlignedBitReader::RemoveUnusedBitsInLastByte() {
+void CharIStreamAdapter::RemoveUnusedBitsInLastByte() {
   char num_unused_bits_in_last_byte = '\0';
   for (uint8_t bit_pos = 1; bit_pos <= kNumBitsForStoringAlignment; ++bit_pos) {
     const bool bit_enabled = look_ahead_queue_.back();
@@ -68,9 +82,9 @@ void ByteAlignedBitReader::RemoveUnusedBitsInLastByte() {
   }
 }
 
-bool ByteAlignedBitReader::HasAdditionalByteUsed(
+bool CharIStreamAdapter::HasAdditionalByteUsed(
     uint8_t num_unused_bits_in_last_byte) {
   return num_unused_bits_in_last_byte < kNumBitsForStoringAlignment;
 }
 
-}  // namespace encryption
+}  // namespace char_adapters
