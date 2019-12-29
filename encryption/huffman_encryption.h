@@ -29,14 +29,14 @@ class HuffmanEncrypt {
 class HuffmanDecrypt {
  public:
   HuffmanDecrypt(std::shared_ptr<BitReader> input,
-                 std::shared_ptr<BitWriter> output);
+                 std::shared_ptr<std::ostream> output);
 
  private:
   std::unique_ptr<TreeNode> ReadTreeInPrefixForm();
   void WriteDecryptedText(TreeNode* root);
 
   std::shared_ptr<BitReader> input_;
-  std::shared_ptr<BitWriter> output_;
+  std::shared_ptr<std::ostream> output_;
 };
 
 }  // namespace encryption

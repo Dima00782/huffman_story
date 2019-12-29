@@ -28,12 +28,11 @@ class EncryptionAcceptanceTests : public ::testing::TestWithParam<TestCase> {
   }
 
   std::string DecryptText(const std::string& text) {
-    std::string buffer;
     auto string_input = std::make_shared<char_adapters::CharIStreamAdapter>(
         std::make_shared<std::istringstream>(text));
-    auto string_output = std::make_shared<string_io::StringBitWriter>(&buffer);
+    auto string_output = std::make_shared<std::ostringstream>();
     encryption::HuffmanDecrypt(string_input, string_output);
-    return buffer;
+    return string_output->str();
   }
 };
 

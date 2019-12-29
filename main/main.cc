@@ -57,14 +57,11 @@ int main(int argc, char* argv[]) {
 
     auto input = std::make_shared<char_adapters::CharIStreamAdapter>(
         std::make_shared<std::ifstream>(file_path, std::ios::binary));
-    std::string buffer;
-    auto string_output = std::make_shared<string_io::StringBitWriter>(&buffer);
-    encryption::HuffmanDecrypt(std::move(input), std::move(string_output));
-
     std::filesystem::path compressed_file_name =
         file_path.filename().replace_extension("");
-    std::ofstream output{compressed_file_name, std::ios::binary};
-    output.write(buffer.c_str(), buffer.size());
+    encryption::HuffmanDecrypt(
+        std::move(input), std::make_shared<std::ofstream>(compressed_file_name,
+                                                          std::ios::binary));
   }
 
   return 0;

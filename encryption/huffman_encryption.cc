@@ -127,7 +127,7 @@ std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
 }  // namespace
 
 HuffmanDecrypt::HuffmanDecrypt(std::shared_ptr<BitReader> input,
-                               std::shared_ptr<BitWriter> output) {
+                               std::shared_ptr<std::ostream> output) {
   input_ = std::move(input);
   output_ = std::move(output);
   auto root = ReadTreeInPrefixForm();
@@ -171,7 +171,7 @@ void HuffmanDecrypt::WriteDecryptedText(TreeNode* root) {
     }
 
     if (IsLeafNode(current_node)) {
-      output_->WriteByte(current_node->key_.back());
+      output_->put(current_node->key_.back());
       current_node = root;
     }
   }
