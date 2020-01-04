@@ -11,6 +11,7 @@
 #include "encryption/bit_reader.h"
 #include "encryption/bit_writer.h"
 #include "encryption/huffman_tree/huffman_tree_builder.h"
+#include "encryption/huffman_tree/text_splitter.h"
 
 namespace encryption {
 
@@ -22,23 +23,27 @@ constexpr bool kLeafNodeBitLabel = true;
 constexpr bool kTurnLeftBitLabel = false;
 constexpr bool kTurnRightBitLabel = true;
 
-std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root);
-bool IsInnerNode(encryption::TreeNode* node);
-bool IsLeafNode(encryption::TreeNode* node);
+std::unordered_map<char, std::vector<bool>> BuildCodesMap(
+    huffman_tree::TreeNode* root);
+bool IsInnerNode(huffman_tree::TreeNode* node);
+bool IsLeafNode(huffman_tree::TreeNode* node);
 }  // namespace
 
 HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
-                               std::shared_ptr<BitWriter> output) {
-  output_ = std::move(output);
+                               std::shared_ptr<BitWriter> output,
+                               const std::set<std::string>& alphabet)
+    : output_{std::move(output)}, alphabet_{alphabet} {
   const std::string text{(std::istreambuf_iterator<char>(*input)),
                          std::istreambuf_iterator<char>()};
-  auto root = HuffmanTreeBuilder(text).GetRoot();
+  auto text_splitter = std::make_unique<huffman_tree::TextSplitter>(alphabet);
+  auto root = huffman_tree::HuffmanTreeBuilder(text, std::move(text_splitter))
+                  .GetRoot();
 
   WriteTreeInPrefixForm(root.get());
   WriteEncryptedText(root.get(), text);
 }
 
-void HuffmanEncrypt::WriteTreeInPrefixForm(TreeNode* root) {
+void HuffmanEncrypt::WriteTreeInPrefixForm(huffman_tree::TreeNode* root) {
   if (!root) {
     return;
   }
@@ -55,12 +60,13 @@ void HuffmanEncrypt::WriteTreeInPrefixForm(TreeNode* root) {
 }
 
 namespace {
-bool IsInnerNode(encryption::TreeNode* node) {
+bool IsInnerNode(huffman_tree::TreeNode* node) {
   return node->left_ && node->right_;
 }
 }  // namespace
 
-void HuffmanEncrypt::WriteEncryptedText(TreeNode* root, std::string_view text) {
+void HuffmanEncrypt::WriteEncryptedText(huffman_tree::TreeNode* root,
+                                        std::string_view text) {
   const auto codes_by_symbol = BuildCodesMap(root);
 
   for (const auto symbol : text) {
@@ -73,7 +79,8 @@ void HuffmanEncrypt::WriteEncryptedText(TreeNode* root, std::string_view text) {
 }
 
 namespace {
-std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
+std::unordered_map<char, std::vector<bool>> BuildCodesMap(
+    huffman_tree::TreeNode* root) {
   std::unordered_map<char, std::vector<bool>> codes;
 
   if (root && !root->left_ && !root->right_) {
@@ -82,11 +89,11 @@ std::unordered_map<char, std::vector<bool>> BuildCodesMap(TreeNode* root) {
   }
 
   struct NodeWithCode {
-    TreeNode* node;
+    huffman_tree::TreeNode* node;
     std::vector<bool> code;
   };
 
-  std::unordered_set<const TreeNode*> used;
+  std::unordered_set<const huffman_tree::TreeNode*> used;
   std::stack<NodeWithCode> stack;
 
   stack.push(NodeWithCode{root, std::vector<bool>()});
@@ -134,7 +141,7 @@ HuffmanDecrypt::HuffmanDecrypt(std::shared_ptr<BitReader> input,
   WriteDecryptedText(root.get());
 }
 
-std::unique_ptr<TreeNode> HuffmanDecrypt::ReadTreeInPrefixForm() {
+std::unique_ptr<huffman_tree::TreeNode> HuffmanDecrypt::ReadTreeInPrefixForm() {
   const auto bit = input_->ReadBit();
   if (!bit.has_value()) {
     return nullptr;
@@ -143,18 +150,18 @@ std::unique_ptr<TreeNode> HuffmanDecrypt::ReadTreeInPrefixForm() {
   if (*bit == kLeafNodeBitLabel) {
     const auto symbol = input_->ReadByte();
     assert(symbol.has_value());
-    return std::make_unique<TreeNode>(std::string(1, *symbol), 0, nullptr,
-                                      nullptr);
+    return std::make_unique<huffman_tree::TreeNode>(std::string(1, *symbol), 0,
+                                                    nullptr, nullptr);
   }
 
   assert(*bit == kInnerNodeBitLabel);
-  auto node = std::make_unique<TreeNode>("", 0, nullptr, nullptr);
+  auto node = std::make_unique<huffman_tree::TreeNode>("", 0, nullptr, nullptr);
   node->left_ = std::move(ReadTreeInPrefixForm());
   node->right_ = std::move(ReadTreeInPrefixForm());
   return node;
 }
 
-void HuffmanDecrypt::WriteDecryptedText(TreeNode* root) {
+void HuffmanDecrypt::WriteDecryptedText(huffman_tree::TreeNode* root) {
   if (!root) {
     return;
   }
@@ -178,7 +185,7 @@ void HuffmanDecrypt::WriteDecryptedText(TreeNode* root) {
 }
 
 namespace {
-bool IsLeafNode(encryption::TreeNode* node) {
+bool IsLeafNode(huffman_tree::TreeNode* node) {
   return !node->left_ && !node->right_;
 }
 }  // namespace

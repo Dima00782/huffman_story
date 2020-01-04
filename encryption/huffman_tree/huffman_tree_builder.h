@@ -1,11 +1,14 @@
-#ifndef ENCRYPTION_HUFFMAN_TREE_BUILDER_H_
-#define ENCRYPTION_HUFFMAN_TREE_BUILDER_H_
+#ifndef ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
+#define ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
 
 #include <memory>
+#include <set>
+#include <string>
 #include <string_view>
 #include <vector>
 
-namespace encryption {
+namespace huffman_tree {
+class TextSplitter;
 
 struct TreeNode {
   TreeNode(const std::string& key,
@@ -21,7 +24,8 @@ struct TreeNode {
 
 class HuffmanTreeBuilder {
  public:
-  explicit HuffmanTreeBuilder(std::string_view text);
+  explicit HuffmanTreeBuilder(std::string_view text,
+                              std::unique_ptr<TextSplitter> splitter);
 
   std::unique_ptr<TreeNode> GetRoot();
 
@@ -29,6 +33,6 @@ class HuffmanTreeBuilder {
   std::unique_ptr<TreeNode> root_;
 };
 
-}  // namespace encryption
+}  // namespace huffman_tree
 
-#endif  // ENCRYPTION_HUFFMAN_TREE_BUILDER_H_
+#endif  // ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_

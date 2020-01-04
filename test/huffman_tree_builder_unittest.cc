@@ -1,19 +1,39 @@
 #include <string>
 
 #include "encryption/huffman_tree/huffman_tree_builder.h"
+#include "encryption/huffman_tree/text_splitter.h"
 #include "gtest/gtest.h"
 
-bool IsInnerNode(encryption::TreeNode* node) {
+namespace huffman_tree {
+
+bool IsInnerNode(TreeNode* node) {
   return node->left_ && node->right_;
 }
 
-bool IsLeafNode(encryption::TreeNode* node) {
+bool IsLeafNode(TreeNode* node) {
   return !node->left_ && !node->right_;
 }
 
-TEST(HuffmanTreeBuilder, OneSymbol) {
+class HuffmanTreeBuilderTest : public ::testing::Test {
+ public:
+  std::set<std::string> GetAllCharactersAlphabet() {
+    std::set<std::string> alphabet;
+    for (int letter = 0; letter < 256; ++letter) {
+      alphabet.insert(std::string{static_cast<char>(letter)});
+    }
+    return alphabet;
+  }
+
+  std::unique_ptr<TreeNode> BuildTree(std::string_view text) {
+    auto text_splitter =
+        std::make_unique<TextSplitter>(GetAllCharactersAlphabet());
+    return HuffmanTreeBuilder(text, std::move(text_splitter)).GetRoot();
+  }
+};
+
+TEST_F(HuffmanTreeBuilderTest, OneSymbol) {
   const std::string kTestString = "aaaa";
-  const auto root = encryption::HuffmanTreeBuilder(kTestString).GetRoot();
+  const auto root = BuildTree(kTestString);
 
   ASSERT_TRUE(root);
   EXPECT_TRUE(IsLeafNode(root.get()));
@@ -21,9 +41,9 @@ TEST(HuffmanTreeBuilder, OneSymbol) {
   EXPECT_EQ(root->frequency_, 4u);
 }
 
-TEST(HuffmanTreeBuilder, TwoSymbols) {
+TEST_F(HuffmanTreeBuilderTest, TwoSymbols) {
   const std::string kTestString = "aaaabbb";
-  const auto root = encryption::HuffmanTreeBuilder(kTestString).GetRoot();
+  const auto root = BuildTree(kTestString);
 
   ASSERT_TRUE(root);
   EXPECT_TRUE(IsInnerNode(root.get()));
@@ -40,9 +60,9 @@ TEST(HuffmanTreeBuilder, TwoSymbols) {
   EXPECT_TRUE(IsLeafNode(right));
 }
 
-TEST(HuffmanTreeBuilder, ThreeSymbols) {
+TEST_F(HuffmanTreeBuilderTest, ThreeSymbols) {
   const std::string kTestString = "aaaabbc";
-  const auto root = encryption::HuffmanTreeBuilder(kTestString).GetRoot();
+  const auto root = BuildTree(kTestString);
 
   ASSERT_TRUE(root);
   EXPECT_TRUE(IsInnerNode(root.get()));
@@ -67,3 +87,5 @@ TEST(HuffmanTreeBuilder, ThreeSymbols) {
   EXPECT_EQ(left_right->key_, "b");
   EXPECT_EQ(left_right->frequency_, 2u);
 }
+
+}  // namespace huffman_tree

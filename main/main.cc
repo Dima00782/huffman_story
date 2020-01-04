@@ -11,6 +11,8 @@
 #include "string_io/string_bit_reader.h"
 #include "string_io/string_bit_writer.h"
 
+std::set<std::string> GetAllCharactersAlphabet();
+
 int main(int argc, char* argv[]) {
   if (argc != 3) {
     std::cout << "usage:" << std::endl;
@@ -47,7 +49,7 @@ int main(int argc, char* argv[]) {
                                         std::ios::binary));
     encryption::HuffmanEncrypt(
         std::make_shared<std::ifstream>(file_path, std::ios::binary),
-        std::move(output));
+        std::move(output), GetAllCharactersAlphabet());
   } else {
     assert(action_flag == 'd');
     if (!file_path.has_extension() || file_path.extension() != ".huf") {
@@ -65,4 +67,12 @@ int main(int argc, char* argv[]) {
   }
 
   return 0;
+}
+
+std::set<std::string> GetAllCharactersAlphabet() {
+  std::set<std::string> alphabet;
+  for (int letter = 0; letter < 256; ++letter) {
+    alphabet.insert(std::string{static_cast<char>(letter)});
+  }
+  return alphabet;
 }

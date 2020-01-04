@@ -8,11 +8,14 @@
 #include <vector>
 
 #include "bits_manipulation/bits_manipulation.h"
+#include "encryption/huffman_tree/text_splitter.h"
 
-namespace encryption {
+namespace huffman_tree {
 
 namespace {
-std::unordered_map<char, uint32_t> CountChars(std::string_view text);
+std::unordered_map<std::string, uint32_t> CountLetters(
+    std::string_view text,
+    std::unique_ptr<TextSplitter> splitter);
 }  // namespace
 
 TreeNode::TreeNode(const std::string& key,
@@ -24,17 +27,18 @@ TreeNode::TreeNode(const std::string& key,
       left_{std::move(left)},
       right_{std::move(right)} {}
 
-HuffmanTreeBuilder::HuffmanTreeBuilder(std::string_view text) {
+HuffmanTreeBuilder::HuffmanTreeBuilder(std::string_view text,
+                                       std::unique_ptr<TextSplitter> splitter) {
   if (text.empty()) {
     return;
   }
 
-  const auto char_count = CountChars(text);
+  const auto letter_count = CountLetters(text, std::move(splitter));
 
   std::vector<std::unique_ptr<TreeNode>> nodes;
-  for (const auto& [symbol, frequence] : char_count) {
-    nodes.push_back(std::make_unique<TreeNode>(std::string(1, symbol),
-                                               frequence, nullptr, nullptr));
+  for (const auto& [letter, frequence] : letter_count) {
+    nodes.push_back(
+        std::make_unique<TreeNode>(letter, frequence, nullptr, nullptr));
   }
 
   const auto frequency_comparator = [](const std::unique_ptr<TreeNode>& lhs,
@@ -62,13 +66,15 @@ HuffmanTreeBuilder::HuffmanTreeBuilder(std::string_view text) {
 }
 
 namespace {
-std::unordered_map<char, uint32_t> CountChars(std::string_view text) {
-  std::unordered_map<char, uint32_t> char_count;
-  for (const auto byte : text) {
-    ++char_count[byte];
+std::unordered_map<std::string, uint32_t> CountLetters(
+    std::string_view text,
+    std::unique_ptr<TextSplitter> splitter) {
+  std::unordered_map<std::string, uint32_t> letter_count;
+  for (const auto letter : splitter->Split(text)) {
+    ++letter_count[letter];
   }
 
-  return char_count;
+  return letter_count;
 }
 }  // namespace
 
@@ -76,4 +82,4 @@ std::unique_ptr<TreeNode> HuffmanTreeBuilder::GetRoot() {
   return std::move(root_);
 }
 
-}  // namespace encryption
+}  // namespace huffman_tree

@@ -6,24 +6,31 @@
 #include <optional>
 #include <ostream>
 #include <string_view>
+#include <set>
+#include <string>
+
+namespace huffman_tree {
+struct TreeNode;
+}
 
 namespace encryption {
 
 class BitWriter;
 class BitReader;
-struct TreeNode;
 
 class HuffmanEncrypt {
  public:
   HuffmanEncrypt(std::shared_ptr<std::istream> input,
-                 std::shared_ptr<BitWriter> output);
+                 std::shared_ptr<BitWriter> output,
+                 const std::set<std::string>& alphabet);
 
  private:
-  void WriteTreeInPrefixForm(TreeNode* root);
-  void WriteEncryptedText(TreeNode* root, std::string_view text);
+  void WriteTreeInPrefixForm(huffman_tree::TreeNode* root);
+  void WriteEncryptedText(huffman_tree::TreeNode* root, std::string_view text);
 
   std::shared_ptr<std::istream> input_;
   std::shared_ptr<BitWriter> output_;
+  std::set<std::string> alphabet_;
 };
 
 class HuffmanDecrypt {
@@ -32,8 +39,8 @@ class HuffmanDecrypt {
                  std::shared_ptr<std::ostream> output);
 
  private:
-  std::unique_ptr<TreeNode> ReadTreeInPrefixForm();
-  void WriteDecryptedText(TreeNode* root);
+  std::unique_ptr<huffman_tree::TreeNode> ReadTreeInPrefixForm();
+  void WriteDecryptedText(huffman_tree::TreeNode* root);
 
   std::shared_ptr<BitReader> input_;
   std::shared_ptr<std::ostream> output_;

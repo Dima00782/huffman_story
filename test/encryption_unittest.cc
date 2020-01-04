@@ -7,7 +7,9 @@
 #include "string_io/string_bit_writer.h"
 
 #include <iterator>
+#include <set>
 #include <sstream>
+#include <string>
 
 struct TestCase {
   std::string input;
@@ -16,13 +18,16 @@ struct TestCase {
 
 class EncryptionAcceptanceTests : public ::testing::TestWithParam<TestCase> {
  public:
+  EncryptionAcceptanceTests() : english_alphabet_{GetEnglishAlphabet()} {}
+
   std::string EncryptText(const std::string& text) {
     auto string_input = std::make_shared<std::istringstream>(text);
     auto ostring_stream = std::make_shared<std::ostringstream>();
     {
       auto string_output =
           std::make_shared<char_adapters::CharOStreamAdapter>(ostring_stream);
-      encryption::HuffmanEncrypt(string_input, string_output);
+      encryption::HuffmanEncrypt(string_input, string_output,
+                                 english_alphabet_);
     }
     return ostring_stream->str();
   }
@@ -34,6 +39,16 @@ class EncryptionAcceptanceTests : public ::testing::TestWithParam<TestCase> {
     encryption::HuffmanDecrypt(string_input, string_output);
     return string_output->str();
   }
+
+  static std::set<std::string> GetEnglishAlphabet() {
+    std::set<std::string> english_alphabet;
+    for (char letter = 'a'; letter <= 'z'; ++letter) {
+      english_alphabet.insert(std::string{letter});
+    }
+    return english_alphabet;
+  }
+
+  const std::set<std::string> english_alphabet_;
 };
 
 TEST_P(EncryptionAcceptanceTests, EncryptAndDecrypt) {
