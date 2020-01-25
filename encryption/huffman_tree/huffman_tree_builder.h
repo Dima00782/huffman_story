@@ -24,8 +24,7 @@ struct TreeNode {
 
 class HuffmanTreeBuilder {
  public:
-  explicit HuffmanTreeBuilder(std::string_view text,
-                              std::unique_ptr<TextSplitter> splitter);
+  explicit HuffmanTreeBuilder(std::vector<std::string> text);
 
   std::unique_ptr<TreeNode> GetRoot();
 

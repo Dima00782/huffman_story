@@ -1,4 +1,4 @@
-#include "encryption/huffman_tree/text_splitter.h"
+#include "encryption/text_splitter/text_splitter.h"
 
 #include <algorithm>
 #include <vector>

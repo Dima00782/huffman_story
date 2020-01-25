@@ -11,7 +11,7 @@
 #include "encryption/bit_reader.h"
 #include "encryption/bit_writer.h"
 #include "encryption/huffman_tree/huffman_tree_builder.h"
-#include "encryption/huffman_tree/text_splitter.h"
+#include "encryption/text_splitter/text_splitter.h"
 
 namespace encryption {
 
@@ -35,9 +35,9 @@ HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
     : output_{std::move(output)}, alphabet_{alphabet} {
   const std::string text{(std::istreambuf_iterator<char>(*input)),
                          std::istreambuf_iterator<char>()};
-  auto text_splitter = std::make_unique<huffman_tree::TextSplitter>(alphabet);
-  auto root = huffman_tree::HuffmanTreeBuilder(text, std::move(text_splitter))
-                  .GetRoot();
+  huffman_tree::TextSplitter text_splitter{alphabet};
+  auto root =
+      huffman_tree::HuffmanTreeBuilder(text_splitter.Split(text)).GetRoot();
 
   WriteTreeInPrefixForm(root.get());
   WriteEncryptedText(root.get(), text);

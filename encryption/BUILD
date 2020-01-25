@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//encryption/huffman_tree:huffman_tree",
+        "//encryption/text_splitter:text_splitter",
     ],
     visibility = ["//visibility:public"],
 )

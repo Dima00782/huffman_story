@@ -8,14 +8,12 @@
 #include <vector>
 
 #include "bits_manipulation/bits_manipulation.h"
-#include "encryption/huffman_tree/text_splitter.h"
 
 namespace huffman_tree {
 
 namespace {
 std::unordered_map<std::string, uint32_t> CountLetters(
-    std::string_view text,
-    std::unique_ptr<TextSplitter> splitter);
+    std::vector<std::string> text);
 }  // namespace
 
 TreeNode::TreeNode(const std::string& key,
@@ -27,13 +25,12 @@ TreeNode::TreeNode(const std::string& key,
       left_{std::move(left)},
       right_{std::move(right)} {}
 
-HuffmanTreeBuilder::HuffmanTreeBuilder(std::string_view text,
-                                       std::unique_ptr<TextSplitter> splitter) {
+HuffmanTreeBuilder::HuffmanTreeBuilder(std::vector<std::string> text) {
   if (text.empty()) {
     return;
   }
 
-  const auto letter_count = CountLetters(text, std::move(splitter));
+  const auto letter_count = CountLetters(text);
 
   std::vector<std::unique_ptr<TreeNode>> nodes;
   for (const auto& [letter, frequence] : letter_count) {
@@ -67,10 +64,9 @@ HuffmanTreeBuilder::HuffmanTreeBuilder(std::string_view text,
 
 namespace {
 std::unordered_map<std::string, uint32_t> CountLetters(
-    std::string_view text,
-    std::unique_ptr<TextSplitter> splitter) {
+    std::vector<std::string> text) {
   std::unordered_map<std::string, uint32_t> letter_count;
-  for (const auto letter : splitter->Split(text)) {
+  for (const auto letter : text) {
     ++letter_count[letter];
   }
 

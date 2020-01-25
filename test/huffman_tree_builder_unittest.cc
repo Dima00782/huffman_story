@@ -1,7 +1,7 @@
 #include <string>
 
 #include "encryption/huffman_tree/huffman_tree_builder.h"
-#include "encryption/huffman_tree/text_splitter.h"
+#include "encryption/text_splitter/text_splitter.h"
 #include "gtest/gtest.h"
 
 namespace huffman_tree {
@@ -25,9 +25,8 @@ class HuffmanTreeBuilderTest : public ::testing::Test {
   }
 
   std::unique_ptr<TreeNode> BuildTree(std::string_view text) {
-    auto text_splitter =
-        std::make_unique<TextSplitter>(GetAllCharactersAlphabet());
-    return HuffmanTreeBuilder(text, std::move(text_splitter)).GetRoot();
+    TextSplitter text_splitter{GetAllCharactersAlphabet()};
+    return HuffmanTreeBuilder(text_splitter.Split(text)).GetRoot();
   }
 };
 
