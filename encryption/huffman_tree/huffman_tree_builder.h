@@ -24,7 +24,7 @@ struct TreeNode {
 
 class HuffmanTreeBuilder {
  public:
-  explicit HuffmanTreeBuilder(std::vector<std::string> text);
+  explicit HuffmanTreeBuilder(const std::vector<std::string>& text);
 
   std::unique_ptr<TreeNode> GetRoot();
 

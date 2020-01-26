@@ -5,9 +5,10 @@
 #include <memory>
 #include <optional>
 #include <ostream>
-#include <string_view>
 #include <set>
 #include <string>
+#include <string_view>
+#include <vector>
 
 namespace huffman_tree {
 struct TreeNode;
@@ -26,7 +27,11 @@ class HuffmanEncrypt {
 
  private:
   void WriteTreeInPrefixForm(huffman_tree::TreeNode* root);
-  void WriteEncryptedText(huffman_tree::TreeNode* root, std::string_view text);
+  void WriteNodeKey(const std::string& key);
+  void WriteKeySize(const char size);
+
+  void WriteEncryptedText(huffman_tree::TreeNode* root,
+                          const std::vector<std::string>& text);
 
   std::shared_ptr<std::istream> input_;
   std::shared_ptr<BitWriter> output_;
@@ -41,6 +46,7 @@ class HuffmanDecrypt {
  private:
   std::unique_ptr<huffman_tree::TreeNode> ReadTreeInPrefixForm();
   void WriteDecryptedText(huffman_tree::TreeNode* root);
+  std::string ReadNodeKey();
 
   std::shared_ptr<BitReader> input_;
   std::shared_ptr<std::ostream> output_;

@@ -25,7 +25,7 @@ TreeNode::TreeNode(const std::string& key,
       left_{std::move(left)},
       right_{std::move(right)} {}
 
-HuffmanTreeBuilder::HuffmanTreeBuilder(std::vector<std::string> text) {
+HuffmanTreeBuilder::HuffmanTreeBuilder(const std::vector<std::string>& text) {
   if (text.empty()) {
     return;
   }
