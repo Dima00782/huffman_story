@@ -5,6 +5,7 @@
 #include <streambuf>
 #include <string>
 
+#include "CLI11/CLI11.hpp"
 #include "char_streams_adapters/char_istream_adapter.h"
 #include "char_streams_adapters/char_ostream_adapter.h"
 #include "encryption/huffman_encryption.h"
@@ -14,58 +15,59 @@
 std::set<std::string> GetAllCharactersAlphabet();
 
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    std::cout << "usage:" << std::endl;
-    std::cout << "huffman -c file_to_compress" << std::endl;
-    std::cout << "huffman -d file_to_decompress" << std::endl;
-    return -1;
-  }
+  CLI::App app{"Huffman archiver"};
+  app.require_subcommand(1);
 
-  std::string first_param{argv[1]};
-  if (first_param.size() != 2) {
-    std::cout << "unknown parameter: " << first_param << std::endl;
-    return -2;
-  }
-
-  const char dash = first_param[0];
-  const char action_flag = first_param[1];
-  if (dash != '-' || (action_flag != 'c' && action_flag != 'd')) {
-    std::cout << "unknown parameter: " << action_flag << std::endl;
-    return -2;
-  }
-
-  const std::filesystem::path file_path{argv[2]};
-  if (!std::filesystem::is_regular_file(file_path)) {
-    std::cout << "passed file is not a regular file: " << file_path
-              << std::endl;
-    return 0;
-  }
-
-  if (action_flag == 'c') {
-    std::filesystem::path compressed_file_name = file_path.filename();
-    compressed_file_name += ".huf";
-    auto output = std::make_shared<char_adapters::CharOStreamAdapter>(
-        std::make_shared<std::ofstream>(compressed_file_name,
-                                        std::ios::binary));
-    encryption::HuffmanEncrypt(
-        std::make_shared<std::ifstream>(file_path, std::ios::binary),
-        std::move(output), GetAllCharactersAlphabet());
-  } else {
-    assert(action_flag == 'd');
-    if (!file_path.has_extension() || file_path.extension() != ".huf") {
-      std::cout << "wrong extension of file: " << file_path << std::endl;
-      return 0;
+  auto crypt_command = app.add_subcommand("crypt", "Crypt passed file.");
+  std::string file_to_crypt;
+  crypt_command->add_option("file", file_to_crypt, "File to crypt.");
+  crypt_command->callback([&file_to_crypt]() {
+    const std::filesystem::path file_to_crypt_path{file_to_crypt};
+    if (!std::filesystem::is_regular_file(file_to_crypt_path)) {
+      std::cerr << "It isn't a regular file : " << file_to_crypt_path
+                << std::endl;
+    } else {
+      std::filesystem::path compressed_file_name =
+          file_to_crypt_path.filename();
+      compressed_file_name += ".huf";
+      auto output = std::make_shared<char_adapters::CharOStreamAdapter>(
+          std::make_shared<std::ofstream>(compressed_file_name,
+                                          std::ios::binary));
+      encryption::HuffmanEncrypt(
+          std::make_shared<std::ifstream>(file_to_crypt_path, std::ios::binary),
+          std::move(output), GetAllCharactersAlphabet());
     }
+  });
 
-    auto input = std::make_shared<char_adapters::CharIStreamAdapter>(
-        std::make_shared<std::ifstream>(file_path, std::ios::binary));
-    std::filesystem::path compressed_file_name =
-        file_path.filename().replace_extension("");
-    encryption::HuffmanDecrypt(
-        std::move(input), std::make_shared<std::ofstream>(compressed_file_name,
-                                                          std::ios::binary));
-  }
+  auto decrypt_command = app.add_subcommand(
+      "decrypt", "Decrypt passed file. File must have .huf extension.");
+  std::string file_to_decrypt;
+  decrypt_command->add_option("file", file_to_decrypt, "File to decrypt.");
+  decrypt_command->callback([&file_to_decrypt]() {
+    const std::filesystem::path file_to_decrypt_path{file_to_decrypt};
+    if (!std::filesystem::is_regular_file(file_to_decrypt_path)) {
+      std::cerr << "It isn't a regular file : " << file_to_decrypt_path
+                << std::endl;
+    } else {
+      if (!file_to_decrypt_path.has_extension() ||
+          file_to_decrypt_path.extension() != ".huf") {
+        std::cerr << "wrong extension of file: " << file_to_decrypt_path
+                  << std::endl;
+        return;
+      }
 
+      auto input = std::make_shared<char_adapters::CharIStreamAdapter>(
+          std::make_shared<std::ifstream>(file_to_decrypt_path,
+                                          std::ios::binary));
+      std::filesystem::path compressed_file_name =
+          file_to_decrypt_path.filename().replace_extension("");
+      encryption::HuffmanDecrypt(std::move(input),
+                                 std::make_shared<std::ofstream>(
+                                     compressed_file_name, std::ios::binary));
+    }
+  });
+
+  CLI11_PARSE(app, argc, argv);
   return 0;
 }
 
