@@ -9,4 +9,5 @@ cc_binary(
         "//encryption:huffman_encryption",
         "//string_io:string_io",
     ],
+    visibility = ["//visibility:public"],
 )
