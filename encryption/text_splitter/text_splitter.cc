@@ -7,6 +7,7 @@ namespace huffman_tree {
 
 namespace {
 bool StartsWith(std::string_view text, std::string_view pattern) {
+  text = text.substr(0, pattern.size());
   if (pattern.size() > text.size()) {
     return false;
   }
