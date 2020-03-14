@@ -1,7 +1,7 @@
 #include "encryption/text_splitter/text_splitter.h"
 #include "gtest/gtest.h"
 
-namespace huffman_tree {
+namespace text_splitter {
 
 TEST(TextSplitter, OneLetterAlphabet) {
   TextSplitter splitter({"a"});
@@ -35,4 +35,4 @@ TEST(TextSplitter, ChooseLetterWithMaxLength) {
   }
 }
 
-}  // namespace huffman_tree
+}  // namespace text_splitter

@@ -1,12 +1,14 @@
-#ifndef ENCRYPTION_HUFFMAN_TREE_TEXT_SPLITTER_H_
-#define ENCRYPTION_HUFFMAN_TREE_TEXT_SPLITTER_H_
+#ifndef ENCRYPTION_TEXT_SPLITTER_TEXT_SPLITTER_H_
+#define ENCRYPTION_TEXT_SPLITTER_TEXT_SPLITTER_H_
 
 #include <set>
 #include <string>
 #include <string_view>
 #include <vector>
 
-namespace huffman_tree {
+#include "encryption/text_splitter/trie.h"
+
+namespace text_splitter {
 
 class TextSplitter {
  public:
@@ -15,9 +17,9 @@ class TextSplitter {
   std::vector<std::string> Split(std::string_view text);
 
  private:
-  const std::set<std::string> alphabet_;
+  Trie trie_;
 };
 
-}  // namespace huffman_tree
+}  // namespace text_splitter
 
-#endif  // ENCRYPTION_HUFFMAN_TREE_TEXT_SPLITTER_H_
+#endif  // ENCRYPTION_TEXT_SPLITTER_TEXT_SPLITTER_H_

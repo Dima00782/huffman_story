@@ -8,7 +8,6 @@
 #include <vector>
 
 namespace huffman_tree {
-class TextSplitter;
 
 struct TreeNode {
   TreeNode(const std::string& key,

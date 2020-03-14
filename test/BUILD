@@ -6,10 +6,12 @@ cc_test(
         "huffman_tree_builder_unittest.cc",
         "string_io_unittest.cc",
         "text_splitter_unittest.cc",
+        "trie_unittest.cc",
     ],
     deps = [
         "//char_streams_adapters:char_streams_adapters",
         "//encryption:huffman_encryption",
+        "//encryption/text_splitter:text_splitter",
         "//string_io:string_io",
         "@googletest//:gtest_main",
     ],

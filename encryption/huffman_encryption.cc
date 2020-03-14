@@ -36,7 +36,7 @@ HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
     : output_{std::move(output)}, alphabet_{alphabet} {
   const std::string text{(std::istreambuf_iterator<char>(*input)),
                          std::istreambuf_iterator<char>()};
-  auto splitted_text = huffman_tree::TextSplitter(alphabet).Split(text);
+  auto splitted_text = text_splitter::TextSplitter(alphabet).Split(text);
   auto root = huffman_tree::HuffmanTreeBuilder(splitted_text).GetRoot();
 
   WriteTreeInPrefixForm(root.get());
