@@ -27,8 +27,9 @@ class HuffmanEncrypt {
 
  private:
   void WriteTreeInPrefixForm(huffman_tree::TreeNode* root);
+  void WriteNode(huffman_tree::TreeNode* node);
   void WriteNodeKey(const std::string& key);
-  void WriteKeySize(const char size);
+  void WriteKeySize(const std::size_t size);
 
   void WriteEncryptedText(huffman_tree::TreeNode* root,
                           const std::vector<std::string>& text);

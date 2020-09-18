@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iterator>
+#include <limits>
 #include <stack>
 #include <unordered_map>
 #include <unordered_set>
@@ -48,27 +49,33 @@ void HuffmanEncrypt::WriteTreeInPrefixForm(huffman_tree::TreeNode* root) {
     return;
   }
 
-  const auto node_label =
-      IsInnerNode(root) ? kInnerNodeBitLabel : kLeafNodeBitLabel;
-  output_->WriteBit(node_label);
-  if (node_label == kLeafNodeBitLabel) {
-    WriteNodeKey(root->key_);
-  }
+  WriteNode(root);
 
   WriteTreeInPrefixForm(root->left_.get());
   WriteTreeInPrefixForm(root->right_.get());
 }
 
+void HuffmanEncrypt::WriteNode(huffman_tree::TreeNode* node) {
+  if (IsInnerNode(node)) {
+    output_->WriteBit(kInnerNodeBitLabel);
+  } else {
+    output_->WriteBit(kLeafNodeBitLabel);
+    WriteNodeKey(node->key_);
+  }
+}
+
 void HuffmanEncrypt::WriteNodeKey(const std::string& key) {
-  WriteKeySize(static_cast<char>(key.size()));
+  WriteKeySize(key.size());
 
   for (const auto byte : key) {
     output_->WriteByte(byte);
   }
 }
 
-void HuffmanEncrypt::WriteKeySize(const char size) {
-  output_->WriteByte(size);
+void HuffmanEncrypt::WriteKeySize(const std::size_t size) {
+  assert(size < std::numeric_limits<unsigned char>::max());
+  const auto key_size = static_cast<char>(size);
+  output_->WriteByte(key_size);
 }
 
 namespace {
