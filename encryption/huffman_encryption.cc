@@ -8,8 +8,10 @@
 #include <unordered_set>
 #include <utility>
 
-#include "encryption/bit_reader.h"
-#include "encryption/bit_writer.h"
+#include "encryption/bit_io/bit_reader.h"
+#include "encryption/bit_io/bit_writer.h"
+#include "encryption/char_streams_adapters/char_istream_adapter.h"
+#include "encryption/char_streams_adapters/char_ostream_adapter.h"
 #include "encryption/huffman_tree/huffman_tree_builder.h"
 #include "encryption/text_splitter/text_splitter.h"
 
@@ -19,10 +21,8 @@ namespace {
 
 constexpr bool kInnerNodeBitLabel = false;
 constexpr bool kLeafNodeBitLabel = true;
-
 constexpr bool kTurnLeftBitLabel = false;
 constexpr bool kTurnRightBitLabel = true;
-
 constexpr uint8_t kNumBitsForKeySize = 8u;
 
 std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
@@ -32,12 +32,12 @@ bool IsLeafNode(huffman_tree::TreeNode* node);
 }  // namespace
 
 HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
-                               std::shared_ptr<BitWriter> output,
+                               std::shared_ptr<std::ostream> output,
                                const std::set<std::string>& alphabet)
-    : output_{std::move(output)}, alphabet_{alphabet} {
+    : output_{std::make_shared<char_adapters::CharOStreamAdapter>(output)} {
   const std::string text{(std::istreambuf_iterator<char>(*input)),
                          std::istreambuf_iterator<char>()};
-  auto splitted_text = text_splitter::TextSplitter(alphabet).Split(text);
+  const auto splitted_text = text_splitter::TextSplitter(alphabet).Split(text);
   auto root = huffman_tree::HuffmanTreeBuilder(splitted_text).GetRoot();
 
   WriteTreeInPrefixForm(root.get());
@@ -152,9 +152,9 @@ std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
 }
 }  // namespace
 
-HuffmanDecrypt::HuffmanDecrypt(std::shared_ptr<BitReader> input,
-                               std::shared_ptr<std::ostream> output) {
-  input_ = std::move(input);
+HuffmanDecrypt::HuffmanDecrypt(std::shared_ptr<std::istream> input,
+                               std::shared_ptr<std::ostream> output)
+    : input_{std::make_shared<char_adapters::CharIStreamAdapter>(input)} {
   output_ = std::move(output);
   auto root = ReadTreeInPrefixForm();
   WriteDecryptedText(root.get());

@@ -1,15 +1,15 @@
-#ifndef CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_
-#define CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_
+#ifndef ENCRYPTION_CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_
+#define ENCRYPTION_CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_
 
 #include <memory>
 #include <ostream>
 #include <vector>
 
-#include "encryption/bit_writer.h"
+#include "encryption/bit_io/bit_writer.h"
 
 namespace char_adapters {
 
-class CharOStreamAdapter : public encryption::BitWriter {
+class CharOStreamAdapter : public bit_io::BitWriter {
  public:
   explicit CharOStreamAdapter(std::shared_ptr<std::ostream> ostream);
   ~CharOStreamAdapter() override;
@@ -28,4 +28,4 @@ class CharOStreamAdapter : public encryption::BitWriter {
 
 }  // namespace char_adapters
 
-#endif  // CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_
+#endif  // ENCRYPTION_CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_

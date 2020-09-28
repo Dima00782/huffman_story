@@ -7,8 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include "bits_manipulation/bits_manipulation.h"
-
 namespace huffman_tree {
 
 namespace {

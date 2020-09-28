@@ -6,9 +6,6 @@ cc_library(
     hdrs = [
         "huffman_tree_builder.h",
     ],
-    deps = [
-        "//bits_manipulation:bits_manipulation",
-    ],
     visibility = [
         "//encryption:__pkg__",
         "//test:__pkg__",

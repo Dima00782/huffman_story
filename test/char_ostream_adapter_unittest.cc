@@ -1,4 +1,4 @@
-#include "char_streams_adapters/char_ostream_adapter.h"
+#include "encryption/char_streams_adapters/char_ostream_adapter.h"
 #include "gtest/gtest.h"
 
 #include <memory>

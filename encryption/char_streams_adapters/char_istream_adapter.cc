@@ -1,4 +1,4 @@
-#include "char_streams_adapters/char_istream_adapter.h"
+#include "encryption/char_streams_adapters/char_istream_adapter.h"
 
 #include <cassert>
 #include <climits>

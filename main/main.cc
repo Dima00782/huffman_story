@@ -6,11 +6,7 @@
 #include <string>
 
 #include "CLI11/CLI11.hpp"
-#include "char_streams_adapters/char_istream_adapter.h"
-#include "char_streams_adapters/char_ostream_adapter.h"
 #include "encryption/huffman_encryption.h"
-#include "string_io/string_bit_reader.h"
-#include "string_io/string_bit_writer.h"
 
 std::set<std::string> GetAllCharactersAlphabet();
 std::set<std::string> GetAlphabetFromFile(const std::string& file_name);
@@ -36,17 +32,16 @@ int main(int argc, char* argv[]) {
       std::filesystem::path compressed_file_name =
           file_to_crypt_path.filename();
       compressed_file_name += ".huf";
-      auto output = std::make_shared<char_adapters::CharOStreamAdapter>(
-          std::make_shared<std::ofstream>(compressed_file_name,
-                                          std::ios::binary));
+      auto input =
+          std::make_shared<std::ifstream>(file_to_crypt_path, std::ios::binary);
+      auto output = std::make_shared<std::ofstream>(compressed_file_name,
+                                                    std::ios::binary);
       auto alphabet = GetAllCharactersAlphabet();
       if (!alphabet_file.empty()) {
         alphabet =
             UnionTwoAlphabets(GetAlphabetFromFile(alphabet_file), alphabet);
       }
-      encryption::HuffmanEncrypt(
-          std::make_shared<std::ifstream>(file_to_crypt_path, std::ios::binary),
-          std::move(output), alphabet);
+      encryption::HuffmanEncrypt(std::move(input), std::move(output), alphabet);
     }
   });
 
@@ -67,14 +62,14 @@ int main(int argc, char* argv[]) {
         return;
       }
 
-      auto input = std::make_shared<char_adapters::CharIStreamAdapter>(
-          std::make_shared<std::ifstream>(file_to_decrypt_path,
-                                          std::ios::binary));
+      auto input = std::make_shared<std::ifstream>(file_to_decrypt_path,
+                                                   std::ios::binary);
+
       std::filesystem::path compressed_file_name =
           file_to_decrypt_path.filename().replace_extension("");
-      encryption::HuffmanDecrypt(std::move(input),
-                                 std::make_shared<std::ofstream>(
-                                     compressed_file_name, std::ios::binary));
+      auto output = std::make_shared<std::ofstream>(compressed_file_name,
+                                                    std::ios::binary);
+      encryption::HuffmanDecrypt(std::move(input), std::move(output));
     }
   });
 

@@ -1,10 +1,10 @@
-#include "encryption/bit_reader.h"
+#include "encryption/bit_io/bit_reader.h"
 #include "bits_manipulation/bits_manipulation.h"
 
 #include <climits>
 #include <cstdint>
 
-namespace encryption {
+namespace bit_io {
 
 std::optional<char> BitReader::ReadByte() {
   char byte = '\0';
@@ -19,4 +19,4 @@ std::optional<char> BitReader::ReadByte() {
   return byte;
 }
 
-}  // namespace encryption
+}  // namespace bit_io

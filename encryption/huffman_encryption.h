@@ -14,15 +14,17 @@ namespace huffman_tree {
 struct TreeNode;
 }
 
-namespace encryption {
-
+namespace bit_io {
 class BitWriter;
 class BitReader;
+}
+
+namespace encryption {
 
 class HuffmanEncrypt {
  public:
   HuffmanEncrypt(std::shared_ptr<std::istream> input,
-                 std::shared_ptr<BitWriter> output,
+                 std::shared_ptr<std::ostream> output,
                  const std::set<std::string>& alphabet);
 
  private:
@@ -35,13 +37,12 @@ class HuffmanEncrypt {
                           const std::vector<std::string>& text);
 
   std::shared_ptr<std::istream> input_;
-  std::shared_ptr<BitWriter> output_;
-  std::set<std::string> alphabet_;
+  std::shared_ptr<bit_io::BitWriter> output_;
 };
 
 class HuffmanDecrypt {
  public:
-  HuffmanDecrypt(std::shared_ptr<BitReader> input,
+  HuffmanDecrypt(std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output);
 
  private:
@@ -49,7 +50,7 @@ class HuffmanDecrypt {
   void WriteDecryptedText(huffman_tree::TreeNode* root);
   std::string ReadNodeKey();
 
-  std::shared_ptr<BitReader> input_;
+  std::shared_ptr<bit_io::BitReader> input_;
   std::shared_ptr<std::ostream> output_;
 };
 

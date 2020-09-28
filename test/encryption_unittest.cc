@@ -1,10 +1,8 @@
 #include "bits_manipulation/bits_manipulation.h"
-#include "char_streams_adapters/char_istream_adapter.h"
-#include "char_streams_adapters/char_ostream_adapter.h"
+#include "encryption/char_streams_adapters/char_istream_adapter.h"
+#include "encryption/char_streams_adapters/char_ostream_adapter.h"
 #include "encryption/huffman_encryption.h"
 #include "gtest/gtest.h"
-#include "string_io/string_bit_reader.h"
-#include "string_io/string_bit_writer.h"
 
 #include <iterator>
 #include <set>
@@ -16,17 +14,12 @@ class EncryptionAcceptanceTestBase : public ::testing::Test {
   std::string EncryptText(const std::string& text) {
     auto string_input = std::make_shared<std::istringstream>(text);
     auto ostring_stream = std::make_shared<std::ostringstream>();
-    {
-      auto string_output =
-          std::make_shared<char_adapters::CharOStreamAdapter>(ostring_stream);
-      encryption::HuffmanEncrypt(string_input, string_output, alphabet_);
-    }
+    encryption::HuffmanEncrypt(string_input, ostring_stream, alphabet_);
     return ostring_stream->str();
   }
 
   std::string DecryptText(const std::string& text) {
-    auto string_input = std::make_shared<char_adapters::CharIStreamAdapter>(
-        std::make_shared<std::istringstream>(text));
+    auto string_input = std::make_shared<std::istringstream>(text);
     auto string_output = std::make_shared<std::ostringstream>();
     encryption::HuffmanDecrypt(string_input, string_output);
     return string_output->str();

@@ -1,15 +1,15 @@
-#ifndef CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
-#define CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
+#ifndef ENCRYPTION_CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
+#define ENCRYPTION_CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
 
 #include <istream>
 #include <memory>
 #include <deque>
 
-#include "encryption/bit_reader.h"
+#include "encryption/bit_io/bit_reader.h"
 
 namespace char_adapters {
 
-class CharIStreamAdapter : public encryption::BitReader {
+class CharIStreamAdapter : public bit_io::BitReader {
  public:
   explicit CharIStreamAdapter(std::shared_ptr<std::istream> underlying_reader);
   ~CharIStreamAdapter() override = default;
@@ -27,4 +27,4 @@ class CharIStreamAdapter : public encryption::BitReader {
 
 }  // namespace char_adapters
 
-#endif  // CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
+#endif  // ENCRYPTION_CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
