@@ -3,11 +3,9 @@
 
 #include <istream>
 #include <memory>
-#include <optional>
 #include <ostream>
 #include <set>
 #include <string>
-#include <string_view>
 #include <vector>
 
 namespace huffman_tree {
@@ -17,7 +15,7 @@ struct TreeNode;
 namespace bit_io {
 class BitWriter;
 class BitReader;
-}
+}  // namespace bit_io
 
 namespace encryption {
 
