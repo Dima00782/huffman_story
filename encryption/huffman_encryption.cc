@@ -27,8 +27,15 @@ constexpr uint8_t kNumBitsForKeySize = 8u;
 
 std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
     huffman_tree::TreeNode* root);
-bool IsInnerNode(huffman_tree::TreeNode* node);
-bool IsLeafNode(huffman_tree::TreeNode* node);
+
+bool IsInnerNode(huffman_tree::TreeNode* node) {
+  return node->left_ || node->right_;
+}
+
+bool IsLeafNode(huffman_tree::TreeNode* node) {
+  return !IsInnerNode(node);
+}
+
 }  // namespace
 
 HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
@@ -77,12 +84,6 @@ void HuffmanEncrypt::WriteKeySize(const std::size_t size) {
   const auto key_size = static_cast<char>(size);
   output_->WriteByte(key_size);
 }
-
-namespace {
-bool IsInnerNode(huffman_tree::TreeNode* node) {
-  return node->left_ && node->right_;
-}
-}  // namespace
 
 void HuffmanEncrypt::WriteEncryptedText(huffman_tree::TreeNode* root,
                                         const std::vector<std::string>& text) {
@@ -215,11 +216,5 @@ std::string HuffmanDecrypt::ReadNodeKey() {
 
   return node_key;
 }
-
-namespace {
-bool IsLeafNode(huffman_tree::TreeNode* node) {
-  return !node->left_ && !node->right_;
-}
-}  // namespace
 
 }  // namespace encryption
