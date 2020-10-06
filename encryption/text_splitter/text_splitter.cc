@@ -1,6 +1,7 @@
 #include "encryption/text_splitter/text_splitter.h"
 
 #include <algorithm>
+#include <string_view>
 #include <vector>
 
 namespace text_splitter {

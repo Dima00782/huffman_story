@@ -28,6 +28,8 @@ constexpr uint8_t kNumBitsForKeySize = 8u;
 std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
     huffman_tree::TreeNode* root);
 
+std::string ReadStreamToString(std::istream& input);
+
 bool IsInnerNode(huffman_tree::TreeNode* node) {
   return node->left_ || node->right_;
 }
@@ -42,10 +44,9 @@ HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
                                std::shared_ptr<std::ostream> output,
                                const std::set<std::string>& alphabet)
     : output_{std::make_shared<char_adapters::CharOStreamAdapter>(output)} {
-  const std::string text{(std::istreambuf_iterator<char>(*input)),
-                         std::istreambuf_iterator<char>()};
+  const std::string text = ReadStreamToString(*input);
   const auto splitted_text = text_splitter::TextSplitter(alphabet).Split(text);
-  auto root = huffman_tree::HuffmanTreeBuilder(splitted_text).GetRoot();
+  auto root = huffman_tree::BuildHuffmanTree(splitted_text);
 
   WriteTreeInPrefixForm(root.get());
   WriteEncryptedText(root.get(), splitted_text);
@@ -99,6 +100,12 @@ void HuffmanEncrypt::WriteEncryptedText(huffman_tree::TreeNode* root,
 }
 
 namespace {
+std::string ReadStreamToString(std::istream& input) {
+  std::string text{(std::istreambuf_iterator<char>(input)),
+                   std::istreambuf_iterator<char>()};
+  return text;
+}
+
 std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
     huffman_tree::TreeNode* root) {
   std::unordered_map<std::string, std::vector<bool>> codes;

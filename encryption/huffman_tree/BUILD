@@ -1,8 +1,5 @@
 cc_library(
     name = "huffman_tree",
-    srcs = [
-        "huffman_tree_builder.cc",
-    ],
     hdrs = [
         "huffman_tree_builder.h",
     ],

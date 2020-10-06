@@ -26,7 +26,7 @@ class HuffmanTreeBuilderTest : public ::testing::Test {
 
   std::unique_ptr<TreeNode> BuildTree(std::string_view text) {
     text_splitter::TextSplitter text_splitter{GetAllCharactersAlphabet()};
-    return HuffmanTreeBuilder(text_splitter.Split(text)).GetRoot();
+    return BuildHuffmanTree(text_splitter.Split(text));
   }
 };
 
