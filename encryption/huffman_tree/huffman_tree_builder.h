@@ -1,6 +1,7 @@
 #ifndef ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
 #define ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
 
+#include <algorithm>
 #include <memory>
 #include <set>
 #include <string>
