@@ -2,6 +2,7 @@
 #define ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
 
 #include <algorithm>
+#include <cassert>
 #include <memory>
 #include <set>
 #include <string>
@@ -25,6 +26,9 @@ struct TreeNode {
         left_{std::move(left)},
         right_{std::move(right)} {}
 
+  bool isLeaf() const { return !left_ && !right_; }
+  bool isInner() const { return left_ && right_; }
+
   std::string key_;
   uint32_t frequency_;
   std::unique_ptr<TreeNode> left_;
@@ -32,8 +36,12 @@ struct TreeNode {
 };
 
 template <class InputRange>
-std::unique_ptr<TreeNode> BuildHuffmanTree(InputRange&& text) {
+std::unique_ptr<TreeNode> BuildHuffmanTree(const InputRange& text) {
   const auto letter_count = CountLetters(text);
+
+  if (letter_count.empty()) {
+    return nullptr;
+  }
 
   std::vector<std::unique_ptr<TreeNode>> nodes;
   for (const auto& [letter, frequence] : letter_count) {
@@ -62,10 +70,7 @@ std::unique_ptr<TreeNode> BuildHuffmanTree(InputRange&& text) {
     nodes.emplace_back(std::move(union_node));
   }
 
-  if (nodes.empty()) {
-    return nullptr;
-  }
-
+  assert(nodes.size() == 1);
   return std::move(nodes.back());
 }
 

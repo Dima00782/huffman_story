@@ -30,14 +30,6 @@ std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
 
 std::string ReadStreamToString(std::istream& input);
 
-bool IsInnerNode(huffman_tree::TreeNode* node) {
-  return node->left_ || node->right_;
-}
-
-bool IsLeafNode(huffman_tree::TreeNode* node) {
-  return !IsInnerNode(node);
-}
-
 }  // namespace
 
 HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
@@ -64,7 +56,7 @@ void HuffmanEncrypt::WriteTreeInPrefixForm(huffman_tree::TreeNode* root) {
 }
 
 void HuffmanEncrypt::WriteNode(huffman_tree::TreeNode* node) {
-  if (IsInnerNode(node)) {
+  if (node->isInner()) {
     output_->WriteBit(kInnerNodeBitLabel);
   } else {
     output_->WriteBit(kLeafNodeBitLabel);
@@ -108,9 +100,10 @@ std::string ReadStreamToString(std::istream& input) {
 
 std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
     huffman_tree::TreeNode* root) {
+  assert(root);
   std::unordered_map<std::string, std::vector<bool>> codes;
 
-  if (root && !root->left_ && !root->right_) {
+  if (root->isLeaf()) {
     codes[root->key_] = std::vector<bool>(1, kTurnLeftBitLabel);
     return codes;
   }
@@ -120,40 +113,31 @@ std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
     std::vector<bool> code;
   };
 
-  std::unordered_set<const huffman_tree::TreeNode*> used;
   std::stack<NodeWithCode> stack;
-
   stack.push(NodeWithCode{root, std::vector<bool>()});
 
   while (!stack.empty()) {
     const auto current = stack.top();
-    const auto* current_node = current.node;
     stack.pop();
 
-    if (!current_node) {
+    if (current.node->isLeaf()) {
+      codes[current.node->key_] = current.code;
       continue;
     }
 
-    if (!current_node->left_ && !current_node->right_) {
-      codes[current_node->key_] = current.code;
-      continue;
-    }
+    assert(current.node->isInner());
 
-    if (current_node->left_ &&
-        used.find(current_node->left_.get()) == used.end()) {
+    {
       auto code = current.code;
       code.push_back(kTurnLeftBitLabel);
-      stack.push(NodeWithCode{current_node->left_.get(), std::move(code)});
+      stack.push(NodeWithCode{current.node->left_.get(), std::move(code)});
     }
 
-    if (current_node->right_ &&
-        used.find(current_node->right_.get()) == used.end()) {
+    {
       auto code = current.code;
       code.push_back(kTurnRightBitLabel);
-      stack.push(NodeWithCode{current_node->right_.get(), std::move(code)});
+      stack.push(NodeWithCode{current.node->right_.get(), std::move(code)});
     }
-
-    used.insert(current_node);
   }
 
   return codes;
@@ -194,7 +178,7 @@ void HuffmanDecrypt::WriteDecryptedText(huffman_tree::TreeNode* root) {
 
   auto* current_node = root;
   for (auto bit = input_->ReadBit(); bit; bit = input_->ReadBit()) {
-    if (!IsLeafNode(current_node)) {
+    if (current_node->isInner()) {
       if (*bit == kTurnLeftBitLabel) {
         current_node = current_node->left_.get();
       } else {
@@ -203,7 +187,7 @@ void HuffmanDecrypt::WriteDecryptedText(huffman_tree::TreeNode* root) {
       }
     }
 
-    if (IsLeafNode(current_node)) {
+    if (current_node->isLeaf()) {
       output_->put(current_node->key_.back());
       current_node = root;
     }
