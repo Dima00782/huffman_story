@@ -13,9 +13,9 @@ namespace {
 constexpr uint8_t kNumBitsForStoringAlignment =
     static_cast<uint8_t>(std::log2(CHAR_BIT));
 
-constexpr uint32_t kBufferSizeInBytes = 8u;
+constexpr uint32_t kBufferSizeInBits = 1024u * 1024u * 8u;
 
-static_assert(kBufferSizeInBytes == 8u);
+static_assert(kBufferSizeInBits % CHAR_BIT == 0);
 }  // namespace
 
 CharOStreamAdapter::CharOStreamAdapter(std::shared_ptr<std::ostream> ostream)
@@ -52,7 +52,7 @@ void CharOStreamAdapter::WriteFooter() {
 
 void CharOStreamAdapter::WriteBit(bool enabled) {
   has_bits_written_ = true;
-  if (buffer_.size() == kBufferSizeInBytes) {
+  if (buffer_.size() == kBufferSizeInBits) {
     FlushBuffer();
   }
 
