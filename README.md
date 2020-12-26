@@ -24,5 +24,5 @@ bazel test //test:unittest
 
 To see main deps
 ```bash
-bazel query --notool_deps --noimplicit_deps "deps(//main:main)" \--output graph
+bazel query --notool_deps --noimplicit_deps "deps(//main:main)" \--output graph > deps_graph
 ```
