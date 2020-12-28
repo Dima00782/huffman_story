@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "letter/letter.h"
+
 namespace huffman_tree {
 struct TreeNode;
 }
@@ -23,7 +25,7 @@ class HuffmanEncrypt {
  public:
   HuffmanEncrypt(std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output,
-                 const std::set<std::string>& alphabet);
+                 std::shared_ptr<letter::LetterLexer> extractor);
 
  private:
   void WriteTreeInPrefixForm(huffman_tree::TreeNode* root);
@@ -32,7 +34,7 @@ class HuffmanEncrypt {
   void WriteKeySize(const std::size_t size);
 
   void WriteEncryptedText(huffman_tree::TreeNode* root,
-                          const std::vector<std::string>& text);
+                          const std::vector<std::unique_ptr<letter::Letter>>& text);
 
   std::shared_ptr<std::istream> input_;
   std::shared_ptr<bit_io::BitWriter> output_;

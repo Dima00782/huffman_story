@@ -28,20 +28,17 @@ constexpr uint8_t kNumBitsForKeySize = 8u;
 std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
     huffman_tree::TreeNode* root);
 
-std::string ReadStreamToString(std::istream& input);
-
 }  // namespace
 
 HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
                                std::shared_ptr<std::ostream> output,
-                               const std::set<std::string>& alphabet)
-    : output_{std::make_shared<char_adapters::CharOStreamAdapter>(output)} {
-  const std::string text = ReadStreamToString(*input);
-  const auto splitted_text = text_splitter::TextSplitter(alphabet).Split(text);
-  auto root = huffman_tree::BuildHuffmanTree(splitted_text);
-
+                               std::shared_ptr<letter::LetterLexer> extractor)
+    : output_{std::make_shared<char_adapters::CharOStreamAdapter>(
+          output /*TODO: use move*/)} {
+  const auto splittedText = std::move(extractor)->Split(std::move(input));
+  auto root = huffman_tree::BuildHuffmanTree(splittedText);
   WriteTreeInPrefixForm(root.get());
-  WriteEncryptedText(root.get(), splitted_text);
+  WriteEncryptedText(root.get(), splittedText);
 }
 
 void HuffmanEncrypt::WriteTreeInPrefixForm(huffman_tree::TreeNode* root) {
@@ -78,26 +75,20 @@ void HuffmanEncrypt::WriteKeySize(const std::size_t size) {
   output_->WriteByte(key_size);
 }
 
-void HuffmanEncrypt::WriteEncryptedText(huffman_tree::TreeNode* root,
-                                        const std::vector<std::string>& text) {
-  const auto codes_by_symbol = BuildCodesMap(root);
-
-  for (const auto symbol : text) {
-    const auto code_iter = codes_by_symbol.find(symbol);
-    assert(code_iter != codes_by_symbol.end());
-    for (const auto bit : code_iter->second) {
+void HuffmanEncrypt::WriteEncryptedText(
+    huffman_tree::TreeNode* root,
+    const std::vector<std::unique_ptr<letter::Letter>>& text) {
+  const auto codes_by_letter = BuildCodesMap(root);
+  for (const auto& letter : text) {
+    const auto letterAsString = letter->toString(); // TODO: REMOVE ME.
+    assert(codes_by_letter.contains(letterAsString));
+    for (const auto bit : codes_by_letter.at(letterAsString)) {
       output_->WriteBit(bit);
     }
   }
 }
 
 namespace {
-std::string ReadStreamToString(std::istream& input) {
-  std::string text{(std::istreambuf_iterator<char>(input)),
-                   std::istreambuf_iterator<char>()};
-  return text;
-}
-
 std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
     huffman_tree::TreeNode* root) {
   assert(root);

@@ -9,6 +9,7 @@ class BitWriter {
 
   virtual void WriteBit(bool enabled) = 0;
 
+  // TODO: change char -> std::byte.
   virtual void WriteByte(char byte);
 };
 

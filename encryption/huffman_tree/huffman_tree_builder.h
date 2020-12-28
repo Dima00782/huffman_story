@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "letter/letter.h"
+
 namespace huffman_tree {
 
 namespace {
@@ -80,7 +82,10 @@ std::unordered_map<std::string, uint32_t> CountLetters(const InputRange& text) {
   std::unordered_map<std::string, uint32_t> letter_count;
   std::for_each(
       std::cbegin(text), std::cend(text),
-      [&letter_count](const auto& letter) { ++letter_count[letter]; });
+      [&letter_count](const auto& letter) {
+        std::string ss = letter->toString();
+        ++letter_count[ss];
+      });
   return letter_count;
 }
 }  // namespace
