@@ -34,7 +34,7 @@ HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
                                std::shared_ptr<std::ostream> output,
                                std::shared_ptr<letter::LetterLexer> extractor)
     : output_{std::make_shared<char_adapters::CharOStreamAdapter>(
-          output /*TODO: use move*/)} {
+          std::move(output))} {
   const auto splittedText = std::move(extractor)->Split(std::move(input));
   auto root = huffman_tree::BuildHuffmanTree(splittedText);
   WriteTreeInPrefixForm(root.get());
@@ -80,7 +80,7 @@ void HuffmanEncrypt::WriteEncryptedText(
     const std::vector<std::unique_ptr<letter::Letter>>& text) {
   const auto codes_by_letter = BuildCodesMap(root);
   for (const auto& letter : text) {
-    const auto letterAsString = letter->toString(); // TODO: REMOVE ME.
+    const auto letterAsString = letter->toString();  // TODO: REMOVE ME.
     assert(codes_by_letter.contains(letterAsString));
     for (const auto bit : codes_by_letter.at(letterAsString)) {
       output_->WriteBit(bit);
