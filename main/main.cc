@@ -7,16 +7,13 @@
 
 #include "CLI11/CLI11.hpp"
 #include "encryption/huffman_encryption.h"
-
-std::set<std::string> GetAllCharactersAlphabet();
-std::set<std::string> GetAlphabetFromFile(const std::string& file_name);
-std::set<std::string> UnionTwoAlphabets(const std::set<std::string>& lhs,
-                                        const std::set<std::string>& rhs);
+#include "letter/one_byte_letter.h"
 
 int main(int argc, char* argv[]) {
   CLI::App app{"Huffman archiver"};
   app.require_subcommand(1);
 
+  // TODO: create InstallCryptSubcommand and InstallDecryptSubcommand and use them here.
   auto crypt_command = app.add_subcommand("crypt", "Crypt passed file.");
   std::string file_to_crypt;
   crypt_command->add_option("file", file_to_crypt, "File to crypt.");
@@ -36,12 +33,8 @@ int main(int argc, char* argv[]) {
           std::make_shared<std::ifstream>(file_to_crypt_path, std::ios::binary);
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
-      auto alphabet = GetAllCharactersAlphabet();
-      if (!alphabet_file.empty()) {
-        alphabet =
-            UnionTwoAlphabets(GetAlphabetFromFile(alphabet_file), alphabet);
-      }
-      encryption::HuffmanEncrypt(std::move(input), std::move(output), alphabet);
+      auto letterLexer = std::make_shared<letter::OneByteLetterLexer>();
+      encryption::HuffmanEncrypt(std::move(input), std::move(output), std::move(letterLexer));
     }
   });
 
@@ -64,7 +57,6 @@ int main(int argc, char* argv[]) {
 
       auto input = std::make_shared<std::ifstream>(file_to_decrypt_path,
                                                    std::ios::binary);
-
       std::filesystem::path compressed_file_name =
           file_to_decrypt_path.filename().replace_extension("");
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
@@ -75,31 +67,4 @@ int main(int argc, char* argv[]) {
 
   CLI11_PARSE(app, argc, argv);
   return 0;
-}
-
-std::set<std::string> GetAllCharactersAlphabet() {
-  std::set<std::string> alphabet;
-  for (int letter = 0; letter < 256; ++letter) {
-    alphabet.insert(std::string{static_cast<char>(letter)});
-  }
-  return alphabet;
-}
-
-std::set<std::string> GetAlphabetFromFile(const std::string& file_name) {
-  std::ifstream alphabet_file(file_name);
-
-  std::set<std::string> alphabet;
-  std::string letter;
-  while (alphabet_file >> letter) {
-    alphabet.insert(letter);
-  }
-
-  return alphabet;
-}
-
-std::set<std::string> UnionTwoAlphabets(const std::set<std::string>& lhs,
-                                        const std::set<std::string>& rhs) {
-  auto alphabet = lhs;
-  alphabet.insert(rhs.cbegin(), rhs.cend());
-  return alphabet;
 }

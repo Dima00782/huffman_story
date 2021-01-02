@@ -5,6 +5,8 @@ cc_binary(
     ],
     deps = [
         "//third_party/CLI11:CLI11",
+        "//letter:letter",
+        "//letter:one_byte_letter",
         "//encryption:huffman_encryption",
     ],
     visibility = ["//visibility:public"],

@@ -3,10 +3,7 @@ cc_library(
     hdrs = [
         "letter.h",
     ],
-    visibility = [
-        "//encryption:__pkg__",
-        "//test:__pkg__",
-    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -14,8 +11,5 @@ cc_library(
     hdrs = [
         "one_byte_letter.h",
     ],
-    visibility = [
-        "//encryption:__pkg__",
-        "//test:__pkg__",
-    ],
+    visibility = ["//visibility:public"],
 )
