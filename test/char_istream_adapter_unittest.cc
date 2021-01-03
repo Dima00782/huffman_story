@@ -87,7 +87,8 @@ TEST(CharIStreamAdapter, OneUnusedBits) {
 }
 
 TEST(CharIStreamAdapter, ZeroUnusedBits) {
-  auto istring_stream = std::make_shared<std::istringstream>(std::string("\xaa\x00", 2));
+  auto istring_stream =
+      std::make_shared<std::istringstream>(std::string("\xaa\x00", 2));
   char_adapters::CharIStreamAdapter bit_reader{std::move(istring_stream)};
 
   EXPECT_TRUE(*bit_reader.ReadBit());

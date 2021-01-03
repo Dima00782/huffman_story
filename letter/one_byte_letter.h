@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 #include <utility>
+#include <cassert>
 
 #include "letter/letter.h"
 
@@ -37,15 +38,12 @@ class OneByteLetterLexer final : public LetterLexer {
   std::vector<std::unique_ptr<Letter>> Split(
       std::shared_ptr<std::istream> input) override {
     std::vector<std::unique_ptr<Letter>> letters;
-    for (char symbol = '\0'; *input_ >> symbol;) {
+    for (char letter = '\0'; *input >> letter;) {
       letters.push_back(
-          std::make_unique<OneByteLetter>(static_cast<std::byte>(symbol)));
+          std::make_unique<OneByteLetter>(static_cast<std::byte>(letter)));
     }
     return letters;
   }
-
- private:
-  std::shared_ptr<std::istream> input_;
 };
 
 class OneByteLetterSerializer final : public LetterSerializer {
