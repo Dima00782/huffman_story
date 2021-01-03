@@ -1,6 +1,7 @@
 cc_test(
     name = "unittest",
     srcs = [
+        "char_istream_adapter_unittest.cc",
         "char_ostream_adapter_unittest.cc",
         "encryption_unittest.cc",
         "huffman_tree_builder_unittest.cc",
