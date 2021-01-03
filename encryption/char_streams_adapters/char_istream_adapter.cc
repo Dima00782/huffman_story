@@ -21,6 +21,7 @@ static_assert(kMinimumQueueSize % CHAR_BIT == 0,
 CharIStreamAdapter::CharIStreamAdapter(
     std::shared_ptr<std::istream> underlying_reader)
     : underlying_reader_{underlying_reader} {
+  // TODO: THIS LOGIC IS THE SAME AS IN CharIStreamAdapter::ReadBit, DON'T REPEAT YOURSELF!
   for (uint32_t i = 0u; i < kMinimumQueueSize / CHAR_BIT; ++i) {
     char byte = '\0';
     if (!underlying_reader_->get(byte)) {
