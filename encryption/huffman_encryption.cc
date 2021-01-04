@@ -10,8 +10,8 @@
 
 #include "encryption/bit_io/bit_reader.h"
 #include "encryption/bit_io/bit_writer.h"
-#include "encryption/char_streams_adapters/char_istream_adapter.h"
-#include "encryption/char_streams_adapters/char_ostream_adapter.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_reader.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
 #include "encryption/huffman_tree/huffman_tree_builder.h"
 #include "encryption/text_splitter/text_splitter.h"
 
@@ -33,7 +33,7 @@ std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
 HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
                                std::shared_ptr<std::ostream> output,
                                std::shared_ptr<letter::LetterLexer> extractor)
-    : output_{std::make_shared<char_adapters::CharOStreamAdapter>(
+    : output_{std::make_shared<char_adapters::CharAlignedBitWriter>(
           std::move(output))} {
   const auto splittedText = std::move(extractor)->Split(std::move(input));
   auto root = huffman_tree::BuildHuffmanTree(splittedText);
@@ -137,7 +137,7 @@ std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
 
 HuffmanDecrypt::HuffmanDecrypt(std::shared_ptr<std::istream> input,
                                std::shared_ptr<std::ostream> output)
-    : input_{std::make_shared<char_adapters::CharIStreamAdapter>(input)} {
+    : input_{std::make_shared<char_adapters::CharAlignedBitReader>(input)} {
   output_ = std::move(output);
   auto root = ReadTreeInPrefixForm();
   WriteDecryptedText(root.get());

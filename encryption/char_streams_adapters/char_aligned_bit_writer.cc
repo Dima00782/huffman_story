@@ -1,4 +1,4 @@
-#include "encryption/char_streams_adapters/char_ostream_adapter.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
 
 #include <cassert>
 #include <climits>
@@ -18,10 +18,10 @@ constexpr uint32_t kBufferSizeInBits = 1024u * 1024u * 8u;
 static_assert(kBufferSizeInBits % CHAR_BIT == 0);
 }  // namespace
 
-CharOStreamAdapter::CharOStreamAdapter(std::shared_ptr<std::ostream> ostream)
+CharAlignedBitWriter::CharAlignedBitWriter(std::shared_ptr<std::ostream> ostream)
     : underlying_writer_{ostream} {}
 
-CharOStreamAdapter::~CharOStreamAdapter() {
+CharAlignedBitWriter::~CharAlignedBitWriter() {
   if (!has_bits_written_) {
     return;
   }
@@ -30,7 +30,7 @@ CharOStreamAdapter::~CharOStreamAdapter() {
   FlushBuffer();
 }
 
-void CharOStreamAdapter::WriteFooter() {
+void CharAlignedBitWriter::WriteFooter() {
   auto num_unused_bits_in_last_byte = kNumBitsForStoringAlignment;
   while (num_of_filled_bits_in_last_byte_ !=
          (CHAR_BIT - kNumBitsForStoringAlignment)) {
@@ -50,7 +50,7 @@ void CharOStreamAdapter::WriteFooter() {
   assert(num_of_filled_bits_in_last_byte_ == 0u);
 }
 
-void CharOStreamAdapter::WriteBit(bool enabled) {
+void CharAlignedBitWriter::WriteBit(bool enabled) {
   has_bits_written_ = true;
   if (buffer_.size() == kBufferSizeInBits) {
     FlushBuffer();
@@ -62,7 +62,7 @@ void CharOStreamAdapter::WriteBit(bool enabled) {
       (num_of_filled_bits_in_last_byte_ + 1) % CHAR_BIT;
 }
 
-void CharOStreamAdapter::FlushBuffer() {
+void CharAlignedBitWriter::FlushBuffer() {
   assert(buffer_.size() % CHAR_BIT == 0);
   for (uint32_t byte_num = 0; byte_num < buffer_.size() / CHAR_BIT;
        ++byte_num) {

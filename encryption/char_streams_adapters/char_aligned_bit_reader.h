@@ -9,10 +9,10 @@
 
 namespace char_adapters {
 
-class CharIStreamAdapter : public bit_io::BitReader {
+class CharAlignedBitReader : public bit_io::BitReader {
  public:
-  explicit CharIStreamAdapter(std::shared_ptr<std::istream> underlying_reader);
-  ~CharIStreamAdapter() override = default;
+  explicit CharAlignedBitReader(std::shared_ptr<std::istream> underlying_reader);
+  ~CharAlignedBitReader() override = default;
 
   std::optional<bool> ReadBit() override;
 

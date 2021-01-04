@@ -9,10 +9,10 @@
 
 namespace char_adapters {
 
-class CharOStreamAdapter : public bit_io::BitWriter {
+class CharAlignedBitWriter : public bit_io::BitWriter {
  public:
-  explicit CharOStreamAdapter(std::shared_ptr<std::ostream> ostream);
-  ~CharOStreamAdapter() override;
+  explicit CharAlignedBitWriter(std::shared_ptr<std::ostream> ostream);
+  ~CharAlignedBitWriter() override;
 
   void WriteBit(bool enabled) override;
 

@@ -1,29 +1,29 @@
-#include "encryption/char_streams_adapters/char_ostream_adapter.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
 #include "gtest/gtest.h"
 
 #include <memory>
 #include <sstream>
 
-TEST(CharOStreamAdapter, EmptyBits) {
+TEST(CharAlignedBitWriter, EmptyBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
-  { char_adapters::CharOStreamAdapter bit_writer{ostring_stream}; }
+  { char_adapters::CharAlignedBitWriter bit_writer{ostring_stream}; }
 
   EXPECT_TRUE(ostring_stream->str().empty());
 }
 
-TEST(CharOStreamAdapter, SevenUnusedBits) {
+TEST(CharAlignedBitWriter, SevenUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharOStreamAdapter bit_writer{ostring_stream};
+    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     bit_writer.WriteBit(true);
   }
   EXPECT_EQ(ostring_stream->str(), "\x87");
 }
 
-TEST(CharOStreamAdapter, SixUnusedBits) {
+TEST(CharAlignedBitWriter, SixUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharOStreamAdapter bit_writer{ostring_stream};
+    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
   }
@@ -31,10 +31,10 @@ TEST(CharOStreamAdapter, SixUnusedBits) {
   EXPECT_EQ(ostring_stream->str(), "\x46");
 }
 
-TEST(CharOStreamAdapter, FiveUnusedBits) {
+TEST(CharAlignedBitWriter, FiveUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharOStreamAdapter bit_writer{ostring_stream};
+    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
@@ -42,10 +42,10 @@ TEST(CharOStreamAdapter, FiveUnusedBits) {
   EXPECT_EQ(ostring_stream->str(), "\xc5");
 }
 
-TEST(CharOStreamAdapter, FourUnusedBits) {
+TEST(CharAlignedBitWriter, FourUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharOStreamAdapter bit_writer{ostring_stream};
+    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
@@ -54,10 +54,10 @@ TEST(CharOStreamAdapter, FourUnusedBits) {
   EXPECT_EQ(ostring_stream->str(), "\xb4");
 }
 
-TEST(CharOStreamAdapter, ThreeUnusedBits) {
+TEST(CharAlignedBitWriter, ThreeUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharOStreamAdapter bit_writer{ostring_stream};
+    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
@@ -67,10 +67,10 @@ TEST(CharOStreamAdapter, ThreeUnusedBits) {
   EXPECT_EQ(ostring_stream->str(), "\xb3");
 }
 
-TEST(CharOStreamAdapter, TwoUnusedBits) {
+TEST(CharAlignedBitWriter, TwoUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharOStreamAdapter bit_writer{ostring_stream};
+    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);
@@ -83,10 +83,10 @@ TEST(CharOStreamAdapter, TwoUnusedBits) {
             "\x02");
 }
 
-TEST(CharOStreamAdapter, OneUnusedBit) {
+TEST(CharAlignedBitWriter, OneUnusedBit) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharOStreamAdapter bit_writer{ostring_stream};
+    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     bit_writer.WriteBit(true);
     bit_writer.WriteBit(false);
     bit_writer.WriteBit(true);

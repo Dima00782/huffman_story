@@ -1,4 +1,4 @@
-#include "encryption/char_streams_adapters/char_istream_adapter.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_reader.h"
 
 #include <cassert>
 #include <climits>
@@ -18,10 +18,10 @@ static_assert(kMinimumQueueSize % CHAR_BIT == 0,
               "kMinimumQueueSize should be byte aligned.");
 }  // namespace
 
-CharIStreamAdapter::CharIStreamAdapter(
+CharAlignedBitReader::CharAlignedBitReader(
     std::shared_ptr<std::istream> underlying_reader)
     : underlying_reader_{underlying_reader} {
-  // TODO: THIS LOGIC IS THE SAME AS IN CharIStreamAdapter::ReadBit, DON'T REPEAT YOURSELF!
+  // TODO: THIS LOGIC IS THE SAME AS IN CharAlignedBitReader::ReadBit, DON'T REPEAT YOURSELF!
   for (uint32_t i = 0u; i < kMinimumQueueSize / CHAR_BIT; ++i) {
     char byte = '\0';
     if (!underlying_reader_->get(byte)) {
@@ -36,7 +36,7 @@ CharIStreamAdapter::CharIStreamAdapter(
   }
 }
 
-std::optional<bool> CharIStreamAdapter::ReadBit() {
+std::optional<bool> CharAlignedBitReader::ReadBit() {
   if (look_ahead_queue_.empty()) {
     return std::nullopt;
   }
@@ -62,7 +62,7 @@ std::optional<bool> CharIStreamAdapter::ReadBit() {
   return bit_value;
 }
 
-void CharIStreamAdapter::RemoveUnusedBitsInLastByte() {
+void CharAlignedBitReader::RemoveUnusedBitsInLastByte() {
   char num_unused_bits_in_last_byte = '\0';
   for (uint8_t bit_pos = 1; bit_pos <= kNumBitsForStoringAlignment; ++bit_pos) {
     const bool bit_enabled = look_ahead_queue_.back();
@@ -83,7 +83,7 @@ void CharIStreamAdapter::RemoveUnusedBitsInLastByte() {
   }
 }
 
-bool CharIStreamAdapter::HasAdditionalByteUsed(
+bool CharAlignedBitReader::HasAdditionalByteUsed(
     uint8_t num_unused_bits_in_last_byte) {
   return num_unused_bits_in_last_byte < kNumBitsForStoringAlignment;
 }

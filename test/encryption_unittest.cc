@@ -1,6 +1,6 @@
 #include "bits_manipulation/bits_manipulation.h"
-#include "encryption/char_streams_adapters/char_istream_adapter.h"
-#include "encryption/char_streams_adapters/char_ostream_adapter.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_reader.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
 #include "encryption/huffman_encryption.h"
 #include "gtest/gtest.h"
 
