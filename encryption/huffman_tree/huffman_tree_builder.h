@@ -15,15 +15,16 @@ namespace huffman_tree {
 
 namespace {
 template <class InputRange>
-std::unordered_map<std::string, uint32_t> CountLetters(const InputRange& text);
+std::unordered_map<std::shared_ptr<letter::Letter>, uint32_t> CountLetters(
+    const InputRange& text);
 }  // namespace
 
 struct TreeNode {
-  TreeNode(const std::string& key,
+  TreeNode(std::shared_ptr<letter::Letter> key,
            uint32_t frequency,
            std::unique_ptr<TreeNode> left,
            std::unique_ptr<TreeNode> right)
-      : key_{key},
+      : key_{std::move(key)},
         frequency_{frequency},
         left_{std::move(left)},
         right_{std::move(right)} {}
@@ -31,7 +32,7 @@ struct TreeNode {
   bool isLeaf() const { return !left_ && !right_; }
   bool isInner() const { return left_ && right_; }
 
-  std::string key_;
+  std::shared_ptr<letter::Letter> key_;
   uint32_t frequency_;
   std::unique_ptr<TreeNode> left_;
   std::unique_ptr<TreeNode> right_;
@@ -66,7 +67,7 @@ std::unique_ptr<TreeNode> BuildHuffmanTree(const InputRange& text) {
 
     const auto total_frequency =
         first_minimum->frequency_ + second_minimum->frequency_;
-    auto union_node = std::make_unique<TreeNode>("", total_frequency,
+    auto union_node = std::make_unique<TreeNode>(nullptr, total_frequency,
                                                  std::move(first_minimum),
                                                  std::move(second_minimum));
     nodes.emplace_back(std::move(union_node));
@@ -78,14 +79,11 @@ std::unique_ptr<TreeNode> BuildHuffmanTree(const InputRange& text) {
 
 namespace {
 template <class InputRange>
-std::unordered_map<std::string, uint32_t> CountLetters(const InputRange& text) {
-  std::unordered_map<std::string, uint32_t> letter_count;
-  std::for_each(
-      std::cbegin(text), std::cend(text),
-      [&letter_count](const auto& letter) {
-        std::string ss = letter->toString();
-        ++letter_count[ss];
-      });
+std::unordered_map<std::shared_ptr<letter::Letter>, uint32_t> CountLetters(
+    const InputRange& text) {
+  std::unordered_map<std::shared_ptr<letter::Letter>, uint32_t> letter_count;
+  std::for_each(std::cbegin(text), std::cend(text),
+                [&letter_count](auto& letter) { ++letter_count[letter]; });
   return letter_count;
 }
 }  // namespace

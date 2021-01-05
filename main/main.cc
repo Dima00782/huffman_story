@@ -13,7 +13,8 @@ int main(int argc, char* argv[]) {
   CLI::App app{"Huffman archiver"};
   app.require_subcommand(1);
 
-  // TODO: create InstallCryptSubcommand and InstallDecryptSubcommand and use them here.
+  // TODO: create InstallCryptSubcommand and InstallDecryptSubcommand and use
+  // them here.
   auto crypt_command = app.add_subcommand("crypt", "Crypt passed file.");
   std::string file_to_crypt;
   crypt_command->add_option("file", file_to_crypt, "File to crypt.");
@@ -34,7 +35,11 @@ int main(int argc, char* argv[]) {
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
       auto letterLexer = std::make_shared<letter::OneByteLetterLexer>();
-      encryption::HuffmanEncrypt(std::move(input), std::move(output), std::move(letterLexer));
+      auto letterserializer =
+          std::make_shared<letter::OneByteLetterSerializer>();
+      encryption::HuffmanEncrypt(std::move(input), std::move(output),
+                                 std::move(letterLexer),
+                                 std::move(letterserializer));
     }
   });
 
@@ -61,7 +66,10 @@ int main(int argc, char* argv[]) {
           file_to_decrypt_path.filename().replace_extension("");
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
-      encryption::HuffmanDecrypt(std::move(input), std::move(output));
+      auto letterserializer =
+          std::make_shared<letter::OneByteLetterSerializer>();
+      encryption::HuffmanDecrypt(std::move(input), std::move(output),
+                                 std::move(letterserializer));
     }
   });
 

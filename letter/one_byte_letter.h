@@ -35,12 +35,12 @@ class OneByteLetterLexer final : public LetterLexer {
  public:
   ~OneByteLetterLexer() override {}
 
-  std::vector<std::unique_ptr<Letter>> Split(
+  std::vector<std::shared_ptr<Letter>> Split(
       std::shared_ptr<std::istream> input) override {
-    std::vector<std::unique_ptr<Letter>> letters;
+    std::vector<std::shared_ptr<Letter>> letters;
     for (char letter = '\0'; *input >> letter;) {
       letters.push_back(
-          std::make_unique<OneByteLetter>(static_cast<std::byte>(letter)));
+          std::make_shared<OneByteLetter>(static_cast<std::byte>(letter)));
     }
     return letters;
   }
@@ -50,10 +50,10 @@ class OneByteLetterSerializer final : public LetterSerializer {
  public:
   ~OneByteLetterSerializer() override {}
 
-  std::unique_ptr<Letter> ReadSerialized(bit_io::BitReader& input) override {
+  std::shared_ptr<Letter> ReadSerialized(bit_io::BitReader& input) override {
     const auto byte = input.ReadByte();
     if (byte) {
-      return std::make_unique<OneByteLetter>(static_cast<std::byte>(*byte));
+      return std::make_shared<OneByteLetter>(static_cast<std::byte>(*byte));
     }
     return nullptr;
   }

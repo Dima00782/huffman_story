@@ -25,16 +25,19 @@ constexpr bool kTurnLeftBitLabel = false;
 constexpr bool kTurnRightBitLabel = true;
 constexpr uint8_t kNumBitsForKeySize = 8u;
 
-std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
-    huffman_tree::TreeNode* root);
+std::unordered_map<std::shared_ptr<letter::Letter>, std::vector<bool>>
+BuildCodesMap(huffman_tree::TreeNode* root);
 
 }  // namespace
 
-HuffmanEncrypt::HuffmanEncrypt(std::shared_ptr<std::istream> input,
-                               std::shared_ptr<std::ostream> output,
-                               std::shared_ptr<letter::LetterLexer> extractor)
+HuffmanEncrypt::HuffmanEncrypt(
+    std::shared_ptr<std::istream> input,
+    std::shared_ptr<std::ostream> output,
+    std::shared_ptr<letter::LetterLexer> extractor,
+    std::shared_ptr<letter::LetterSerializer> serializer)
     : output_{std::make_shared<char_adapters::CharAlignedBitWriter>(
-          std::move(output))} {
+          std::move(output))},
+      serializer_{std::move(serializer)} {
   const auto splittedText = std::move(extractor)->Split(std::move(input));
   auto root = huffman_tree::BuildHuffmanTree(splittedText);
   WriteTreeInPrefixForm(root.get());
@@ -57,42 +60,27 @@ void HuffmanEncrypt::WriteNode(huffman_tree::TreeNode* node) {
     output_->WriteBit(kInnerNodeBitLabel);
   } else {
     output_->WriteBit(kLeafNodeBitLabel);
-    WriteNodeKey(node->key_);
+    serializer_->WriteSerialized(*output_, *node->key_);
   }
-}
-
-void HuffmanEncrypt::WriteNodeKey(const std::string& key) {
-  WriteKeySize(key.size());
-
-  for (const auto byte : key) {
-    output_->WriteByte(byte);
-  }
-}
-
-void HuffmanEncrypt::WriteKeySize(const std::size_t size) {
-  assert(size < std::numeric_limits<unsigned char>::max());
-  const auto key_size = static_cast<char>(size);
-  output_->WriteByte(key_size);
 }
 
 void HuffmanEncrypt::WriteEncryptedText(
     huffman_tree::TreeNode* root,
-    const std::vector<std::unique_ptr<letter::Letter>>& text) {
+    const std::vector<std::shared_ptr<letter::Letter>>& text) {
   const auto codes_by_letter = BuildCodesMap(root);
   for (const auto& letter : text) {
-    const auto letterAsString = letter->toString();  // TODO: REMOVE ME.
-    assert(codes_by_letter.contains(letterAsString));
-    for (const auto bit : codes_by_letter.at(letterAsString)) {
+    assert(codes_by_letter.contains(letter));
+    for (const auto bit : codes_by_letter.at(letter)) {
       output_->WriteBit(bit);
     }
   }
 }
 
 namespace {
-std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
-    huffman_tree::TreeNode* root) {
+std::unordered_map<std::shared_ptr<letter::Letter>, std::vector<bool>>
+BuildCodesMap(huffman_tree::TreeNode* root) {
   assert(root);
-  std::unordered_map<std::string, std::vector<bool>> codes;
+  std::unordered_map<std::shared_ptr<letter::Letter>, std::vector<bool>> codes;
 
   if (root->isLeaf()) {
     codes[root->key_] = std::vector<bool>(1, kTurnLeftBitLabel);
@@ -135,28 +123,33 @@ std::unordered_map<std::string, std::vector<bool>> BuildCodesMap(
 }
 }  // namespace
 
-HuffmanDecrypt::HuffmanDecrypt(std::shared_ptr<std::istream> input,
-                               std::shared_ptr<std::ostream> output)
-    : input_{std::make_shared<char_adapters::CharAlignedBitReader>(input)} {
+HuffmanDecrypt::HuffmanDecrypt(
+    std::shared_ptr<std::istream> input,
+    std::shared_ptr<std::ostream> output,
+    std::shared_ptr<letter::LetterSerializer> serializer)
+    : input_{std::make_shared<char_adapters::CharAlignedBitReader>(input)},
+      serializer_{std::move(serializer)} {
   output_ = std::move(output);
   auto root = ReadTreeInPrefixForm();
   WriteDecryptedText(root.get());
 }
 
 std::unique_ptr<huffman_tree::TreeNode> HuffmanDecrypt::ReadTreeInPrefixForm() {
+  // TODO: remove auto, make it std::optional<bool> and then use if (!bit)
   const auto bit = input_->ReadBit();
   if (!bit.has_value()) {
     return nullptr;
   }
 
   if (*bit == kLeafNodeBitLabel) {
-    const auto node_key = ReadNodeKey();
-    return std::make_unique<huffman_tree::TreeNode>(node_key, 0, nullptr,
-                                                    nullptr);
+    auto node_key = serializer_->ReadSerialized(*input_);
+    return std::make_unique<huffman_tree::TreeNode>(std::move(node_key), 0,
+                                                    nullptr, nullptr);
   }
 
   assert(*bit == kInnerNodeBitLabel);
-  auto node = std::make_unique<huffman_tree::TreeNode>("", 0, nullptr, nullptr);
+  auto node =
+      std::make_unique<huffman_tree::TreeNode>(nullptr, 0, nullptr, nullptr);
   node->left_ = std::move(ReadTreeInPrefixForm());
   node->right_ = std::move(ReadTreeInPrefixForm());
   return node;
@@ -179,24 +172,11 @@ void HuffmanDecrypt::WriteDecryptedText(huffman_tree::TreeNode* root) {
     }
 
     if (current_node->isLeaf()) {
-      output_->put(current_node->key_.back());
+      // TODO: FIXME!
+      output_->put(current_node->key_->toString().back());
       current_node = root;
     }
   }
-}
-
-std::string HuffmanDecrypt::ReadNodeKey() {
-  const auto size_byte = input_->ReadByte();
-  assert(size_byte.has_value());
-
-  std::string node_key;
-  for (uint8_t i = 0; i < size_byte; ++i) {
-    const auto symbol = input_->ReadByte();
-    assert(symbol.has_value());
-    node_key += *symbol;
-  }
-
-  return node_key;
 }
 
 }  // namespace encryption
