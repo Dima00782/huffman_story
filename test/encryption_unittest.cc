@@ -1,7 +1,3 @@
-#include "bits_manipulation/bits_manipulation.h"
-#include "encryption/char_streams_adapters/char_aligned_bit_reader.h"
-#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
-#include "encryption/huffman_encryption.h"
 #include "gtest/gtest.h"
 
 #include <iterator>
@@ -9,61 +5,53 @@
 #include <sstream>
 #include <string>
 
-/*
+#include "bits_manipulation/bits_manipulation.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_reader.h"
+#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
+#include "encryption/huffman_encryption.h"
+#include "letter/one_byte_letter.h"
+
+// TODO: add a generic SetLexer and SetSeri
 class EncryptionAcceptanceTestBase : public ::testing::Test {
  public:
   std::string EncryptText(const std::string& text) {
     auto string_input = std::make_shared<std::istringstream>(text);
     auto ostring_stream = std::make_shared<std::ostringstream>();
-    encryption::HuffmanEncrypt(string_input, ostring_stream, alphabet_);
+    auto letterLexer = std::make_shared<letter::OneByteLetterLexer>();
+    auto letterSerializer = std::make_shared<letter::OneByteLetterSerializer>();
+    encryption::HuffmanEncrypt(string_input, ostring_stream, letterLexer,
+                               letterSerializer);
     return ostring_stream->str();
   }
 
   std::string DecryptText(const std::string& text) {
     auto string_input = std::make_shared<std::istringstream>(text);
     auto string_output = std::make_shared<std::ostringstream>();
-    encryption::HuffmanDecrypt(string_input, string_output);
+    auto letterSerializer = std::make_shared<letter::OneByteLetterSerializer>();
+    encryption::HuffmanDecrypt(string_input, string_output, letterSerializer);
     return string_output->str();
   }
-
-  void SetAlphabet(std::set<std::string> alphabet) {
-    alphabet_ = std::move(alphabet);
-  }
-
- private:
-  std::set<std::string> alphabet_;
 };
 
+// TODO: add one byte letter into the name;
 struct TestCase {
   std::string input;
   std::string expected_output;
 };
 
-std::set<std::string> GetEnglishAlphabet() {
-  std::set<std::string> english_alphabet;
-  for (char letter = 'a'; letter <= 'z'; ++letter) {
-    english_alphabet.insert(std::string{letter});
-  }
-  return english_alphabet;
-}
-
-class EncryptionAcceptanceTestEnglishAlphabet
+class EncryptionAcceptanceTestOneByteLetter
     : public EncryptionAcceptanceTestBase,
       public ::testing::WithParamInterface<TestCase> {
- public:
-  EncryptionAcceptanceTestEnglishAlphabet() {
-    SetAlphabet(GetEnglishAlphabet());
-  }
 };
 
-TEST_P(EncryptionAcceptanceTestEnglishAlphabet, EncryptAndDecrypt) {
+TEST_P(EncryptionAcceptanceTestOneByteLetter, EncryptAndDecrypt) {
   EXPECT_EQ(EncryptText(GetParam().input), GetParam().expected_output);
   EXPECT_EQ(DecryptText(GetParam().expected_output), GetParam().input);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     AcceptanceTests,
-    EncryptionAcceptanceTestEnglishAlphabet,
+    EncryptionAcceptanceTestOneByteLetter,
     ::testing::Values(
         TestCase{"aaaaaaa",
                  std::string("\x80\xb0\x80\x00", 4)},  // Zero unused bits.
@@ -81,6 +69,7 @@ INSTANTIATE_TEST_CASE_P(
         TestCase{"aaaabbc",
                  std::string("\x20\x2c\x70\x16\x28\x0b\x0f\xa8\x01", 9)}));
 
+/*
 class EncryptionAcceptanceTestCustomAlphabet
     : public EncryptionAcceptanceTestBase {};
 

@@ -4,7 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 git_repository(
     name = "googletest",
     remote = "https://github.com/google/googletest",
-    tag = "release-1.8.1",
+    tag = "release-1.10.0",
 )
 
 http_file(
