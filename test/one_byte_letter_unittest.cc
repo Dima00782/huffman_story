@@ -63,6 +63,11 @@ TEST(OneByteLetter, Trivial) {
 TEST(OneByteLetter, Hashable) {
   std::unordered_map<std::unique_ptr<Letter>, int> map;
   map.insert(std::pair(std::make_unique<OneByteLetter>(std::byte{'a'}), 10));
+  map.insert(std::pair(std::make_unique<OneByteLetter>(std::byte{'b'}), 20));
+  EXPECT_EQ(map[std::make_unique<OneByteLetter>(std::byte{'a'})], 10);
+  EXPECT_EQ(map[std::make_unique<OneByteLetter>(std::byte{'a'})], 10);
+  EXPECT_EQ(map[std::make_unique<OneByteLetter>(std::byte{'b'})], 20);
+  EXPECT_EQ(map[std::make_unique<OneByteLetter>(std::byte{'b'})], 20);
 }
 
 TEST(OneByteLetter, Lexer) {

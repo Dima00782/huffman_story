@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
 
   // TODO: create InstallCryptSubcommand and InstallDecryptSubcommand and use
   // them here.
+  // Hmm, the library is strange, I need to pass pass a reference to file_to_crypt. 
   auto crypt_command = app.add_subcommand("crypt", "Crypt passed file.");
   std::string file_to_crypt;
   crypt_command->add_option("file", file_to_crypt, "File to crypt.");

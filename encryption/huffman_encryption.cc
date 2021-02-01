@@ -33,12 +33,12 @@ BuildCodesMap(huffman_tree::TreeNode* root);
 HuffmanEncrypt::HuffmanEncrypt(
     std::shared_ptr<std::istream> input,
     std::shared_ptr<std::ostream> output,
-    std::shared_ptr<letter::LetterLexer> extractor,
+    std::shared_ptr<letter::LetterLexer> lexer,
     std::shared_ptr<letter::LetterSerializer> serializer)
     : output_{std::make_shared<char_adapters::CharAlignedBitWriter>(
           std::move(output))},
       serializer_{std::move(serializer)} {
-  const auto splittedText = std::move(extractor)->Split(std::move(input));
+  const auto splittedText = std::move(lexer)->Split(std::move(input));
   auto root = huffman_tree::BuildHuffmanTree(splittedText);
   WriteTreeInPrefixForm(root.get());
   WriteEncryptedText(root.get(), splittedText);

@@ -25,7 +25,7 @@ class HuffmanEncrypt {
  public:
   HuffmanEncrypt(std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output,
-                 std::shared_ptr<letter::LetterLexer> extractor,
+                 std::shared_ptr<letter::LetterLexer> lexer,
                  std::shared_ptr<letter::LetterSerializer> serializer);
 
  private:

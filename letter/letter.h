@@ -28,7 +28,8 @@ class LetterSerializer {
  public:
   virtual ~LetterSerializer() {}
   virtual std::shared_ptr<Letter> ReadSerialized(bit_io::BitReader& input) = 0;
-  virtual bool WriteSerialized(bit_io::BitWriter& output, const Letter& letter) = 0;
+  virtual bool WriteSerialized(bit_io::BitWriter& output,
+                               const Letter& letter) = 0;
 };
 
 class LetterLexer {
@@ -47,6 +48,23 @@ struct hash<letter::Letter*> {
     return letter->Hash();
   }
 };
+
+template <>
+struct equal_to<unique_ptr<letter::Letter>> {
+  bool operator()(const unique_ptr<letter::Letter>& lhs, const unique_ptr<letter::Letter>& rhs) const {
+    // Will be ugly with dynamic casts for checking if two different Letters are actually the same type.
+    return lhs->toString() == rhs->toString();
+  }
+};
+
+template <>
+struct equal_to<shared_ptr<letter::Letter>> {
+  bool operator()(const shared_ptr<letter::Letter>& lhs, const shared_ptr<letter::Letter>& rhs) const {
+    // Will be ugly with dynamic casts for checking if two different Letters are actually the same type.
+    return lhs->toString() == rhs->toString();
+  }
+};
+
 }  // namespace std
 
 #endif  // LETTER_LETTER_H_
