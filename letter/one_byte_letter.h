@@ -1,6 +1,7 @@
 #ifndef SYMBOL_ONE_BYTE_SYMBOL_H_
 #define SYMBOL_ONE_BYTE_SYMBOL_H_
 
+#include <cassert>
 #include <cstddef>
 #include <functional>
 #include <istream>
@@ -8,59 +9,39 @@
 #include <optional>
 #include <string>
 #include <utility>
-#include <cassert>
+#include <vector>
 
-#include "letter/letter.h"
+// TODO: extract bit_io from encryption and make it top level package.
+#include "encryption/bit_io/bit_reader.h"
+#include "encryption/bit_io/bit_writer.h"
 
 namespace letter {
 
-class OneByteLetter final : public Letter {
+class ByteLetterLexer final {
  public:
-  explicit OneByteLetter(std::byte content) : content_{content} {}
-  ~OneByteLetter() override {}
+  ~ByteLetterLexer() {}
 
-  std::size_t Hash() const noexcept override {
-    return std::hash<char>{}(static_cast<char>(content_));
-  }
-
-  std::string toString() const override {
-    return std::string(1, static_cast<char>(content_));
-  }
-
- private:
-  std::byte content_;
-};
-
-class OneByteLetterLexer final : public LetterLexer {
- public:
-  ~OneByteLetterLexer() override {}
-
-  std::vector<std::shared_ptr<Letter>> Split(
-      std::shared_ptr<std::istream> input) override {
-    std::vector<std::shared_ptr<Letter>> letters;
+  std::vector<std::byte> Split(std::shared_ptr<std::istream> input) {
+    std::vector<std::byte> letters;
     for (char letter = '\0'; *input >> letter;) {
-      letters.push_back(
-          std::make_shared<OneByteLetter>(static_cast<std::byte>(letter)));
+      letters.push_back(static_cast<std::byte>(letter));
     }
     return letters;
   }
 };
 
-class OneByteLetterSerializer final : public LetterSerializer {
+class ByteLetterSerializer final {
  public:
-  ~OneByteLetterSerializer() override {}
+  ~ByteLetterSerializer() {}
 
-  std::shared_ptr<Letter> ReadSerialized(bit_io::BitReader& input) override {
+  std::byte ReadSerialized(bit_io::BitReader& input) {
     const auto byte = input.ReadByte();
-    if (byte) {
-      return std::make_shared<OneByteLetter>(static_cast<std::byte>(*byte));
-    }
-    return nullptr;
+    assert(byte);  // TODO: fixme
+    return static_cast<std::byte>(*byte);
   }
 
-  bool WriteSerialized(bit_io::BitWriter& output, const Letter& letter) override {
-    assert(letter.toString().size() == 1);
-    output.WriteByte(static_cast<char>(letter.toString().front()));
+  bool WriteSerialized(bit_io::BitWriter& output, const std::byte letter) {
+    output.WriteByte(static_cast<char>(letter));
     // TODO: FIXME.
     return true;
   }

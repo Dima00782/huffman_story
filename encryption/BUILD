@@ -1,8 +1,5 @@
 cc_library(
     name = "huffman_encryption",
-    srcs = [
-        "huffman_encryption.cc",
-    ],
     hdrs = [
         "huffman_encryption.h",
     ],

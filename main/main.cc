@@ -15,7 +15,8 @@ int main(int argc, char* argv[]) {
 
   // TODO: create InstallCryptSubcommand and InstallDecryptSubcommand and use
   // them here.
-  // Hmm, the library is strange, I need to pass pass a reference to file_to_crypt. 
+  // Hmm, the library is strange, I need to pass pass a reference to
+  // file_to_crypt.
   auto crypt_command = app.add_subcommand("crypt", "Crypt passed file.");
   std::string file_to_crypt;
   crypt_command->add_option("file", file_to_crypt, "File to crypt.");
@@ -35,12 +36,12 @@ int main(int argc, char* argv[]) {
           std::make_shared<std::ifstream>(file_to_crypt_path, std::ios::binary);
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
-      auto letterLexer = std::make_shared<letter::OneByteLetterLexer>();
-      auto letterserializer =
-          std::make_shared<letter::OneByteLetterSerializer>();
-      encryption::HuffmanEncrypt(std::move(input), std::move(output),
-                                 std::move(letterLexer),
-                                 std::move(letterserializer));
+      auto letter_lexer = std::make_unique<letter::ByteLetterLexer>();
+      auto letter_serializer = std::make_unique<letter::ByteLetterSerializer>();
+      encryption::HuffmanEncrypt<std::byte, letter::ByteLetterLexer,
+                                 letter::ByteLetterSerializer>(
+          std::move(input), std::move(output), std::move(letter_lexer),
+          std::move(letter_serializer));
     }
   });
 
@@ -67,10 +68,10 @@ int main(int argc, char* argv[]) {
           file_to_decrypt_path.filename().replace_extension("");
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
-      auto letterserializer =
-          std::make_shared<letter::OneByteLetterSerializer>();
-      encryption::HuffmanDecrypt(std::move(input), std::move(output),
-                                 std::move(letterserializer));
+      auto letter_serializer = std::make_unique<letter::ByteLetterSerializer>();
+      encryption::HuffmanDecrypt<std::byte, letter::ByteLetterLexer,
+                                 letter::ByteLetterSerializer>(
+          std::move(input), std::move(output), std::move(letter_serializer));
     }
   });
 
