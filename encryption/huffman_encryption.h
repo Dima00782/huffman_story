@@ -79,7 +79,6 @@ std::unordered_map<LetterType, std::vector<bool>> BuildCodesMap(
 }  // namespace
 
 namespace encryption {
-
 template <typename LetterType,
           typename LetterLexerType,
           typename LetterSerializerType>

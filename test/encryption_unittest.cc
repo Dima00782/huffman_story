@@ -11,42 +11,63 @@
 #include "encryption/huffman_encryption.h"
 #include "letter/one_byte_letter.h"
 
-class EncryptionAcceptanceTestBase : public ::testing::Test {
- public:
-  std::string EncryptText(const std::string& text) {
-    auto string_input = std::make_shared<std::istringstream>(text);
-    auto ostring_stream = std::make_shared<std::ostringstream>();
-    auto letterLexer = std::make_unique<letter::ByteLetterLexer>();
-    auto letter_serializer = std::make_unique<letter::ByteLetterSerializer>();
-    encryption::HuffmanEncrypt<std::byte, letter::ByteLetterLexer,
-                               letter::ByteLetterSerializer>(
-        string_input, ostring_stream, std::move(letterLexer),
-        std::move(letter_serializer));
-    return ostring_stream->str();
-  }
+template <typename LetterType,
+          typename LetterLexerType,
+          typename LetterSerializerType>
+std::string EncryptTextBase(
+    const std::string& text,
+    std::unique_ptr<LetterLexerType> letter_lexer,
+    std::unique_ptr<LetterSerializerType> letter_serializer) {
+  auto string_input = std::make_shared<std::istringstream>(text);
+  auto ostring_stream = std::make_shared<std::ostringstream>();
+  encryption::HuffmanEncrypt<LetterType, LetterLexerType, LetterSerializerType>(
+      string_input, ostring_stream, std::move(letter_lexer),
+      std::move(letter_serializer));
+  return ostring_stream->str();
+}
 
-  std::string DecryptText(const std::string& text) {
-    auto string_input = std::make_shared<std::istringstream>(text);
-    auto string_output = std::make_shared<std::ostringstream>();
-    auto letter_serializer = std::make_unique<letter::ByteLetterSerializer>();
-    encryption::HuffmanDecrypt<std::byte, letter::ByteLetterLexer, letter::ByteLetterSerializer>(string_input, string_output, std::move(letter_serializer));
-    return string_output->str();
-  }
-};
+template <typename LetterType,
+          typename LetterLexerType,
+          typename LetterSerializerType>
+std::string DecryptTextBase(
+    const std::string& text,
+    std::unique_ptr<LetterSerializerType> letter_serializer) {
+  auto string_input = std::make_shared<std::istringstream>(text);
+  auto string_output = std::make_shared<std::ostringstream>();
+  encryption::HuffmanDecrypt<LetterType, LetterLexerType, LetterSerializerType>(
+      string_input, string_output, std::move(letter_serializer));
+  return string_output->str();
+}
 
-// TODO: add one byte letter into the name;
 struct TestCase {
   std::string input;
   std::string expected_output;
 };
 
 class EncryptionAcceptanceTestOneByteLetter
-    : public EncryptionAcceptanceTestBase,
-      public ::testing::WithParamInterface<TestCase> {};
+    : public ::testing::TestWithParam<TestCase> {
+ public:
+  using LetterT = std::byte;
+  using LexerT = letter::ByteLetterLexer;
+  using SerializerT = letter::ByteLetterSerializer;
+
+  std::string Encrypt(const std::string& text) {
+    auto lexer = std::unique_ptr<LexerT>();
+    auto serializer = std::unique_ptr<SerializerT>();
+    return EncryptTextBase<LetterT, LexerT, SerializerT>(text, std::move(lexer),
+                                                         std::move(serializer));
+  }
+
+  std::string Decrypt(const std::string& text) {
+    auto serializer = std::unique_ptr<SerializerT>();
+    return DecryptTextBase<LetterT, LexerT, SerializerT>(text,
+                                                         std::move(serializer));
+  }
+};
 
 TEST_P(EncryptionAcceptanceTestOneByteLetter, EncryptAndDecrypt) {
-  EXPECT_EQ(EncryptText(GetParam().input), GetParam().expected_output);
-  EXPECT_EQ(DecryptText(GetParam().expected_output), GetParam().input);
+  EXPECT_EQ(Encrypt(GetParam().input), GetParam().expected_output);
+  EXPECT_EQ(Decrypt(GetParam().expected_output), GetParam().input);
 }
 
 INSTANTIATE_TEST_SUITE_P(
