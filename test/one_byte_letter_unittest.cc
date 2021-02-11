@@ -56,52 +56,35 @@ class StringBasedBitWriter : public bit_io::BitWriter {
 
 namespace letter {
 
-// TEST(OneByteLetter, Trivial) {
-//   auto letter = std::make_unique<OneByteLetter>(std::byte{'a'});
-// }
+TEST(OneByteLetter, Lexer) {
+  ByteLetterLexer lexer;
+  auto result = lexer.Split(std::make_shared<std::istringstream>("abcdefg"));
+  EXPECT_EQ(result.size(), 7u);
+  EXPECT_EQ(result[0], std::byte('a'));
+  EXPECT_EQ(result[1], std::byte('b'));
+  EXPECT_EQ(result[2], std::byte('c'));
+  EXPECT_EQ(result[3], std::byte('d'));
+  EXPECT_EQ(result[4], std::byte('e'));
+  EXPECT_EQ(result[5], std::byte('f'));
+  EXPECT_EQ(result[6], std::byte('g'));
+}
 
-// TEST(OneByteLetter, Hashable) {
-//   std::unordered_map<std::unique_ptr<Letter>, int> map;
-//   map.insert(std::pair(std::make_unique<OneByteLetter>(std::byte{'a'}), 10));
-//   map.insert(std::pair(std::make_unique<OneByteLetter>(std::byte{'b'}), 20));
-//   EXPECT_EQ(map[std::make_unique<OneByteLetter>(std::byte{'a'})], 10);
-//   EXPECT_EQ(map[std::make_unique<OneByteLetter>(std::byte{'a'})], 10);
-//   EXPECT_EQ(map[std::make_unique<OneByteLetter>(std::byte{'b'})], 20);
-//   EXPECT_EQ(map[std::make_unique<OneByteLetter>(std::byte{'b'})], 20);
-// }
+TEST(OneByteLetter, SerializerRead) {
+  ByteLetterSerializer serializer;
+  StringBasedBitReader input("abc");
+  EXPECT_EQ(*serializer.ReadSerialized(input), std::byte('a'));
+  EXPECT_EQ(*serializer.ReadSerialized(input), std::byte('b'));
+  EXPECT_EQ(*serializer.ReadSerialized(input), std::byte('c'));
+  EXPECT_FALSE(serializer.ReadSerialized(input));
+}
 
-// TEST(OneByteLetter, Lexer) {
-//   auto lexer = std::make_unique<OneByteLetterLexer>();
-//   auto result = lexer->Split(std::make_shared<std::istringstream>("abcdefg"));
-//   EXPECT_EQ(result.size(), 7u);
-//   EXPECT_EQ(result[0]->toString(), "a");
-//   EXPECT_EQ(result[1]->toString(), "b");
-//   EXPECT_EQ(result[2]->toString(), "c");
-//   EXPECT_EQ(result[3]->toString(), "d");
-//   EXPECT_EQ(result[4]->toString(), "e");
-//   EXPECT_EQ(result[5]->toString(), "f");
-//   EXPECT_EQ(result[6]->toString(), "g");
-// }
-
-// TEST(OneByteLetter, SerializerRead) {
-//   auto serializer = std::make_unique<OneByteLetterSerializer>();
-//   StringBasedBitReader input("abc");
-//   EXPECT_EQ(serializer->ReadSerialized(input)->toString(), "a");
-//   EXPECT_EQ(serializer->ReadSerialized(input)->toString(), "b");
-//   EXPECT_EQ(serializer->ReadSerialized(input)->toString(), "c");
-//   EXPECT_EQ(serializer->ReadSerialized(input), nullptr);
-// }
-
-// TEST(OneByteLetter, SerializerWrite) {
-//   auto serializer = std::make_unique<OneByteLetterSerializer>();
-//   StringBasedBitWriter output;
-//   ASSERT_TRUE(
-//       serializer->WriteSerialized(output, OneByteLetter(std::byte{'a'})));
-//   ASSERT_TRUE(
-//       serializer->WriteSerialized(output, OneByteLetter(std::byte{'b'})));
-//   ASSERT_TRUE(
-//       serializer->WriteSerialized(output, OneByteLetter(std::byte{'c'})));
-//   EXPECT_EQ(output.getContent(), "abc");
-// }
+TEST(OneByteLetter, SerializerWrite) {
+  ByteLetterSerializer serializer;
+  StringBasedBitWriter output;
+  ASSERT_TRUE(serializer.WriteSerialized(output, std::byte{'a'}));
+  ASSERT_TRUE(serializer.WriteSerialized(output, std::byte{'b'}));
+  ASSERT_TRUE(serializer.WriteSerialized(output, std::byte{'c'}));
+  EXPECT_EQ(output.getContent(), "abc");
+}
 
 }  // namespace letter
