@@ -154,9 +154,8 @@ class HuffmanDecrypt {
 
  private:
   std::unique_ptr<huffman_tree::TreeNode<LetterType>> ReadTreeInPrefixForm() {
-    // TODO: remove auto, make it std::optional<bool> and then use if (!bit)
-    const auto bit = input_->ReadBit();
-    if (!bit.has_value()) {
+    const std::optional<bool> bit = input_->ReadBit();
+    if (!bit) {
       return nullptr;
     }
 
