@@ -162,8 +162,11 @@ class HuffmanDecrypt {
 
     if (*bit == kLeafNodeBitLabel) {
       auto node_key = serializer_->ReadSerialized(*input_);
+      if (!node_key) {
+        return nullptr;
+      }
       return std::make_unique<huffman_tree::TreeNode<LetterType>>(
-          std::move(node_key), 0, nullptr, nullptr);
+          std::move(*node_key), 0, nullptr, nullptr);
     }
 
     assert(*bit == kInnerNodeBitLabel);
