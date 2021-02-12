@@ -12,26 +12,26 @@ namespace char_adapters {
 namespace {
 constexpr uint8_t kNumBitsForStoringAlignment =
     static_cast<uint8_t>(std::log2(CHAR_BIT));
-
-constexpr uint32_t kMinimumQueueSize = 16u;
-static_assert(kMinimumQueueSize % CHAR_BIT == 0,
-              "kMinimumQueueSize should be byte aligned.");
+constexpr uint32_t kMinimumQueueSizeInBytes = 1024u;
 }  // namespace
 
 CharAlignedBitReader::CharAlignedBitReader(
     std::shared_ptr<std::istream> underlying_reader)
     : underlying_reader_{underlying_reader} {
-  // TODO: THIS LOGIC IS THE SAME AS IN CharAlignedBitReader::ReadBit, DON'T REPEAT YOURSELF!
-  for (uint32_t i = 0u; i < kMinimumQueueSize / CHAR_BIT; ++i) {
+  ConsumeBytes(kMinimumQueueSizeInBytes);
+}
+
+void CharAlignedBitReader::ConsumeBytes(uint32_t num_bytes) {
+  for (uint32_t i = 0u; i < num_bytes; ++i) {
     char byte = '\0';
-    if (!underlying_reader_->get(byte)) {
+    if (underlying_reader_->get(byte)) {
+      for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
+        const auto bit = bits_manipulation::IsBitEnabled(byte, bit_pos);
+        look_ahead_queue_.push_back(bit);
+      }
+    } else if (!is_last_bit_met_) {
       is_last_bit_met_ = true;
       RemoveUnusedBitsInLastByte();
-      return;
-    }
-    for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
-      const auto bit = bits_manipulation::IsBitEnabled(byte, bit_pos);
-      look_ahead_queue_.push_back(bit);
     }
   }
 }
@@ -44,19 +44,8 @@ std::optional<bool> CharAlignedBitReader::ReadBit() {
   const bool bit_value = look_ahead_queue_.front();
   look_ahead_queue_.pop_front();
 
-  if (look_ahead_queue_.size() >= kMinimumQueueSize) {
-    return bit_value;
-  }
-
-  char byte = '\0';
-  if (underlying_reader_->get(byte)) {
-    for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
-      const auto bit = bits_manipulation::IsBitEnabled(byte, bit_pos);
-      look_ahead_queue_.push_back(bit);
-    }
-  } else if (!is_last_bit_met_) {
-    is_last_bit_met_ = true;
-    RemoveUnusedBitsInLastByte();
+  if (look_ahead_queue_.empty()) {
+    ConsumeBytes(kMinimumQueueSizeInBytes);
   }
 
   return bit_value;
