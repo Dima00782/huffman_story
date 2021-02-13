@@ -84,6 +84,8 @@ INSTANTIATE_TEST_SUITE_P(
         TestCase{"a", std::string("\xb0\x86", 2)},     // Six unused bits.
         TestCase{"aaaaaaaa",
                  std::string("\xb0\x80\x07", 3)},  // Seven unused bits.
+        TestCase{"aaaaa bbb",
+                 std::string("\x24\x16\x2b\x0f\xc5\x46", 6)},
         TestCase{"aaabb", std::string("\x58\xac\x3c\x00", 4)},
         TestCase{"aaaabbc", std::string("\x2c\x76\x2b\x0f\xa8\x01", 6)}));
 

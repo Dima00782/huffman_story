@@ -58,15 +58,18 @@ namespace letter {
 
 TEST(OneByteLetter, Lexer) {
   ByteLetterLexer lexer;
-  auto result = lexer.Split(std::make_shared<std::istringstream>("abcdefg"));
-  EXPECT_EQ(result.size(), 7u);
-  EXPECT_EQ(result[0], std::byte('a'));
-  EXPECT_EQ(result[1], std::byte('b'));
-  EXPECT_EQ(result[2], std::byte('c'));
-  EXPECT_EQ(result[3], std::byte('d'));
-  EXPECT_EQ(result[4], std::byte('e'));
-  EXPECT_EQ(result[5], std::byte('f'));
-  EXPECT_EQ(result[6], std::byte('g'));
+  auto result = lexer.Split(std::make_shared<std::istringstream>(" abc defg "));
+  EXPECT_EQ(result.size(), 10u);
+  EXPECT_EQ(result[0], std::byte(' '));
+  EXPECT_EQ(result[1], std::byte('a'));
+  EXPECT_EQ(result[2], std::byte('b'));
+  EXPECT_EQ(result[3], std::byte('c'));
+  EXPECT_EQ(result[4], std::byte(' '));
+  EXPECT_EQ(result[5], std::byte('d'));
+  EXPECT_EQ(result[6], std::byte('e'));
+  EXPECT_EQ(result[7], std::byte('f'));
+  EXPECT_EQ(result[8], std::byte('g'));
+  EXPECT_EQ(result[9], std::byte(' '));
 }
 
 TEST(OneByteLetter, SerializerRead) {

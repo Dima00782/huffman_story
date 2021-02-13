@@ -23,7 +23,7 @@ class ByteLetterLexer final {
 
   std::vector<std::byte> Split(std::shared_ptr<std::istream> input) {
     std::vector<std::byte> letters;
-    for (char letter = '\0'; *input >> letter;) {
+    for (char letter = '\0'; input->get(letter);) {
       letters.push_back(static_cast<std::byte>(letter));
     }
     return letters;
