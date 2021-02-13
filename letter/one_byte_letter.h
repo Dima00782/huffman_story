@@ -11,9 +11,8 @@
 #include <utility>
 #include <vector>
 
-// TODO: extract bit_io from encryption and make it top level package.
-#include "encryption/bit_io/bit_reader.h"
-#include "encryption/bit_io/bit_writer.h"
+#include "bit_io/bit_reader.h"
+#include "bit_io/bit_writer.h"
 
 namespace letter {
 

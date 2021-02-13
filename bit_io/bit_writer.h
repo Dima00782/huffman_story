@@ -1,5 +1,5 @@
-#ifndef ENCRYPTION_BIT_IO_BIT_WRITER_H_
-#define ENCRYPTION_BIT_IO_BIT_WRITER_H_
+#ifndef BIT_IO_BIT_WRITER_H_
+#define BIT_IO_BIT_WRITER_H_
 
 #include <cstddef>
 
@@ -16,4 +16,4 @@ class BitWriter {
 
 }  // namespace bit_io
 
-#endif  // ENCRYPTION_BIT_IO_BIT_WRITER_H_
+#endif  // BIT_IO_BIT_WRITER_H_

@@ -5,7 +5,7 @@
 #include <ostream>
 #include <vector>
 
-#include "encryption/bit_io/bit_writer.h"
+#include "bit_io/bit_writer.h"
 
 namespace char_adapters {
 

@@ -1,4 +1,4 @@
-#include "encryption/bit_io/bit_reader.h"
+#include "bit_io/bit_reader.h"
 #include "bits_manipulation/bits_manipulation.h"
 
 #include <climits>

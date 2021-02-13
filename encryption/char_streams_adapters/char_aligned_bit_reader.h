@@ -5,7 +5,7 @@
 #include <istream>
 #include <memory>
 
-#include "encryption/bit_io/bit_reader.h"
+#include "bit_io/bit_reader.h"
 
 namespace char_adapters {
 

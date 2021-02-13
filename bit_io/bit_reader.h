@@ -1,8 +1,8 @@
-#ifndef ENCRYPTION_BIT_IO_BIT_READER_H_
-#define ENCRYPTION_BIT_IO_BIT_READER_H_
+#ifndef BIT_IO_BIT_READER_H_
+#define BIT_IO_BIT_READER_H_
 
-#include <optional>
 #include <cstddef>
+#include <optional>
 
 namespace bit_io {
 
@@ -16,4 +16,4 @@ class BitReader {
 
 }  // namespace bit_io
 
-#endif  // ENCRYPTION_BIT_IO_BIT_READER_H_
+#endif  // BIT_IO_BIT_READER_H_

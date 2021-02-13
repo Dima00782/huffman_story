@@ -10,7 +10,7 @@ cc_library(
     ],
     deps = [
         "//bits_manipulation:bits_manipulation",
-        "//encryption/bit_io:bit_io",
+        "//bit_io:bit_io",
     ],
     visibility = ["//visibility:public"],
 )

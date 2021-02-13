@@ -15,8 +15,8 @@
 #include <utility>
 #include <vector>
 
-#include "encryption/bit_io/bit_reader.h"
-#include "encryption/bit_io/bit_writer.h"
+#include "bit_io/bit_reader.h"
+#include "bit_io/bit_writer.h"
 #include "encryption/char_streams_adapters/char_aligned_bit_reader.h"
 #include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
 #include "encryption/huffman_tree/huffman_tree_builder.h"
