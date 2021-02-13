@@ -34,12 +34,11 @@ class ByteLetterSerializer final {
   ~ByteLetterSerializer() {}
 
   std::optional<std::byte> ReadSerialized(bit_io::BitReader& input) {
-    // TODO: why we return optional<char>, can it be optional<std::byte>?
     const auto byte = input.ReadByte();
     if (!byte) {
       return std::nullopt;
     }
-    return static_cast<std::byte>(*byte);
+    return *byte;
   }
 
   bool WriteSerialized(bit_io::BitWriter& output, const std::byte letter) {
