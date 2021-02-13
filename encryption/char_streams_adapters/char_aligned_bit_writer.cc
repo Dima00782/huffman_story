@@ -18,7 +18,8 @@ constexpr uint32_t kBufferSizeInBits = 1024u * 1024u * 8u;
 static_assert(kBufferSizeInBits % CHAR_BIT == 0);
 }  // namespace
 
-CharAlignedBitWriter::CharAlignedBitWriter(std::shared_ptr<std::ostream> ostream)
+CharAlignedBitWriter::CharAlignedBitWriter(
+    std::shared_ptr<std::ostream> ostream)
     : underlying_writer_{ostream} {}
 
 CharAlignedBitWriter::~CharAlignedBitWriter() {
@@ -66,12 +67,14 @@ void CharAlignedBitWriter::FlushBuffer() {
   assert(buffer_.size() % CHAR_BIT == 0);
   for (uint32_t byte_num = 0; byte_num < buffer_.size() / CHAR_BIT;
        ++byte_num) {
-    char byte = '\0';
+    std::byte byte{0};
     for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
       byte = bits_manipulation::SetBitInByte(
           byte, bit_pos, buffer_[byte_num * CHAR_BIT + bit_pos]);
     }
-    underlying_writer_->write(&byte, 1u);
+
+    // TODO: fixme - we can write a lot of bytes here rather than just one.
+    underlying_writer_->write(reinterpret_cast<char*>(&byte), 1u);
   }
   underlying_writer_->flush();
 

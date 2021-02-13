@@ -26,7 +26,8 @@ void CharAlignedBitReader::ConsumeBytes(uint32_t num_bytes) {
     char byte = '\0';
     if (underlying_reader_->get(byte)) {
       for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
-        const auto bit = bits_manipulation::IsBitEnabled(byte, bit_pos);
+        const auto bit = bits_manipulation::IsBitEnabled(
+            static_cast<std::byte>(byte), bit_pos);
         look_ahead_queue_.push_back(bit);
       }
     } else if (!is_last_bit_met_) {
@@ -52,12 +53,13 @@ std::optional<bool> CharAlignedBitReader::ReadBit() {
 }
 
 void CharAlignedBitReader::RemoveUnusedBitsInLastByte() {
-  char num_unused_bits_in_last_byte = '\0';
+  uint8_t num_unused_bits_in_last_byte = 0u;
   for (uint8_t bit_pos = 1; bit_pos <= kNumBitsForStoringAlignment; ++bit_pos) {
     const bool bit_enabled = look_ahead_queue_.back();
     const uint8_t pos_from_end = CHAR_BIT - bit_pos;
-    num_unused_bits_in_last_byte = bits_manipulation::SetBitInByte(
-        num_unused_bits_in_last_byte, pos_from_end, bit_enabled);
+    num_unused_bits_in_last_byte = std::to_integer<uint8_t>(
+        bits_manipulation::SetBitInByte(std::byte{num_unused_bits_in_last_byte},
+                                        pos_from_end, bit_enabled));
     look_ahead_queue_.pop_back();
   }
 

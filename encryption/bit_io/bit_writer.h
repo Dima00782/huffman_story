@@ -1,6 +1,8 @@
 #ifndef ENCRYPTION_BIT_IO_BIT_WRITER_H_
 #define ENCRYPTION_BIT_IO_BIT_WRITER_H_
 
+#include <cstddef>
+
 namespace bit_io {
 
 class BitWriter {
@@ -9,8 +11,7 @@ class BitWriter {
 
   virtual void WriteBit(bool enabled) = 0;
 
-  // TODO: change char -> std::byte.
-  virtual void WriteByte(char byte);
+  virtual void WriteByte(std::byte byte);
 };
 
 }  // namespace bit_io

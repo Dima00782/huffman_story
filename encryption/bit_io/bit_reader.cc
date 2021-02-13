@@ -6,8 +6,8 @@
 
 namespace bit_io {
 
-std::optional<char> BitReader::ReadByte() {
-  char byte = '\0';
+std::optional<std::byte> BitReader::ReadByte() {
+  std::byte byte{0};
   for (uint8_t bit_pos = 0u; bit_pos < CHAR_BIT; ++bit_pos) {
     const auto bit_value = ReadBit();
     if (!bit_value.has_value()) {

@@ -2,16 +2,15 @@
 #define BITS_MANIPULATION_BITS_MANIPULATION_H_
 
 #include <array>
-#include <cstdint>
 #include <climits>
-#include <string>
-#include <vector>
+#include <cstddef>
+#include <cstdint>
 
 namespace bits_manipulation {
 
-bool IsBitEnabled(char byte, uint8_t pos);
-char SetBitInByte(char byte, uint8_t pos, bool enabled);
-std::array<bool, CHAR_BIT> ByteToBits(char byte);
+bool IsBitEnabled(std::byte byte, uint8_t pos);
+std::byte SetBitInByte(std::byte byte, uint8_t pos, bool enabled);
+std::array<bool, CHAR_BIT> ByteToBits(std::byte byte);
 
 }  // namespace bits_manipulation
 

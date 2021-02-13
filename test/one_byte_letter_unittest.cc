@@ -21,8 +21,8 @@ class StringBasedBitReader : public bit_io::BitReader {
       return std::nullopt;
     }
 
-    const bool result = bits_manipulation::IsBitEnabled(content_[byte_index],
-                                                        bit_index_ % CHAR_BIT);
+    const bool result = bits_manipulation::IsBitEnabled(
+        static_cast<std::byte>(content_[byte_index]), bit_index_ % CHAR_BIT);
     ++bit_index_;
     return result;
   }
@@ -41,8 +41,9 @@ class StringBasedBitWriter : public bit_io::BitWriter {
     if (byte_index >= content_.size()) {
       content_.push_back('\0');
     }
-    content_[byte_index] = bits_manipulation::SetBitInByte(
-        content_[byte_index], bit_index_ % CHAR_BIT, enabled);
+    content_[byte_index] = static_cast<char>(bits_manipulation::SetBitInByte(
+        static_cast<std::byte>(content_[byte_index]), bit_index_ % CHAR_BIT,
+        enabled));
     ++bit_index_;
   }
 
