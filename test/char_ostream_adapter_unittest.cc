@@ -15,7 +15,7 @@ TEST(CharAlignedBitWriter, SevenUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
-    bit_writer.WriteBit(true);
+    ASSERT_TRUE(bit_writer.WriteBit(true));
   }
   EXPECT_EQ(ostring_stream->str(), "\x87");
 }
@@ -24,8 +24,8 @@ TEST(CharAlignedBitWriter, SixUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
+    ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
   }
 
   EXPECT_EQ(ostring_stream->str(), "\x46");
@@ -35,9 +35,9 @@ TEST(CharAlignedBitWriter, FiveUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
   }
   EXPECT_EQ(ostring_stream->str(), "\xc5");
 }
@@ -46,10 +46,10 @@ TEST(CharAlignedBitWriter, FourUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(true);
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
   }
   EXPECT_EQ(ostring_stream->str(), "\xb4");
 }
@@ -58,11 +58,11 @@ TEST(CharAlignedBitWriter, ThreeUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
   }
   EXPECT_EQ(ostring_stream->str(), "\xb3");
 }
@@ -71,12 +71,12 @@ TEST(CharAlignedBitWriter, TwoUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(false);
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
   }
   EXPECT_EQ(ostring_stream->str(),
             "\xb0"
@@ -87,13 +87,13 @@ TEST(CharAlignedBitWriter, OneUnusedBit) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(true);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(false);
-    bit_writer.WriteBit(true);
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteBit(true));
   }
   EXPECT_EQ(ostring_stream->str(),
             "\xb2"

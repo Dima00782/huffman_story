@@ -35,6 +35,7 @@ void CharAlignedBitWriter::WriteFooter() {
   auto num_unused_bits_in_last_byte = kNumBitsForStoringAlignment;
   while (num_of_filled_bits_in_last_byte_ !=
          (CHAR_BIT - kNumBitsForStoringAlignment)) {
+    // TODO: check return value!
     WriteBit(false);
     ++num_unused_bits_in_last_byte;
   }
@@ -45,13 +46,14 @@ void CharAlignedBitWriter::WriteFooter() {
     const auto bit_value = (num_unused_bits_in_last_byte >>
                             (kNumBitsForStoringAlignment - bit_pos)) &
                            1u;
+    // TODO: check return value!
     WriteBit(bit_value == 1u);
   }
 
   assert(num_of_filled_bits_in_last_byte_ == 0u);
 }
 
-void CharAlignedBitWriter::WriteBit(bool enabled) {
+bool CharAlignedBitWriter::WriteBit(bool enabled) {
   has_bits_written_ = true;
   if (buffer_.size() == kBufferSizeInBits) {
     FlushBuffer();
@@ -61,6 +63,8 @@ void CharAlignedBitWriter::WriteBit(bool enabled) {
 
   num_of_filled_bits_in_last_byte_ =
       (num_of_filled_bits_in_last_byte_ + 1) % CHAR_BIT;
+
+  return true;
 }
 
 void CharAlignedBitWriter::FlushBuffer() {

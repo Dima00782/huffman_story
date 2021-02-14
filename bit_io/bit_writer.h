@@ -9,9 +9,9 @@ class BitWriter {
  public:
   virtual ~BitWriter() {}
 
-  virtual void WriteBit(bool enabled) = 0;
+  virtual bool WriteBit(bool enabled) = 0;
 
-  virtual void WriteByte(std::byte byte);
+  virtual bool WriteByte(std::byte byte);
 };
 
 }  // namespace bit_io

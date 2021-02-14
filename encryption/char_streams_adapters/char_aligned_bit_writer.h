@@ -14,7 +14,7 @@ class CharAlignedBitWriter : public bit_io::BitWriter {
   explicit CharAlignedBitWriter(std::shared_ptr<std::ostream> ostream);
   ~CharAlignedBitWriter() override;
 
-  void WriteBit(bool enabled) override;
+  bool WriteBit(bool enabled) override;
 
  private:
   void FlushBuffer();

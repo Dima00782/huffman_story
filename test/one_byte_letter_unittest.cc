@@ -36,7 +36,7 @@ class StringBasedBitWriter : public bit_io::BitWriter {
  public:
   ~StringBasedBitWriter() override = default;
 
-  void WriteBit(bool enabled) override {
+  bool WriteBit(bool enabled) override {
     const uint32_t byte_index = bit_index_ / CHAR_BIT;
     if (byte_index >= content_.size()) {
       content_.push_back('\0');
@@ -45,6 +45,8 @@ class StringBasedBitWriter : public bit_io::BitWriter {
         static_cast<std::byte>(content_[byte_index]), bit_index_ % CHAR_BIT,
         enabled));
     ++bit_index_;
+
+    return true;
   }
 
   const std::string& getContent() const { return content_; }
