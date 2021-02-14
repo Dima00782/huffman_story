@@ -7,6 +7,7 @@
 #include <istream>
 #include <memory>
 #include <optional>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -16,10 +17,12 @@
 
 namespace letter {
 
+// TODO: unify interface
+// Split -> vector<letter> and Write(ostream&, std::vector<letters>)
+// WriteSerialized & ReadSerialized
+
 class ByteLetterLexer final {
  public:
-  ~ByteLetterLexer() {}
-
   std::vector<std::byte> Split(std::shared_ptr<std::istream> input) {
     std::vector<std::byte> letters;
     for (char letter = '\0'; input->get(letter);) {
@@ -31,8 +34,6 @@ class ByteLetterLexer final {
 
 class ByteLetterSerializer final {
  public:
-  ~ByteLetterSerializer() {}
-
   std::optional<std::byte> ReadSerialized(bit_io::BitReader& input) {
     const auto byte = input.ReadByte();
     if (!byte) {
@@ -43,6 +44,12 @@ class ByteLetterSerializer final {
 
   bool WriteSerialized(bit_io::BitWriter& output, const std::byte letter) {
     output.WriteByte(letter);
+    // TODO: FIXME.
+    return true;
+  }
+
+  bool Write(std::ostream& output, const std::byte letter) {
+    output.put(static_cast<char>(letter));
     // TODO: FIXME.
     return true;
   }

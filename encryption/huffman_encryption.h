@@ -175,6 +175,7 @@ class HuffmanDecrypt {
     node->right_ = std::move(ReadTreeInPrefixForm());
     return node;
   }
+
   void WriteDecryptedText(huffman_tree::TreeNode<LetterType>* root) {
     if (!root) {
       return;
@@ -192,8 +193,7 @@ class HuffmanDecrypt {
       }
 
       if (current_node->isLeaf()) {
-        // TODO: FIXME!
-        output_->put(static_cast<char>(current_node->key_));
+        serializer_->Write(*output_, current_node->key_);
         current_node = root;
       }
     }
