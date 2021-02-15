@@ -11,31 +11,27 @@
 #include "encryption/huffman_encryption.h"
 #include "letter/one_byte_letter.h"
 
-template <typename LetterType,
-          typename LetterLexerType,
-          typename LetterSerializerType>
+template <letter::LetterConfig Config>
 std::string EncryptTextBase(
     const std::string& text,
-    std::unique_ptr<LetterLexerType> letter_lexer,
-    std::unique_ptr<LetterSerializerType> letter_serializer) {
+    std::unique_ptr<typename Config::LetterLexerType> letter_lexer,
+    std::unique_ptr<typename Config::LetterSerializerType> letter_serializer) {
   auto string_input = std::make_shared<std::istringstream>(text);
   auto ostring_stream = std::make_shared<std::ostringstream>();
-  encryption::HuffmanEncrypt<LetterType, LetterLexerType, LetterSerializerType>(
-      string_input, ostring_stream, std::move(letter_lexer),
-      std::move(letter_serializer));
+  encryption::HuffmanEncrypt<Config>(string_input, ostring_stream,
+                                     std::move(letter_lexer),
+                                     std::move(letter_serializer));
   return ostring_stream->str();
 }
 
-template <typename LetterType,
-          typename LetterLexerType,
-          typename LetterSerializerType>
+template <letter::LetterConfig Config>
 std::string DecryptTextBase(
     const std::string& text,
-    std::unique_ptr<LetterSerializerType> letter_serializer) {
+    std::unique_ptr<typename Config::LetterSerializerType> letter_serializer) {
   auto string_input = std::make_shared<std::istringstream>(text);
   auto string_output = std::make_shared<std::ostringstream>();
-  encryption::HuffmanDecrypt<LetterType, LetterLexerType, LetterSerializerType>(
-      string_input, string_output, std::move(letter_serializer));
+  encryption::HuffmanDecrypt<Config>(string_input, string_output,
+                                     std::move(letter_serializer));
   return string_output->str();
 }
 
@@ -47,21 +43,20 @@ struct TestCase {
 class EncryptionAcceptanceTestOneByteLetter
     : public ::testing::TestWithParam<TestCase> {
  public:
-  using LetterT = std::byte;
-  using LexerT = letter::ByteLetterLexer;
-  using SerializerT = letter::ByteLetterSerializer;
-
   std::string Encrypt(const std::string& text) {
-    auto lexer = std::unique_ptr<LexerT>();
-    auto serializer = std::unique_ptr<SerializerT>();
-    return EncryptTextBase<LetterT, LexerT, SerializerT>(text, std::move(lexer),
-                                                         std::move(serializer));
+    auto lexer =
+        std::unique_ptr<letter::OneByteLetterConfig::LetterLexerType>();
+    auto serializer =
+        std::unique_ptr<letter::OneByteLetterConfig::LetterSerializerType>();
+    return EncryptTextBase<letter::OneByteLetterConfig>(text, std::move(lexer),
+                                                        std::move(serializer));
   }
 
   std::string Decrypt(const std::string& text) {
-    auto serializer = std::unique_ptr<SerializerT>();
-    return DecryptTextBase<LetterT, LexerT, SerializerT>(text,
-                                                         std::move(serializer));
+    auto serializer =
+        std::unique_ptr<letter::OneByteLetterConfig::LetterSerializerType>();
+    return DecryptTextBase<letter::OneByteLetterConfig>(text,
+                                                        std::move(serializer));
   }
 };
 
@@ -84,8 +79,7 @@ INSTANTIATE_TEST_SUITE_P(
         TestCase{"a", std::string("\xb0\x86", 2)},     // Six unused bits.
         TestCase{"aaaaaaaa",
                  std::string("\xb0\x80\x07", 3)},  // Seven unused bits.
-        TestCase{"aaaaa bbb",
-                 std::string("\x24\x16\x2b\x0f\xc5\x46", 6)},
+        TestCase{"aaaaa bbb", std::string("\x24\x16\x2b\x0f\xc5\x46", 6)},
         TestCase{"aaabb", std::string("\x58\xac\x3c\x00", 4)},
         TestCase{"aaaabbc", std::string("\x2c\x76\x2b\x0f\xa8\x01", 6)}));
 

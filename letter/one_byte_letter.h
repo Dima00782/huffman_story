@@ -55,6 +55,12 @@ class ByteLetterSerializer final {
   }
 };
 
+struct OneByteLetterConfig {
+  using LetterType = std::byte;
+  using LetterLexerType = ByteLetterLexer;
+  using LetterSerializerType = ByteLetterSerializer;
+};
+
 }  // namespace letter
 
 #endif  // SYMBOL_ONE_BYTE_SYMBOL_H_

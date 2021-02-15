@@ -21,6 +21,7 @@
 #include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
 #include "encryption/huffman_tree/huffman_tree_builder.h"
 #include "encryption/text_splitter/text_splitter.h"
+#include "letter/letter.h"
 
 namespace {
 
@@ -79,28 +80,27 @@ std::unordered_map<LetterType, std::vector<bool>> BuildCodesMap(
 }  // namespace
 
 namespace encryption {
-template <typename LetterType,
-          typename LetterLexerType,
-          typename LetterSerializerType>
+template <letter::LetterConfig Config>
 class HuffmanEncrypt {
  public:
   HuffmanEncrypt(std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output,
-                 std::unique_ptr<LetterLexerType> lexer,
-                 std::unique_ptr<LetterSerializerType> serializer)
+                 std::unique_ptr<typename Config::LetterLexerType> lexer,
+                 std::unique_ptr<typename Config::LetterSerializerType> serializer)
       : output_{std::make_shared<char_adapters::CharAlignedBitWriter>(
             std::move(output))},
         serializer_{std::move(serializer)} {
     const auto splittedText = std::move(lexer)->Split(std::move(input));
     auto root =
-        huffman_tree::BuildHuffmanTree<LetterType, decltype(splittedText)>(
-            splittedText);
+        huffman_tree::BuildHuffmanTree<typename Config::LetterType,
+                                       decltype(splittedText)>(splittedText);
     WriteTreeInPrefixForm(root.get());
     WriteEncryptedText(root.get(), splittedText);
   }
 
  private:
-  void WriteTreeInPrefixForm(huffman_tree::TreeNode<LetterType>* root) {
+  void WriteTreeInPrefixForm(
+      huffman_tree::TreeNode<typename Config::LetterType>* root) {
     if (!root) {
       return;
     }
@@ -111,7 +111,7 @@ class HuffmanEncrypt {
     WriteTreeInPrefixForm(root->right_.get());
   }
 
-  void WriteNode(huffman_tree::TreeNode<LetterType>* node) {
+  void WriteNode(huffman_tree::TreeNode<typename Config::LetterType>* node) {
     if (node->isInner()) {
       output_->WriteBit(kInnerNodeBitLabel);
     } else {
@@ -120,8 +120,9 @@ class HuffmanEncrypt {
     }
   }
 
-  void WriteEncryptedText(huffman_tree::TreeNode<LetterType>* root,
-                          const std::vector<LetterType>& text) {
+  void WriteEncryptedText(
+      huffman_tree::TreeNode<typename Config::LetterType>* root,
+      const std::vector<typename Config::LetterType>& text) {
     const auto codes_by_letter = BuildCodesMap(root);
     for (const auto& letter : text) {
       assert(codes_by_letter.contains(letter));
@@ -133,18 +134,16 @@ class HuffmanEncrypt {
 
   std::shared_ptr<std::istream> input_;
   std::shared_ptr<bit_io::BitWriter> output_;
-  std::unique_ptr<LetterSerializerType> serializer_;
+  std::unique_ptr<typename Config::LetterSerializerType> serializer_;
 };
 
 // TODO: need to union this with encrypt not to redeclarate template parameters.
-template <typename LetterType,
-          typename LetterLexerType,
-          typename LetterSerializerType>
+template <letter::LetterConfig Config>
 class HuffmanDecrypt {
  public:
   HuffmanDecrypt(std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output,
-                 std::unique_ptr<LetterSerializerType> serializer)
+                 std::unique_ptr<typename Config::LetterSerializerType> serializer)
       : input_{std::make_shared<char_adapters::CharAlignedBitReader>(input)},
         serializer_{std::move(serializer)} {
     output_ = std::move(output);
@@ -153,7 +152,8 @@ class HuffmanDecrypt {
   }
 
  private:
-  std::unique_ptr<huffman_tree::TreeNode<LetterType>> ReadTreeInPrefixForm() {
+  std::unique_ptr<huffman_tree::TreeNode<typename Config::LetterType>>
+  ReadTreeInPrefixForm() {
     const std::optional<bool> bit = input_->ReadBit();
     if (!bit) {
       return nullptr;
@@ -164,19 +164,21 @@ class HuffmanDecrypt {
       if (!node_key) {
         return nullptr;
       }
-      return std::make_unique<huffman_tree::TreeNode<LetterType>>(
+      return std::make_unique<huffman_tree::TreeNode<typename Config::LetterType>>(
           std::move(*node_key), 0, nullptr, nullptr);
     }
 
     assert(*bit == kInnerNodeBitLabel);
-    auto node = std::make_unique<huffman_tree::TreeNode<LetterType>>(
-        LetterType(), 0, nullptr, nullptr);
+    auto node =
+        std::make_unique<huffman_tree::TreeNode<typename Config::LetterType>>(
+            typename Config::LetterType(), 0, nullptr, nullptr);
     node->left_ = std::move(ReadTreeInPrefixForm());
     node->right_ = std::move(ReadTreeInPrefixForm());
     return node;
   }
 
-  void WriteDecryptedText(huffman_tree::TreeNode<LetterType>* root) {
+  void WriteDecryptedText(
+      huffman_tree::TreeNode<typename Config::LetterType>* root) {
     if (!root) {
       return;
     }
@@ -201,7 +203,7 @@ class HuffmanDecrypt {
 
   std::shared_ptr<bit_io::BitReader> input_;
   std::shared_ptr<std::ostream> output_;
-  std::unique_ptr<LetterSerializerType> serializer_;
+  std::unique_ptr<typename Config::LetterSerializerType> serializer_;
 };
 
 }  // namespace encryption
