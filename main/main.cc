@@ -36,12 +36,9 @@ int main(int argc, char* argv[]) {
           std::make_shared<std::ifstream>(file_to_crypt_path, std::ios::binary);
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
-      auto letter_lexer = std::make_unique<letter::ByteLetterLexer>();
-      auto letter_serializer = std::make_unique<letter::ByteLetterSerializer>();
-      encryption::HuffmanEncrypt<std::byte, letter::ByteLetterLexer,
-                                 letter::ByteLetterSerializer>(
-          std::move(input), std::move(output), std::move(letter_lexer),
-          std::move(letter_serializer));
+      auto config = std::make_unique<letter::OneByteLetterConfig>();
+      encryption::HuffmanEncrypt<letter::OneByteLetterConfig>(
+          std::move(config), std::move(input), std::move(output));
     }
   });
 
@@ -68,10 +65,9 @@ int main(int argc, char* argv[]) {
           file_to_decrypt_path.filename().replace_extension("");
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
-      auto letter_serializer = std::make_unique<letter::ByteLetterSerializer>();
-      encryption::HuffmanDecrypt<std::byte, letter::ByteLetterLexer,
-                                 letter::ByteLetterSerializer>(
-          std::move(input), std::move(output), std::move(letter_serializer));
+      auto config = std::make_unique<letter::OneByteLetterConfig>();
+      encryption::HuffmanDecrypt<letter::OneByteLetterConfig>(
+          std::move(config), std::move(input), std::move(output));
     }
   });
 

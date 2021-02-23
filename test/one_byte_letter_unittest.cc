@@ -61,7 +61,8 @@ namespace letter {
 
 TEST(OneByteLetter, Lexer) {
   ByteLetterLexer lexer;
-  auto result = lexer.Split(std::make_shared<std::istringstream>(" abc defg "));
+  std::istringstream istring_stream(" abc defg ");
+  auto result = lexer.Split(istring_stream);
   EXPECT_EQ(result.size(), 10u);
   EXPECT_EQ(result[0], std::byte(' '));
   EXPECT_EQ(result[1], std::byte('a'));

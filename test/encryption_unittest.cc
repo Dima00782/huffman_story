@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <iterator>
+#include <memory>
 #include <set>
 #include <sstream>
 #include <string>
@@ -12,27 +13,21 @@
 #include "letter/one_byte_letter.h"
 
 template <letter::LetterConfig Config>
-std::string EncryptTextBase(
-    const std::string& text,
-    std::unique_ptr<typename Config::LetterLexerType> letter_lexer,
-    std::unique_ptr<typename Config::LetterSerializerType> letter_serializer) {
-  auto string_input = std::make_shared<std::istringstream>(text);
-  auto ostring_stream = std::make_shared<std::ostringstream>();
-  encryption::HuffmanEncrypt<Config>(string_input, ostring_stream,
-                                     std::move(letter_lexer),
-                                     std::move(letter_serializer));
-  return ostring_stream->str();
+std::string EncryptTextBase(const std::string& text,
+                            std::unique_ptr<Config> config) {
+  auto input = std::make_shared<std::istringstream>(text);
+  auto output = std::make_shared<std::ostringstream>();
+  encryption::HuffmanEncrypt<Config>(std::move(config), input, output);
+  return output->str();
 }
 
 template <letter::LetterConfig Config>
-std::string DecryptTextBase(
-    const std::string& text,
-    std::unique_ptr<typename Config::LetterSerializerType> letter_serializer) {
-  auto string_input = std::make_shared<std::istringstream>(text);
-  auto string_output = std::make_shared<std::ostringstream>();
-  encryption::HuffmanDecrypt<Config>(string_input, string_output,
-                                     std::move(letter_serializer));
-  return string_output->str();
+std::string DecryptTextBase(const std::string& text,
+                            std::unique_ptr<Config> config) {
+  auto input = std::make_shared<std::istringstream>(text);
+  auto output = std::make_shared<std::ostringstream>();
+  encryption::HuffmanDecrypt<Config>(std::move(config), input, output);
+  return output->str();
 }
 
 struct TestCase {
@@ -44,19 +39,13 @@ class EncryptionAcceptanceTestOneByteLetter
     : public ::testing::TestWithParam<TestCase> {
  public:
   std::string Encrypt(const std::string& text) {
-    auto lexer =
-        std::unique_ptr<letter::OneByteLetterConfig::LetterLexerType>();
-    auto serializer =
-        std::unique_ptr<letter::OneByteLetterConfig::LetterSerializerType>();
-    return EncryptTextBase<letter::OneByteLetterConfig>(text, std::move(lexer),
-                                                        std::move(serializer));
+    return EncryptTextBase<letter::OneByteLetterConfig>(
+        text, std::make_unique<letter::OneByteLetterConfig>());
   }
 
   std::string Decrypt(const std::string& text) {
-    auto serializer =
-        std::unique_ptr<letter::OneByteLetterConfig::LetterSerializerType>();
-    return DecryptTextBase<letter::OneByteLetterConfig>(text,
-                                                        std::move(serializer));
+    return DecryptTextBase<letter::OneByteLetterConfig>(
+        text, std::make_unique<letter::OneByteLetterConfig>());
   }
 };
 

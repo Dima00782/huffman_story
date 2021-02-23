@@ -83,14 +83,13 @@ namespace encryption {
 template <letter::LetterConfig Config>
 class HuffmanEncrypt {
  public:
-  HuffmanEncrypt(std::shared_ptr<std::istream> input,
-                 std::shared_ptr<std::ostream> output,
-                 std::unique_ptr<typename Config::LetterLexerType> lexer,
-                 std::unique_ptr<typename Config::LetterSerializerType> serializer)
-      : output_{std::make_shared<char_adapters::CharAlignedBitWriter>(
-            std::move(output))},
-        serializer_{std::move(serializer)} {
-    const auto splittedText = std::move(lexer)->Split(std::move(input));
+  HuffmanEncrypt(std::unique_ptr<Config> config,
+                 std::shared_ptr<std::istream> input,
+                 std::shared_ptr<std::ostream> output)
+      : output_(std::make_shared<char_adapters::CharAlignedBitWriter>(
+            std::move(output))),
+        config_(std::move(config)) {
+    const auto splittedText = config_->Parse(*input);
     auto root =
         huffman_tree::BuildHuffmanTree<typename Config::LetterType,
                                        decltype(splittedText)>(splittedText);
@@ -116,7 +115,7 @@ class HuffmanEncrypt {
       output_->WriteBit(kInnerNodeBitLabel);
     } else {
       output_->WriteBit(kLeafNodeBitLabel);
-      serializer_->WriteSerialized(*output_, node->key_);
+      config_->WriteSerialized(*output_, node->key_);
     }
   }
 
@@ -134,18 +133,18 @@ class HuffmanEncrypt {
 
   std::shared_ptr<std::istream> input_;
   std::shared_ptr<bit_io::BitWriter> output_;
-  std::unique_ptr<typename Config::LetterSerializerType> serializer_;
+  std::unique_ptr<Config> config_;
 };
 
 // TODO: need to union this with encrypt not to redeclarate template parameters.
 template <letter::LetterConfig Config>
 class HuffmanDecrypt {
  public:
-  HuffmanDecrypt(std::shared_ptr<std::istream> input,
-                 std::shared_ptr<std::ostream> output,
-                 std::unique_ptr<typename Config::LetterSerializerType> serializer)
+  HuffmanDecrypt(std::unique_ptr<Config> config,
+                 std::shared_ptr<std::istream> input,
+                 std::shared_ptr<std::ostream> output)
       : input_{std::make_shared<char_adapters::CharAlignedBitReader>(input)},
-        serializer_{std::move(serializer)} {
+        config_{std::move(config)} {
     output_ = std::move(output);
     auto root = ReadTreeInPrefixForm();
     WriteDecryptedText(root.get());
@@ -160,11 +159,12 @@ class HuffmanDecrypt {
     }
 
     if (*bit == kLeafNodeBitLabel) {
-      auto node_key = serializer_->ReadSerialized(*input_);
+      auto node_key = config_->ReadSerialized(*input_);
       if (!node_key) {
         return nullptr;
       }
-      return std::make_unique<huffman_tree::TreeNode<typename Config::LetterType>>(
+      return std::make_unique<
+          huffman_tree::TreeNode<typename Config::LetterType>>(
           std::move(*node_key), 0, nullptr, nullptr);
     }
 
@@ -195,7 +195,7 @@ class HuffmanDecrypt {
       }
 
       if (current_node->isLeaf()) {
-        serializer_->Write(*output_, current_node->key_);
+        config_->Write(*output_, current_node->key_);
         current_node = root;
       }
     }
@@ -203,7 +203,7 @@ class HuffmanDecrypt {
 
   std::shared_ptr<bit_io::BitReader> input_;
   std::shared_ptr<std::ostream> output_;
-  std::unique_ptr<typename Config::LetterSerializerType> serializer_;
+  std::unique_ptr<Config> config_;
 };
 
 }  // namespace encryption

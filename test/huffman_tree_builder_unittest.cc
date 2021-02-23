@@ -1,18 +1,20 @@
-#include <string>
 #include <memory>
+#include <string>
 
 #include "encryption/huffman_tree/huffman_tree_builder.h"
-#include "letter/one_byte_letter.h"
 #include "gtest/gtest.h"
+#include "letter/one_byte_letter.h"
 
 namespace huffman_tree {
 
 class HuffmanTreeBuilderTest : public ::testing::Test {
  public:
   std::unique_ptr<TreeNode<std::byte>> BuildTree(const std::string& text) {
-    auto string_input = std::make_shared<std::istringstream>(text);
+    std::istringstream string_input(text);
+    // TODO: remove lexer from here!
     letter::ByteLetterLexer lexer;
-    return BuildHuffmanTree<std::byte, std::vector<std::byte>>(lexer.Split(std::move(string_input)));
+    return BuildHuffmanTree<std::byte, std::vector<std::byte>>(
+        lexer.Split(string_input));
   }
 };
 

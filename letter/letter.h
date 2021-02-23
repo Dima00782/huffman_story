@@ -1,6 +1,5 @@
 #include <functional>
 #include <istream>
-#include <memory>
 #include <optional>
 #include <ostream>
 #include <utility>
@@ -19,17 +18,23 @@ concept Hashable = requires(T x) {
 namespace letter {
 
 template <typename T>
-concept LetterConfig = Hashable<typename T::LetterType>&& requires(
-    typename T::LetterType letter,
-    typename T::LetterLexerType lexer,
-    std::shared_ptr<std::istream> input,
-    typename T::LetterSerializerType serializer,
-    bit_io::BitWriter& bit_output,
-    bit_io::BitReader& bit_input) {
-  lexer.Split(input);
-  { serializer.WriteSerialized(bit_output, letter) }
+concept LetterConfig =
+    Hashable<typename T::LetterType>&& requires(T config,
+                                                typename T::LetterType letter,
+                                                std::istream& input,
+                                                std::ostream& output,
+                                                bit_io::BitWriter& bit_output,
+                                                bit_io::BitReader& bit_input) {
+  { config.Parse(input) }
+  ->std::same_as<std::vector<typename T::LetterType>>;
+
+  { config.Write(output, letter) }
   ->std::same_as<bool>;
-  { serializer.ReadSerialized(bit_input) }
+
+  { config.WriteSerialized(bit_output, letter) }
+  ->std::same_as<bool>;
+
+  { config.ReadSerialized(bit_input) }
   ->std::same_as<std::optional<typename T::LetterType>>;
 };
 
