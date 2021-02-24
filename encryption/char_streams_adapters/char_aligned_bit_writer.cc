@@ -12,11 +12,7 @@ namespace char_adapters {
 namespace {
 constexpr uint8_t kNumBitsForStoringAlignment =
     static_cast<uint8_t>(std::log2(CHAR_BIT));
-
-constexpr uint32_t kBufferSizeInBits = 1024u * 1024u * 8u;
-
-static_assert(kBufferSizeInBits % CHAR_BIT == 0);
-}  // namespace
+}
 
 CharAlignedBitWriter::CharAlignedBitWriter(
     std::shared_ptr<std::ostream> ostream)
@@ -55,11 +51,13 @@ void CharAlignedBitWriter::WriteFooter() {
 
 bool CharAlignedBitWriter::WriteBit(bool enabled) {
   has_bits_written_ = true;
-  if (buffer_.size() == kBufferSizeInBits) {
+  if (bit_idx_ * CHAR_BIT == kBufferSizeInBytes) {
     FlushBuffer();
   }
 
-  buffer_.push_back(enabled);
+  std::byte& byte = buffer_[bit_idx_ / CHAR_BIT];
+  byte = bits_manipulation::SetBitInByte(byte, bit_idx_ % CHAR_BIT, enabled);
+  ++bit_idx_;
 
   num_of_filled_bits_in_last_byte_ =
       (num_of_filled_bits_in_last_byte_ + 1) % CHAR_BIT;
@@ -68,21 +66,10 @@ bool CharAlignedBitWriter::WriteBit(bool enabled) {
 }
 
 void CharAlignedBitWriter::FlushBuffer() {
-  assert(buffer_.size() % CHAR_BIT == 0);
-  for (uint32_t byte_num = 0; byte_num < buffer_.size() / CHAR_BIT;
-       ++byte_num) {
-    std::byte byte{0};
-    for (uint32_t bit_pos = 0; bit_pos < CHAR_BIT; ++bit_pos) {
-      byte = bits_manipulation::SetBitInByte(
-          byte, bit_pos, buffer_[byte_num * CHAR_BIT + bit_pos]);
-    }
-
-    // TODO: fixme - we can write a lot of bytes here rather than just one.
-    underlying_writer_->write(reinterpret_cast<char*>(&byte), 1u);
-  }
-  underlying_writer_->flush();
-
-  buffer_.clear();
+  assert(bit_idx_ % CHAR_BIT == 0);
+  underlying_writer_->write(reinterpret_cast<char*>(&buffer_[0]),
+                            bit_idx_ / CHAR_BIT);
+  bit_idx_ = 0u;
 }
 
 }  // namespace char_adapters
