@@ -44,14 +44,16 @@ class ByteLetterSerializer final {
   }
 
   bool WriteSerialized(bit_io::BitWriter& output, const std::byte letter) {
-    output.WriteByte(letter);
-    // TODO: FIXME.
+    if (!output.WriteByte(letter)) {
+      return false;
+    }
     return true;
   }
 
   bool Write(std::ostream& output, const std::byte letter) {
-    output.put(static_cast<char>(letter));
-    // TODO: FIXME.
+    if (!output.put(static_cast<char>(letter))) {
+      return false;
+    }
     return true;
   }
 };

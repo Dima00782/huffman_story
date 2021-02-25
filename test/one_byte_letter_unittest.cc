@@ -49,6 +49,8 @@ class StringBasedBitWriter : public bit_io::BitWriter {
     return true;
   }
 
+  bool WriteFooter() override { return true; }
+
   const std::string& getContent() const { return content_; }
 
  private:

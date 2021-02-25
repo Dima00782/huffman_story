@@ -19,20 +19,23 @@ CharAlignedBitWriter::CharAlignedBitWriter(
     : underlying_writer_{ostream} {}
 
 CharAlignedBitWriter::~CharAlignedBitWriter() {
-  if (!has_bits_written_) {
-    return;
-  }
-
-  WriteFooter();
-  FlushBuffer();
+  assert(has_footer_was_written_);
 }
 
-void CharAlignedBitWriter::WriteFooter() {
+bool CharAlignedBitWriter::WriteFooter() {
+  assert(!has_footer_was_written_);
+  has_footer_was_written_ = true;
+
+  if (!has_bits_written_) {
+    return true;
+  }
+
   auto num_unused_bits_in_last_byte = kNumBitsForStoringAlignment;
   while (num_of_filled_bits_in_last_byte_ !=
          (CHAR_BIT - kNumBitsForStoringAlignment)) {
-    // TODO: check return value!
-    WriteBit(false);
+    if (!WriteBit(false)) {
+      return false;
+    }
     ++num_unused_bits_in_last_byte;
   }
 
@@ -42,11 +45,14 @@ void CharAlignedBitWriter::WriteFooter() {
     const auto bit_value = (num_unused_bits_in_last_byte >>
                             (kNumBitsForStoringAlignment - bit_pos)) &
                            1u;
-    // TODO: check return value!
-    WriteBit(bit_value == 1u);
+    if (!WriteBit(bit_value == 1u)) {
+      return false;
+    }
   }
 
   assert(num_of_filled_bits_in_last_byte_ == 0u);
+  FlushBuffer();
+  return true;
 }
 
 bool CharAlignedBitWriter::WriteBit(bool enabled) {

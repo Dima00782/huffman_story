@@ -6,7 +6,10 @@
 
 TEST(CharAlignedBitWriter, EmptyBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
-  { char_adapters::CharAlignedBitWriter bit_writer{ostring_stream}; }
+  {
+    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    ASSERT_TRUE(bit_writer.WriteFooter());
+  }
 
   EXPECT_TRUE(ostring_stream->str().empty());
 }
@@ -16,6 +19,7 @@ TEST(CharAlignedBitWriter, SevenUnusedBits) {
   {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteFooter());
   }
   EXPECT_EQ(ostring_stream->str(), "\x87");
 }
@@ -26,6 +30,7 @@ TEST(CharAlignedBitWriter, SixUnusedBits) {
     char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteFooter());
   }
 
   EXPECT_EQ(ostring_stream->str(), "\x46");
@@ -38,6 +43,7 @@ TEST(CharAlignedBitWriter, FiveUnusedBits) {
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteFooter());
   }
   EXPECT_EQ(ostring_stream->str(), "\xc5");
 }
@@ -50,6 +56,7 @@ TEST(CharAlignedBitWriter, FourUnusedBits) {
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteFooter());
   }
   EXPECT_EQ(ostring_stream->str(), "\xb4");
 }
@@ -63,6 +70,7 @@ TEST(CharAlignedBitWriter, ThreeUnusedBits) {
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteFooter());
   }
   EXPECT_EQ(ostring_stream->str(), "\xb3");
 }
@@ -77,6 +85,7 @@ TEST(CharAlignedBitWriter, TwoUnusedBits) {
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(false));
+    ASSERT_TRUE(bit_writer.WriteFooter());
   }
   EXPECT_EQ(ostring_stream->str(),
             "\xb0"
@@ -94,6 +103,7 @@ TEST(CharAlignedBitWriter, OneUnusedBit) {
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(true));
+    ASSERT_TRUE(bit_writer.WriteFooter());
   }
   EXPECT_EQ(ostring_stream->str(),
             "\xb2"

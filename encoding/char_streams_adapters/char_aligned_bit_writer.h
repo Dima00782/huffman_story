@@ -21,10 +21,10 @@ class CharAlignedBitWriter final : public bit_io::BitWriter {
   ~CharAlignedBitWriter() override;
 
   bool WriteBit(bool enabled) override;
+  bool WriteFooter() override;
 
  private:
   void FlushBuffer();
-  void WriteFooter();
 
   // TODO: can be replaced with fixed size bitset that can converts into char* array.
   std::array<std::byte, kBufferSizeInBytes> buffer_;
@@ -32,6 +32,7 @@ class CharAlignedBitWriter final : public bit_io::BitWriter {
   bool has_bits_written_{false};
   uint8_t num_of_filled_bits_in_last_byte_{0u};
   std::shared_ptr<std::ostream> underlying_writer_;
+  bool has_footer_was_written_{false};
 };
 
 }  // namespace char_adapters

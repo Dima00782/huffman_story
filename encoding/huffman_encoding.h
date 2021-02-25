@@ -95,6 +95,7 @@ class HuffmanEncrypt {
                                        decltype(splittedText)>(splittedText);
     WriteTreeInPrefixForm(root.get());
     WriteEncryptedText(root.get(), splittedText);
+    output_->WriteFooter();
   }
 
  private:

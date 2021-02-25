@@ -10,8 +10,8 @@ class BitWriter {
   virtual ~BitWriter() {}
 
   virtual bool WriteBit(bool enabled) = 0;
-
   virtual bool WriteByte(std::byte byte);
+  virtual bool WriteFooter() = 0;
 };
 
 }  // namespace bit_io
