@@ -83,7 +83,7 @@ namespace encoding {
 template <letter::LetterConfig Config>
 class HuffmanEncrypt {
  public:
-  HuffmanEncrypt(std::unique_ptr<Config> config,
+  HuffmanEncrypt(std::shared_ptr<Config> config,
                  std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output)
       : output_(std::make_shared<char_adapters::CharAlignedBitWriter>(
@@ -133,14 +133,14 @@ class HuffmanEncrypt {
 
   std::shared_ptr<std::istream> input_;
   std::shared_ptr<bit_io::BitWriter> output_;
-  std::unique_ptr<Config> config_;
+  std::shared_ptr<Config> config_;
 };
 
 // TODO: need to union this with encrypt not to redeclarate template parameters.
 template <letter::LetterConfig Config>
 class HuffmanDecrypt {
  public:
-  HuffmanDecrypt(std::unique_ptr<Config> config,
+  HuffmanDecrypt(std::shared_ptr<Config> config,
                  std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output)
       : input_{std::make_shared<char_adapters::CharAlignedBitReader>(input)},
@@ -203,7 +203,7 @@ class HuffmanDecrypt {
 
   std::shared_ptr<bit_io::BitReader> input_;
   std::shared_ptr<std::ostream> output_;
-  std::unique_ptr<Config> config_;
+  std::shared_ptr<Config> config_;
 };
 
 }  // namespace encoding

@@ -12,6 +12,7 @@
 int main(int argc, char* argv[]) {
   CLI::App app{"Huffman archiver"};
   app.require_subcommand(1);
+  auto config = std::make_shared<letter::OneByteLetterConfig>();
 
   // TODO: create InstallCryptSubcommand and InstallDecryptSubcommand and use
   // them here.
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
   std::string alphabet_file;
   crypt_command->add_option("-a,--alphabet", alphabet_file,
                             "File with alphabet.");
-  crypt_command->callback([&file_to_crypt, &alphabet_file]() {
+  crypt_command->callback([&file_to_crypt, &alphabet_file, config]() {
     const std::filesystem::path file_to_crypt_path{file_to_crypt};
     if (!std::filesystem::is_regular_file(file_to_crypt_path)) {
       std::cerr << "It isn't a regular file : " << file_to_crypt_path
@@ -36,9 +37,8 @@ int main(int argc, char* argv[]) {
           std::make_shared<std::ifstream>(file_to_crypt_path, std::ios::binary);
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
-      auto config = std::make_unique<letter::OneByteLetterConfig>();
       encoding::HuffmanEncrypt<letter::OneByteLetterConfig>(
-          std::move(config), std::move(input), std::move(output));
+          config, std::move(input), std::move(output));
     }
   });
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
       "decrypt", "Decrypt passed file. File must have .huf extension.");
   std::string file_to_decrypt;
   decrypt_command->add_option("file", file_to_decrypt, "File to decrypt.");
-  decrypt_command->callback([&file_to_decrypt]() {
+  decrypt_command->callback([&file_to_decrypt, config]() {
     const std::filesystem::path file_to_decrypt_path{file_to_decrypt};
     if (!std::filesystem::is_regular_file(file_to_decrypt_path)) {
       std::cerr << "It isn't a regular file : " << file_to_decrypt_path
@@ -65,9 +65,8 @@ int main(int argc, char* argv[]) {
           file_to_decrypt_path.filename().replace_extension("");
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
-      auto config = std::make_unique<letter::OneByteLetterConfig>();
       encoding::HuffmanDecrypt<letter::OneByteLetterConfig>(
-          std::move(config), std::move(input), std::move(output));
+          config, std::move(input), std::move(output));
     }
   });
 

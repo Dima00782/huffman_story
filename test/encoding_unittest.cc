@@ -14,7 +14,7 @@
 
 template <letter::LetterConfig Config>
 std::string EncryptTextBase(const std::string& text,
-                            std::unique_ptr<Config> config) {
+                            std::shared_ptr<Config> config) {
   auto input = std::make_shared<std::istringstream>(text);
   auto output = std::make_shared<std::ostringstream>();
   encoding::HuffmanEncrypt<Config>(std::move(config), input, output);
@@ -23,7 +23,7 @@ std::string EncryptTextBase(const std::string& text,
 
 template <letter::LetterConfig Config>
 std::string DecryptTextBase(const std::string& text,
-                            std::unique_ptr<Config> config) {
+                            std::shared_ptr<Config> config) {
   auto input = std::make_shared<std::istringstream>(text);
   auto output = std::make_shared<std::ostringstream>();
   encoding::HuffmanDecrypt<Config>(std::move(config), input, output);
@@ -38,15 +38,19 @@ struct TestCase {
 class EncodingAcceptanceTestOneByteLetter
     : public ::testing::TestWithParam<TestCase> {
  public:
+  void SetUp() override {
+    config_ = std::make_shared<letter::OneByteLetterConfig>();
+  }
+
   std::string Encrypt(const std::string& text) {
-    return EncryptTextBase<letter::OneByteLetterConfig>(
-        text, std::make_unique<letter::OneByteLetterConfig>());
+    return EncryptTextBase<letter::OneByteLetterConfig>(text, config_);
   }
 
   std::string Decrypt(const std::string& text) {
-    return DecryptTextBase<letter::OneByteLetterConfig>(
-        text, std::make_unique<letter::OneByteLetterConfig>());
+    return DecryptTextBase<letter::OneByteLetterConfig>(text, config_);
   }
+
+  std::shared_ptr<letter::OneByteLetterConfig> config_;
 };
 
 TEST_P(EncodingAcceptanceTestOneByteLetter, EncryptAndDecrypt) {
