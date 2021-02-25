@@ -7,7 +7,7 @@ cc_binary(
         "//third_party/CLI11:CLI11",
         "//letter:letter",
         "//letter:one_byte_letter",
-        "//encryption:huffman_encryption",
+        "//encoding:huffman_encoding",
     ],
     visibility = ["//visibility:public"],
 )

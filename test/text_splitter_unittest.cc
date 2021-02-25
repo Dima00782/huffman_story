@@ -1,4 +1,4 @@
-#include "encryption/text_splitter/text_splitter.h"
+#include "encoding/text_splitter/text_splitter.h"
 #include "gtest/gtest.h"
 
 namespace text_splitter {

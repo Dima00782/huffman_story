@@ -1,12 +1,12 @@
-#ifndef ENCRYPTION_TEXT_SPLITTER_TEXT_SPLITTER_H_
-#define ENCRYPTION_TEXT_SPLITTER_TEXT_SPLITTER_H_
+#ifndef ENCODING_TEXT_SPLITTER_TEXT_SPLITTER_H_
+#define ENCODING_TEXT_SPLITTER_TEXT_SPLITTER_H_
 
 #include <set>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "encryption/text_splitter/trie.h"
+#include "encoding/text_splitter/trie.h"
 
 namespace text_splitter {
 
@@ -22,4 +22,4 @@ class TextSplitter {
 
 }  // namespace text_splitter
 
-#endif  // ENCRYPTION_TEXT_SPLITTER_TEXT_SPLITTER_H_
+#endif  // ENCODING_TEXT_SPLITTER_TEXT_SPLITTER_H_

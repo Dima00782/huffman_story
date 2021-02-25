@@ -4,7 +4,7 @@ cc_library(
         "huffman_tree_builder.h",
     ],
     visibility = [
-        "//encryption:__pkg__",
+        "//encoding:__pkg__",
         "//test:__pkg__",
     ],
 )

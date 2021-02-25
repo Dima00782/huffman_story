@@ -1,4 +1,4 @@
-#include "encryption/text_splitter/text_splitter.h"
+#include "encoding/text_splitter/text_splitter.h"
 
 #include <algorithm>
 #include <string_view>

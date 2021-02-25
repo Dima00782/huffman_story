@@ -7,9 +7,9 @@
 #include <string>
 
 #include "bits_manipulation/bits_manipulation.h"
-#include "encryption/char_streams_adapters/char_aligned_bit_reader.h"
-#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
-#include "encryption/huffman_encryption.h"
+#include "encoding/char_streams_adapters/char_aligned_bit_reader.h"
+#include "encoding/char_streams_adapters/char_aligned_bit_writer.h"
+#include "encoding/huffman_encoding.h"
 #include "letter/one_byte_letter.h"
 
 template <letter::LetterConfig Config>
@@ -17,7 +17,7 @@ std::string EncryptTextBase(const std::string& text,
                             std::unique_ptr<Config> config) {
   auto input = std::make_shared<std::istringstream>(text);
   auto output = std::make_shared<std::ostringstream>();
-  encryption::HuffmanEncrypt<Config>(std::move(config), input, output);
+  encoding::HuffmanEncrypt<Config>(std::move(config), input, output);
   return output->str();
 }
 
@@ -26,7 +26,7 @@ std::string DecryptTextBase(const std::string& text,
                             std::unique_ptr<Config> config) {
   auto input = std::make_shared<std::istringstream>(text);
   auto output = std::make_shared<std::ostringstream>();
-  encryption::HuffmanDecrypt<Config>(std::move(config), input, output);
+  encoding::HuffmanDecrypt<Config>(std::move(config), input, output);
   return output->str();
 }
 
@@ -35,7 +35,7 @@ struct TestCase {
   std::string expected_output;
 };
 
-class EncryptionAcceptanceTestOneByteLetter
+class EncodingAcceptanceTestOneByteLetter
     : public ::testing::TestWithParam<TestCase> {
  public:
   std::string Encrypt(const std::string& text) {
@@ -49,14 +49,14 @@ class EncryptionAcceptanceTestOneByteLetter
   }
 };
 
-TEST_P(EncryptionAcceptanceTestOneByteLetter, EncryptAndDecrypt) {
+TEST_P(EncodingAcceptanceTestOneByteLetter, EncryptAndDecrypt) {
   EXPECT_EQ(Encrypt(GetParam().input), GetParam().expected_output);
   EXPECT_EQ(Decrypt(GetParam().expected_output), GetParam().input);
 }
 
 INSTANTIATE_TEST_SUITE_P(
     AcceptanceTests,
-    EncryptionAcceptanceTestOneByteLetter,
+    EncodingAcceptanceTestOneByteLetter,
     ::testing::Values(
         TestCase{"aaaaaaa",
                  std::string("\xb0\x80\x00", 3)},  // Zero unused bits.
@@ -74,10 +74,10 @@ INSTANTIATE_TEST_SUITE_P(
 
 /*
 TODO: need to implement multiple byte letter
-class EncryptionAcceptanceTestCustomAlphabet
-    : public EncryptionAcceptanceTestBase {};
+class EncodingAcceptanceTestCustomAlphabet
+    : public EncodingAcceptanceTestBase {};
 
-TEST_F(EncryptionAcceptanceTestCustomAlphabet, OneLetterAlphabet) {
+TEST_F(EncodingAcceptanceTestCustomAlphabet, OneLetterAlphabet) {
   SetAlphabet({"aa"});
   constexpr char kText[] = "aaaaaa";
   const std::string expected_output{"\x81\x30\xb0\x84", 4};

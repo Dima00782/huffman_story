@@ -1,5 +1,5 @@
-#ifndef ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
-#define ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
+#ifndef ENCODING_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
+#define ENCODING_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
 
 #include <algorithm>
 #include <cassert>
@@ -87,4 +87,4 @@ std::unordered_map<LetterType, uint32_t> CountLetters(const InputRange& text) {
 
 }  // namespace huffman_tree
 
-#endif  // ENCRYPTION_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_
+#endif  // ENCODING_HUFFMAN_TREE_HUFFMAN_TREE_BUILDER_H_

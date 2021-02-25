@@ -1,5 +1,5 @@
-#ifndef ENCRYPTION_TEXT_SPLITTER_TRIE_H_
-#define ENCRYPTION_TEXT_SPLITTER_TRIE_H_
+#ifndef ENCODING_TEXT_SPLITTER_TRIE_H_
+#define ENCODING_TEXT_SPLITTER_TRIE_H_
 
 #include <memory>
 #include <string>
@@ -33,4 +33,4 @@ class Trie {
 };
 }  // namespace text_splitter
 
-#endif  // ENCRYPTION_TEXT_SPLITTER_TEXT_SPLITTER_H_
+#endif  // ENCODING_TEXT_SPLITTER_TEXT_SPLITTER_H_

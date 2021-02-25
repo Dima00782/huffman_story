@@ -1,4 +1,4 @@
-#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
+#include "encoding/char_streams_adapters/char_aligned_bit_writer.h"
 
 #include <cassert>
 #include <climits>

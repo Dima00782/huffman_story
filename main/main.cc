@@ -6,7 +6,7 @@
 #include <string>
 
 #include "CLI11/CLI11.hpp"
-#include "encryption/huffman_encryption.h"
+#include "encoding/huffman_encoding.h"
 #include "letter/one_byte_letter.h"
 
 int main(int argc, char* argv[]) {
@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
       auto config = std::make_unique<letter::OneByteLetterConfig>();
-      encryption::HuffmanEncrypt<letter::OneByteLetterConfig>(
+      encoding::HuffmanEncrypt<letter::OneByteLetterConfig>(
           std::move(config), std::move(input), std::move(output));
     }
   });
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
       auto output = std::make_shared<std::ofstream>(compressed_file_name,
                                                     std::ios::binary);
       auto config = std::make_unique<letter::OneByteLetterConfig>();
-      encryption::HuffmanDecrypt<letter::OneByteLetterConfig>(
+      encoding::HuffmanDecrypt<letter::OneByteLetterConfig>(
           std::move(config), std::move(input), std::move(output));
     }
   });

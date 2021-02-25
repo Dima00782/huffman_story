@@ -1,4 +1,4 @@
-#include "encryption/text_splitter/trie.h"
+#include "encoding/text_splitter/trie.h"
 
 namespace text_splitter {
 

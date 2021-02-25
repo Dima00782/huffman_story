@@ -1,5 +1,5 @@
-#ifndef ENCRYPTION_HUFFMAN_ENCRYPTION_H_
-#define ENCRYPTION_HUFFMAN_ENCRYPTION_H_
+#ifndef ENCODING_HUFFMAN_ENCODING_H_
+#define ENCODING_HUFFMAN_ENCODING_H_
 
 #include <cassert>
 #include <istream>
@@ -17,10 +17,10 @@
 
 #include "bit_io/bit_reader.h"
 #include "bit_io/bit_writer.h"
-#include "encryption/char_streams_adapters/char_aligned_bit_reader.h"
-#include "encryption/char_streams_adapters/char_aligned_bit_writer.h"
-#include "encryption/huffman_tree/huffman_tree_builder.h"
-#include "encryption/text_splitter/text_splitter.h"
+#include "encoding/char_streams_adapters/char_aligned_bit_reader.h"
+#include "encoding/char_streams_adapters/char_aligned_bit_writer.h"
+#include "encoding/huffman_tree/huffman_tree_builder.h"
+#include "encoding/text_splitter/text_splitter.h"
 #include "letter/letter.h"
 
 namespace {
@@ -79,7 +79,7 @@ std::unordered_map<LetterType, std::vector<bool>> BuildCodesMap(
 
 }  // namespace
 
-namespace encryption {
+namespace encoding {
 template <letter::LetterConfig Config>
 class HuffmanEncrypt {
  public:
@@ -206,6 +206,6 @@ class HuffmanDecrypt {
   std::unique_ptr<Config> config_;
 };
 
-}  // namespace encryption
+}  // namespace encoding
 
-#endif  // ENCRYPTION_HUFFMAN_ENCRYPTION_H_
+#endif  // ENCODING_HUFFMAN_ENCODING_H_
