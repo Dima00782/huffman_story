@@ -20,6 +20,7 @@ CharAlignedBitWriter::CharAlignedBitWriter(
 
 CharAlignedBitWriter::~CharAlignedBitWriter() {
   assert(has_footer_was_written_);
+  FlushBuffer();
 }
 
 bool CharAlignedBitWriter::WriteFooter() {

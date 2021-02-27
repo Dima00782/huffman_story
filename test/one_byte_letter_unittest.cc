@@ -62,9 +62,9 @@ class StringBasedBitWriter : public bit_io::BitWriter {
 namespace letter {
 
 TEST(OneByteLetter, Lexer) {
-  ByteLetterLexer lexer;
+  ByteLetterParser lexer;
   std::istringstream istring_stream(" abc defg ");
-  auto result = lexer.Split(istring_stream);
+  auto result = lexer.Parse(istring_stream);
   EXPECT_EQ(result.size(), 10u);
   EXPECT_EQ(result[0], std::byte(' '));
   EXPECT_EQ(result[1], std::byte('a'));
