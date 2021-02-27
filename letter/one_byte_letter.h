@@ -17,13 +17,9 @@
 
 namespace letter {
 
-// TODO: unify interface
-// Split -> vector<letter> and Write(ostream&, std::vector<letters>)
-// WriteSerialized & ReadSerialized
-
-class ByteLetterLexer final {
+class ByteLetterParser final {
  public:
-  std::vector<std::byte> Split(std::istream& input) {
+  std::vector<std::byte> Parse(std::istream& input) {
     std::vector<std::byte> letters;
     // TODO: toooo slow;
     for (char letter = '\0'; input.get(letter);) {
@@ -63,7 +59,7 @@ class OneByteLetterConfig {
   using LetterType = std::byte;
 
   std::vector<LetterType> Parse(std::istream& input) {
-    return lexer_.Split(input);
+    return parser_.Parse(input);
   }
 
   bool Write(std::ostream& output, LetterType letter) {
@@ -79,7 +75,7 @@ class OneByteLetterConfig {
   }
 
  private:
-  ByteLetterLexer lexer_;
+  ByteLetterParser parser_;
   ByteLetterSerializer serializer_;
 };
 
