@@ -17,7 +17,7 @@ std::string EncryptTextBase(const std::string& text,
                             std::shared_ptr<Config> config) {
   auto input = std::make_shared<std::istringstream>(text);
   auto output = std::make_shared<std::ostringstream>();
-  encoding::HuffmanEncrypt<Config>(std::move(config), input, output);
+  encoding::HuffmanEncoder<Config>(std::move(config), input, output);
   return output->str();
 }
 
@@ -26,7 +26,7 @@ std::string DecryptTextBase(const std::string& text,
                             std::shared_ptr<Config> config) {
   auto input = std::make_shared<std::istringstream>(text);
   auto output = std::make_shared<std::ostringstream>();
-  encoding::HuffmanDecrypt<Config>(std::move(config), input, output);
+  encoding::HuffmanDecoder<Config>(std::move(config), input, output);
   return output->str();
 }
 

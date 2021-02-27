@@ -81,9 +81,9 @@ std::unordered_map<LetterType, std::vector<bool>> BuildCodesMap(
 
 namespace encoding {
 template <letter::LetterConfig Config>
-class HuffmanEncrypt {
+class HuffmanEncoder {
  public:
-  HuffmanEncrypt(std::shared_ptr<Config> config,
+  HuffmanEncoder(std::shared_ptr<Config> config,
                  std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output)
       : output_(std::make_shared<char_adapters::CharAlignedBitWriter>(
@@ -137,11 +137,10 @@ class HuffmanEncrypt {
   std::shared_ptr<Config> config_;
 };
 
-// TODO: need to union this with encrypt not to redeclarate template parameters.
 template <letter::LetterConfig Config>
-class HuffmanDecrypt {
+class HuffmanDecoder {
  public:
-  HuffmanDecrypt(std::shared_ptr<Config> config,
+  HuffmanDecoder(std::shared_ptr<Config> config,
                  std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output)
       : input_{std::make_shared<char_adapters::CharAlignedBitReader>(input)},
