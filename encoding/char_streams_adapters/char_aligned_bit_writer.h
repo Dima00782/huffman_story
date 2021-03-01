@@ -8,6 +8,7 @@
 #include <ostream>
 
 #include "bit_io/bit_writer.h"
+#include "bits_manipulation/bits_manipulation.h"
 
 namespace {
 constexpr uint32_t kBufferSizeInBytes = 1024u * 1024u;
@@ -26,12 +27,10 @@ class CharAlignedBitWriter final : public bit_io::BitWriter {
  private:
   void FlushBuffer();
 
-  // TODO: can be replaced with fixed size bitset that can converts into char* array.
-  std::array<std::byte, kBufferSizeInBytes> buffer_;
-  uint32_t bit_idx_{0u};
-  bool has_bits_written_{false};
+  bits_manipulation::FixedSizeBitSet<kBufferSizeInBytes> bitset_;
   uint8_t num_of_filled_bits_in_last_byte_{0u};
   std::shared_ptr<std::ostream> underlying_writer_;
+  bool has_any_bits_written_{false};
   bool has_footer_was_written_{false};
 };
 

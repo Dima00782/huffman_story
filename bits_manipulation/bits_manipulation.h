@@ -2,6 +2,7 @@
 #define BITS_MANIPULATION_BITS_MANIPULATION_H_
 
 #include <array>
+#include <cassert>
 #include <climits>
 #include <cstddef>
 #include <cstdint>
@@ -28,6 +29,30 @@ inline std::array<bool, CHAR_BIT> ByteToBits(std::byte byte) {
 
   return bits;
 }
+
+template <std::size_t SizeInByte>
+class FixedSizeBitSet {
+ public:
+  void PushBack(bool enabled) {
+    assert(bit_idx_ / CHAR_BIT < SizeInByte);
+
+    std::byte& byte = buffer_[bit_idx_ / CHAR_BIT];
+    byte = SetBitInByte(byte, bit_idx_ % CHAR_BIT, enabled);
+    ++bit_idx_;
+  }
+
+  uint32_t SizeInBits() const { return bit_idx_; }
+
+  void Clear() { bit_idx_ = 0u; }
+
+  const char* GetAsCharArray() const {
+    return reinterpret_cast<const char*>(&buffer_[0]);
+  }
+
+ private:
+  std::array<std::byte, SizeInByte> buffer_;
+  uint32_t bit_idx_{0u};
+};
 
 }  // namespace bits_manipulation
 

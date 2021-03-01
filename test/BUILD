@@ -1,6 +1,7 @@
 cc_test(
     name = "unittest",
     srcs = [
+        "bit_manipulation_unittest.cc",
         "char_istream_adapter_unittest.cc",
         "char_ostream_adapter_unittest.cc",
         "encoding_unittest.cc",
@@ -10,6 +11,7 @@ cc_test(
         "one_byte_letter_unittest.cc",
     ],
     deps = [
+        "//bits_manipulation:bits_manipulation",
         "//encoding:huffman_encoding",
         "//encoding/char_streams_adapters:char_streams_adapters",
         "//encoding/text_splitter:text_splitter",

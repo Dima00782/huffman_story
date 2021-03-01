@@ -5,8 +5,6 @@
 #include <cmath>
 #include <cstdint>
 
-#include "bits_manipulation/bits_manipulation.h"
-
 namespace char_adapters {
 
 namespace {
@@ -27,7 +25,7 @@ bool CharAlignedBitWriter::WriteFooter() {
   assert(!has_footer_was_written_);
   has_footer_was_written_ = true;
 
-  if (!has_bits_written_) {
+  if (!has_any_bits_written_) {
     return true;
   }
 
@@ -57,26 +55,22 @@ bool CharAlignedBitWriter::WriteFooter() {
 }
 
 bool CharAlignedBitWriter::WriteBit(bool enabled) {
-  has_bits_written_ = true;
-  if (bit_idx_ * CHAR_BIT == kBufferSizeInBytes) {
+  has_any_bits_written_ = true;
+  // TODO: there is no way to return false!
+  if (bitset_.SizeInBits() * CHAR_BIT == kBufferSizeInBytes) {
     FlushBuffer();
   }
-
-  std::byte& byte = buffer_[bit_idx_ / CHAR_BIT];
-  byte = bits_manipulation::SetBitInByte(byte, bit_idx_ % CHAR_BIT, enabled);
-  ++bit_idx_;
-
+  bitset_.PushBack(enabled);
   num_of_filled_bits_in_last_byte_ =
       (num_of_filled_bits_in_last_byte_ + 1) % CHAR_BIT;
-
   return true;
 }
 
 void CharAlignedBitWriter::FlushBuffer() {
-  assert(bit_idx_ % CHAR_BIT == 0);
-  underlying_writer_->write(reinterpret_cast<char*>(&buffer_[0]),
-                            bit_idx_ / CHAR_BIT);
-  bit_idx_ = 0u;
+  assert(bitset_.SizeInBits() % CHAR_BIT == 0);
+  underlying_writer_->write(bitset_.GetAsCharArray(),
+                            bitset_.SizeInBits() / CHAR_BIT);
+  bitset_.Clear();
 }
 
 }  // namespace char_adapters
