@@ -18,7 +18,6 @@ CharAlignedBitWriter::CharAlignedBitWriter(
 
 CharAlignedBitWriter::~CharAlignedBitWriter() {
   assert(has_footer_was_written_);
-  FlushBuffer();
 }
 
 bool CharAlignedBitWriter::WriteFooter() {
@@ -50,15 +49,18 @@ bool CharAlignedBitWriter::WriteFooter() {
   }
 
   assert(num_of_filled_bits_in_last_byte_ == 0u);
-  FlushBuffer();
+  if (!FlushBuffer()) {
+    return false;
+  }
   return true;
 }
 
 bool CharAlignedBitWriter::WriteBit(bool enabled) {
   has_any_bits_written_ = true;
-  // TODO: there is no way to return false!
   if (bitset_.SizeInBits() * CHAR_BIT == kBufferSizeInBytes) {
-    FlushBuffer();
+    if (!FlushBuffer()) {
+      return false;
+    }
   }
   bitset_.PushBack(enabled);
   num_of_filled_bits_in_last_byte_ =
@@ -66,11 +68,14 @@ bool CharAlignedBitWriter::WriteBit(bool enabled) {
   return true;
 }
 
-void CharAlignedBitWriter::FlushBuffer() {
+bool CharAlignedBitWriter::FlushBuffer() {
   assert(bitset_.SizeInBits() % CHAR_BIT == 0);
-  underlying_writer_->write(bitset_.GetAsCharArray(),
-                            bitset_.SizeInBits() / CHAR_BIT);
+  if (!underlying_writer_->write(bitset_.GetAsCharArray(),
+                                 bitset_.SizeInBits() / CHAR_BIT)) {
+    return false;
+  }
   bitset_.Clear();
+  return true;
 }
 
 }  // namespace char_adapters

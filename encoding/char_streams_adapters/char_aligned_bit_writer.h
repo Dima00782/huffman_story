@@ -25,7 +25,7 @@ class CharAlignedBitWriter final : public bit_io::BitWriter {
   bool WriteFooter() override;
 
  private:
-  void FlushBuffer();
+  bool FlushBuffer();
 
   bits_manipulation::FixedSizeBitSet<kBufferSizeInBytes> bitset_;
   uint8_t num_of_filled_bits_in_last_byte_{0u};
