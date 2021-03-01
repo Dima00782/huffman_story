@@ -80,6 +80,9 @@ namespace encoding {
 template <letter::LetterConfig Config>
 class HuffmanEncoder {
  public:
+  using LetterType = Config::LetterType;
+  using TreeNode = huffman_tree::TreeNode<LetterType>;
+
   HuffmanEncoder(std::shared_ptr<Config> config,
                  std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output)
@@ -88,16 +91,15 @@ class HuffmanEncoder {
         config_(std::move(config)) {
     const auto splittedText = config_->Parse(*input);
     auto root =
-        huffman_tree::BuildHuffmanTree<typename Config::LetterType,
-                                       decltype(splittedText)>(splittedText);
+        huffman_tree::BuildHuffmanTree<LetterType, decltype(splittedText)>(
+            splittedText);
     WriteTreeInPrefixForm(root.get());
     WriteEncryptedText(root.get(), splittedText);
     output_->WriteFooter();
   }
 
  private:
-  void WriteTreeInPrefixForm(
-      huffman_tree::TreeNode<typename Config::LetterType>* root) {
+  void WriteTreeInPrefixForm(TreeNode* root) {
     if (!root) {
       return;
     }
@@ -108,7 +110,7 @@ class HuffmanEncoder {
     WriteTreeInPrefixForm(root->right_.get());
   }
 
-  void WriteNode(huffman_tree::TreeNode<typename Config::LetterType>* node) {
+  void WriteNode(TreeNode* node) {
     if (node->isInner()) {
       output_->WriteBit(kInnerNodeBitLabel);
     } else {
@@ -117,9 +119,7 @@ class HuffmanEncoder {
     }
   }
 
-  void WriteEncryptedText(
-      huffman_tree::TreeNode<typename Config::LetterType>* root,
-      const std::vector<typename Config::LetterType>& text) {
+  void WriteEncryptedText(TreeNode* root, const std::vector<LetterType>& text) {
     const auto codes_by_letter = BuildCodesMap(root);
     for (const auto& letter : text) {
       assert(codes_by_letter.contains(letter));
@@ -137,19 +137,21 @@ class HuffmanEncoder {
 template <letter::LetterConfig Config>
 class HuffmanDecoder {
  public:
+  using LetterType = Config::LetterType;
+  using TreeNode = huffman_tree::TreeNode<LetterType>;
+
   HuffmanDecoder(std::shared_ptr<Config> config,
                  std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output)
-      : input_{std::make_shared<char_adapters::CharAlignedBitReader>(input)},
-        config_{std::move(config)} {
-    output_ = std::move(output);
+      : input_(std::make_shared<char_adapters::CharAlignedBitReader>(input)),
+        output_(std::move(output)),
+        config_(std::move(config)) {
     auto root = ReadTreeInPrefixForm();
     WriteDecryptedText(root.get());
   }
 
  private:
-  std::unique_ptr<huffman_tree::TreeNode<typename Config::LetterType>>
-  ReadTreeInPrefixForm() {
+  std::unique_ptr<TreeNode> ReadTreeInPrefixForm() {
     const std::optional<bool> bit = input_->ReadBit();
     if (!bit) {
       return nullptr;
@@ -160,22 +162,18 @@ class HuffmanDecoder {
       if (!node_key) {
         return nullptr;
       }
-      return std::make_unique<
-          huffman_tree::TreeNode<typename Config::LetterType>>(
-          std::move(*node_key), 0, nullptr, nullptr);
+      return std::make_unique<TreeNode>(std::move(*node_key), 0, nullptr,
+                                        nullptr);
     }
 
     assert(*bit == kInnerNodeBitLabel);
-    auto node =
-        std::make_unique<huffman_tree::TreeNode<typename Config::LetterType>>(
-            typename Config::LetterType(), 0, nullptr, nullptr);
+    auto node = std::make_unique<TreeNode>(LetterType(), 0, nullptr, nullptr);
     node->left_ = std::move(ReadTreeInPrefixForm());
     node->right_ = std::move(ReadTreeInPrefixForm());
     return node;
   }
 
-  void WriteDecryptedText(
-      huffman_tree::TreeNode<typename Config::LetterType>* root) {
+  void WriteDecryptedText(TreeNode* root) {
     if (!root) {
       return;
     }
