@@ -74,6 +74,11 @@ std::unordered_map<LetterType, std::vector<bool>> BuildCodesMap(
   return codes;
 }
 
+void ResetInputStream(std::istream& input) {
+  input.clear();
+  input.seekg(0);
+}
+
 }  // namespace
 
 namespace encoding {
@@ -89,16 +94,26 @@ class HuffmanEncoder {
       : output_(std::make_shared<char_adapters::CharAlignedBitWriter>(
             std::move(output))),
         config_(std::move(config)) {
-    const auto splittedText = config_->Parse(*input);
-    auto root =
-        huffman_tree::BuildHuffmanTree<LetterType, decltype(splittedText)>(
-            splittedText);
+    auto letter_frequencies = CountLetterFrequencies(input);
+    auto root = huffman_tree::BuildHuffmanTree<LetterType>(letter_frequencies);
     WriteTreeInPrefixForm(root.get());
-    WriteEncryptedText(root.get(), splittedText);
+    ResetInputStream(*input);
+    WriteEncodedText(root.get(), std::move(input));
     output_->WriteFooter();
   }
 
  private:
+  std::unordered_map<LetterType, uint32_t> CountLetterFrequencies(
+      std::shared_ptr<std::istream> input) {
+    auto letter_parser = config_->CreateParser(std::move(input));
+    std::unordered_map<LetterType, uint32_t> letter_frequencies;
+    while (letter_parser->HasNext()) {
+      auto letter = letter_parser->Parse();
+      ++letter_frequencies[*letter];
+    }
+    return letter_frequencies;
+  }
+
   void WriteTreeInPrefixForm(TreeNode* root) {
     if (!root) {
       return;
@@ -119,11 +134,17 @@ class HuffmanEncoder {
     }
   }
 
-  void WriteEncryptedText(TreeNode* root, const std::vector<LetterType>& text) {
+  void WriteEncodedText(TreeNode* root,
+                        const std::shared_ptr<std::istream> input) {
     const auto codes_by_letter = BuildCodesMap(root);
-    for (const auto& letter : text) {
-      assert(codes_by_letter.contains(letter));
-      for (const auto bit : codes_by_letter.at(letter)) {
+    auto letter_parser = config_->CreateParser(std::move(input));
+    while (letter_parser->HasNext()) {
+      auto letter = letter_parser->Parse();
+      if (!letter) {
+        break;
+      }
+      assert(codes_by_letter.contains(*letter));
+      for (const auto bit : codes_by_letter.at(*letter)) {
         output_->WriteBit(bit);
       }
     }
@@ -147,7 +168,7 @@ class HuffmanDecoder {
         output_(std::move(output)),
         config_(std::move(config)) {
     auto root = ReadTreeInPrefixForm();
-    WriteDecryptedText(root.get());
+    WriteDecodedText(root.get());
   }
 
  private:
@@ -173,7 +194,7 @@ class HuffmanDecoder {
     return node;
   }
 
-  void WriteDecryptedText(TreeNode* root) {
+  void WriteDecodedText(TreeNode* root) {
     if (!root) {
       return;
     }

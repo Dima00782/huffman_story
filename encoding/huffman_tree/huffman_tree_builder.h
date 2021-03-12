@@ -11,11 +11,6 @@
 
 namespace huffman_tree {
 
-namespace {
-template <class LetterType, class InputRange>
-std::unordered_map<LetterType, uint32_t> CountLetters(const InputRange& text);
-}  // namespace
-
 template <class LetterType>
 struct TreeNode {
   TreeNode(LetterType key,
@@ -36,24 +31,24 @@ struct TreeNode {
   std::unique_ptr<TreeNode<LetterType>> right_;
 };
 
-template <class LetterType, class InputRange>
-std::unique_ptr<TreeNode<LetterType>> BuildHuffmanTree(const InputRange& text) {
-  const auto letter_count = CountLetters<LetterType, InputRange>(text);
-
-  if (letter_count.empty()) {
+template <class LetterType>
+std::unique_ptr<TreeNode<LetterType>> BuildHuffmanTree(
+    const std::unordered_map<LetterType, uint32_t>& letter_frequency) {
+  if (letter_frequency.empty()) {
     return nullptr;
   }
 
   std::vector<std::unique_ptr<TreeNode<LetterType>>> nodes;
-  for (const auto& [letter, frequence] : letter_count) {
-    nodes.push_back(
-        std::make_unique<TreeNode<LetterType>>(letter, frequence, nullptr, nullptr));
+  for (const auto& [letter, frequence] : letter_frequency) {
+    nodes.push_back(std::make_unique<TreeNode<LetterType>>(letter, frequence,
+                                                           nullptr, nullptr));
   }
 
-  const auto frequency_comparator = [](const std::unique_ptr<TreeNode<LetterType>>& lhs,
-                                       const std::unique_ptr<TreeNode<LetterType>>& rhs) {
-    return lhs->frequency_ > rhs->frequency_;
-  };
+  const auto frequency_comparator =
+      [](const std::unique_ptr<TreeNode<LetterType>>& lhs,
+         const std::unique_ptr<TreeNode<LetterType>>& rhs) {
+        return lhs->frequency_ > rhs->frequency_;
+      };
 
   while (nodes.size() >= 2) {
     std::sort(nodes.begin(), nodes.end(), frequency_comparator);
@@ -65,25 +60,15 @@ std::unique_ptr<TreeNode<LetterType>> BuildHuffmanTree(const InputRange& text) {
 
     const auto total_frequency =
         first_minimum->frequency_ + second_minimum->frequency_;
-    auto union_node = std::make_unique<TreeNode<LetterType>>(LetterType(), total_frequency,
-                                                 std::move(first_minimum),
-                                                 std::move(second_minimum));
+    auto union_node = std::make_unique<TreeNode<LetterType>>(
+        LetterType(), total_frequency, std::move(first_minimum),
+        std::move(second_minimum));
     nodes.emplace_back(std::move(union_node));
   }
 
   assert(nodes.size() == 1);
   return std::move(nodes.back());
 }
-
-namespace {
-template <class LetterType, class InputRange>
-std::unordered_map<LetterType, uint32_t> CountLetters(const InputRange& text) {
-  std::unordered_map<LetterType, uint32_t> letter_count;
-  std::for_each(std::cbegin(text), std::cend(text),
-                [&letter_count](auto& letter) { ++letter_count[letter]; });
-  return letter_count;
-}
-}  // namespace
 
 }  // namespace huffman_tree
 

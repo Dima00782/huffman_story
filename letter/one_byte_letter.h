@@ -19,14 +19,22 @@ namespace letter {
 
 class ByteLetterParser final {
  public:
-  std::vector<std::byte> Parse(std::istream& input) {
-    std::vector<std::byte> letters;
-    // TODO: toooo slow;
-    for (char letter = '\0'; input.get(letter);) {
-      letters.push_back(static_cast<std::byte>(letter));
+  explicit ByteLetterParser(std::shared_ptr<std::istream> input)
+      : input_(std::move(input)) {}
+
+  std::optional<std::byte> Parse() {
+    char byte = '\0';
+    // TODO: too slow, need to bufferize it.
+    if (input_->get(byte)) {
+      return static_cast<std::byte>(byte);
     }
-    return letters;
+    return std::nullopt;
   }
+
+  bool HasNext() const { return input_->rdbuf()->in_avail() > 0; }
+
+ private:
+  std::shared_ptr<std::istream> input_;
 };
 
 class ByteLetterSerializer final {
@@ -58,8 +66,8 @@ class OneByteLetterConfig {
  public:
   using LetterType = std::byte;
 
-  std::vector<LetterType> Parse(std::istream& input) {
-    return parser_.Parse(input);
+  std::unique_ptr<ByteLetterParser> CreateParser(std::shared_ptr<std::istream> input) {
+    return std::make_unique<ByteLetterParser>(std::move(input));
   }
 
   bool Write(std::ostream& output, LetterType letter) {
@@ -75,7 +83,6 @@ class OneByteLetterConfig {
   }
 
  private:
-  ByteLetterParser parser_;
   ByteLetterSerializer serializer_;
 };
 

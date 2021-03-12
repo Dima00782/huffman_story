@@ -9,14 +9,14 @@ namespace huffman_tree {
 class HuffmanTreeBuilderTest : public ::testing::Test {
  public:
   std::unique_ptr<TreeNode<char>> BuildTree(
-      const std::vector<char>& parsed_text) {
-    return BuildHuffmanTree<char, std::vector<char>>(parsed_text);
+      const std::unordered_map<char, uint32_t>& frequencies) {
+    return BuildHuffmanTree<char>(frequencies);
   }
 };
 
 TEST_F(HuffmanTreeBuilderTest, OneSymbol) {
-  const std::vector<char> parsed_text = {'a', 'a', 'a', 'a'};
-  const auto root = BuildTree(parsed_text);
+  const std::unordered_map<char, uint32_t> frequencies = {{'a', 4u}};
+  const auto root = BuildTree(frequencies);
 
   ASSERT_TRUE(root);
   EXPECT_TRUE(root->isLeaf());
@@ -25,8 +25,8 @@ TEST_F(HuffmanTreeBuilderTest, OneSymbol) {
 }
 
 TEST_F(HuffmanTreeBuilderTest, TwoSymbols) {
-  const std::vector<char> parsed_text = {'a', 'a', 'a', 'a', 'b', 'b', 'b'};
-  const auto root = BuildTree(parsed_text);
+  const std::unordered_map<char, uint32_t> frequencies = {{'a', 4u}, {'b', 3u}};
+  const auto root = BuildTree(frequencies);
 
   ASSERT_TRUE(root);
   EXPECT_TRUE(root->isInner());
@@ -44,8 +44,9 @@ TEST_F(HuffmanTreeBuilderTest, TwoSymbols) {
 }
 
 TEST_F(HuffmanTreeBuilderTest, ThreeSymbols) {
-  const std::vector<char> parsed_text = {'a', 'a', 'a', 'a', 'b', 'b', 'c'};
-  const auto root = BuildTree(parsed_text);
+  const std::unordered_map<char, uint32_t> frequencies = {
+      {'a', 4u}, {'b', 2u}, {'c', 1u}};
+  const auto root = BuildTree(frequencies);
 
   ASSERT_TRUE(root);
   EXPECT_TRUE(root->isInner());

@@ -25,8 +25,9 @@ concept LetterConfig =
                                                 std::ostream& output,
                                                 bit_io::BitWriter& bit_output,
                                                 bit_io::BitReader& bit_input) {
-  { config.Parse(input) }
-  ->std::same_as<std::vector<typename T::LetterType>>;
+  // TODO: make constraint for createParser
+  // { config.Parse(input) }
+  // ->std::same_as<std::vector<typename T::LetterType>>;
 
   { config.Write(output, letter) }
   ->std::same_as<bool>;
