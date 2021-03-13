@@ -1,5 +1,6 @@
 #include <functional>
 #include <istream>
+#include <memory>
 #include <optional>
 #include <ostream>
 #include <utility>
@@ -16,18 +17,20 @@ concept Hashable = requires(T x) {
 }  // namespace
 
 namespace letter {
-
 template <typename T>
-concept LetterConfig =
-    Hashable<typename T::LetterType>&& requires(T config,
-                                                typename T::LetterType letter,
-                                                std::istream& input,
-                                                std::ostream& output,
-                                                bit_io::BitWriter& bit_output,
-                                                bit_io::BitReader& bit_input) {
-  // TODO: make constraint for createParser
-  // { config.Parse(input) }
-  // ->std::same_as<std::vector<typename T::LetterType>>;
+concept LetterConfig = Hashable<typename T::LetterType>&& requires(
+    T config,
+    typename T::LetterType letter,
+    typename T::LetterParser letter_parser,
+    std::shared_ptr<std::istream> input,
+    std::ostream& output,
+    bit_io::BitWriter& bit_output,
+    bit_io::BitReader& bit_input) {
+  { config.CreateParser(input) }
+  ->std::same_as<std::unique_ptr<typename T::LetterParser>>;
+
+  { letter_parser.Parse() }
+  ->std::same_as<std::optional<typename T::LetterType>>;
 
   { config.Write(output, letter) }
   ->std::same_as<bool>;

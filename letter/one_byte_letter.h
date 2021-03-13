@@ -65,9 +65,11 @@ class ByteLetterSerializer final {
 class OneByteLetterConfig {
  public:
   using LetterType = std::byte;
+  using LetterParser = ByteLetterParser;
 
-  std::unique_ptr<ByteLetterParser> CreateParser(std::shared_ptr<std::istream> input) {
-    return std::make_unique<ByteLetterParser>(std::move(input));
+  std::unique_ptr<LetterParser> CreateParser(
+      std::shared_ptr<std::istream> input) {
+    return std::make_unique<LetterParser>(std::move(input));
   }
 
   bool Write(std::ostream& output, LetterType letter) {
