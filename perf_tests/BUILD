@@ -1,6 +1,6 @@
 py_binary(
-    name = "perf_tests",
-    srcs = ["perf_tests.py"],
+    name = "benchmark",
+    srcs = ["benchmark.py"],
     data = [
         "//main:main",
         "//perf_tests:war_and_peace.txt",
