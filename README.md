@@ -14,7 +14,7 @@ bazel build //main:main
 
 To run perftests
 ```bash
-bazel run //perf_tests:perf_tests
+bazel run //perf_tests:benchmark
 ```
 
 To unittest
