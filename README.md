@@ -19,7 +19,7 @@ bazel run //perf_tests:benchmark
 
 To unittest
 ```bash
-bazel test //test:unittest
+bazel test //test:unittest [--config={asan, ubsan}]
 ```
 
 To see main deps

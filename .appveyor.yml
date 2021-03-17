@@ -8,5 +8,9 @@ install:
   - sudo apt install -y gcc-10
 build_script:
 - echo Ubuntu build script
-- CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 bazel test //test:unittest
+- export CC=/usr/bin/gcc-10
+- export CXX=/usr/bin/g++-10
+- bazel test //test:unittest
+- bazel test //test:unittest --config=asan
+- bazel test //test:unittest --config=ubsan
 
