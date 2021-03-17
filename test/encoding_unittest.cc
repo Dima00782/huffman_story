@@ -7,8 +7,8 @@
 #include <string>
 
 #include "bits_manipulation/bits_manipulation.h"
-#include "encoding/char_streams_adapters/char_aligned_bit_reader.h"
-#include "encoding/char_streams_adapters/char_aligned_bit_writer.h"
+#include "encoding/byte_streams_adapters/byte_aligned_bit_reader.h"
+#include "encoding/byte_streams_adapters/byte_aligned_bit_writer.h"
 #include "encoding/huffman_encoding.h"
 #include "letter/one_byte_letter.h"
 

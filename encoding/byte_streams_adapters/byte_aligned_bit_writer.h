@@ -1,5 +1,5 @@
-#ifndef ENCODING_CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_
-#define ENCODING_CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_
+#ifndef ENCODING_BYTE_STREAMS_ADAPTERS_BYTE_OSTREAM_ADAPTER_H_
+#define ENCODING_BYTE_STREAMS_ADAPTERS_BYTE_OSTREAM_ADAPTER_H_
 
 #include <array>
 #include <cstddef>
@@ -14,12 +14,12 @@ namespace {
 constexpr uint32_t kBufferSizeInBytes = 1024u * 1024u;
 }
 
-namespace char_adapters {
+namespace byte_adapters {
 
-class CharAlignedBitWriter final : public bit_io::BitWriter {
+class ByteAlignedBitWriter final : public bit_io::BitWriter {
  public:
-  explicit CharAlignedBitWriter(std::shared_ptr<std::ostream> ostream);
-  ~CharAlignedBitWriter() override;
+  explicit ByteAlignedBitWriter(std::shared_ptr<std::ostream> ostream);
+  ~ByteAlignedBitWriter() override;
 
   bool WriteBit(bool enabled) override;
   bool WriteFooter() override;
@@ -34,6 +34,6 @@ class CharAlignedBitWriter final : public bit_io::BitWriter {
   bool has_footer_was_written_{false};
 };
 
-}  // namespace char_adapters
+}  // namespace byte_adapters
 
-#endif  // ENCODING_CHAR_STREAMS_ADAPTERS_CHAR_OSTREAM_ADAPTER_H_
+#endif  // ENCODING_BYTE_STREAMS_ADAPTERS_BYTE_OSTREAM_ADAPTER_H_

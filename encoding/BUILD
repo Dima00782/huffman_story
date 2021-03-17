@@ -6,7 +6,7 @@ cc_library(
     deps = [
         "//letter:letter",
         "//bit_io:bit_io",
-        "//encoding/char_streams_adapters:char_streams_adapters",
+        "//encoding/byte_streams_adapters:byte_streams_adapters",
         "//encoding/huffman_tree:huffman_tree",
         "//encoding/text_splitter:text_splitter",
     ],

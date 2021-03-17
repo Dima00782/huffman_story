@@ -14,8 +14,8 @@
 
 #include "bit_io/bit_reader.h"
 #include "bit_io/bit_writer.h"
-#include "encoding/char_streams_adapters/char_aligned_bit_reader.h"
-#include "encoding/char_streams_adapters/char_aligned_bit_writer.h"
+#include "encoding/byte_streams_adapters/byte_aligned_bit_reader.h"
+#include "encoding/byte_streams_adapters/byte_aligned_bit_writer.h"
 #include "encoding/huffman_tree/huffman_tree_builder.h"
 #include "encoding/text_splitter/text_splitter.h"
 #include "letter/letter.h"
@@ -91,7 +91,7 @@ class HuffmanEncoder {
   HuffmanEncoder(std::shared_ptr<Config> config,
                  std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output)
-      : output_(std::make_shared<char_adapters::CharAlignedBitWriter>(
+      : output_(std::make_shared<byte_adapters::ByteAlignedBitWriter>(
             std::move(output))),
         config_(std::move(config)) {
     auto letter_frequencies = CountLetterFrequencies(input);
@@ -164,7 +164,7 @@ class HuffmanDecoder {
   HuffmanDecoder(std::shared_ptr<Config> config,
                  std::shared_ptr<std::istream> input,
                  std::shared_ptr<std::ostream> output)
-      : input_(std::make_shared<char_adapters::CharAlignedBitReader>(input)),
+      : input_(std::make_shared<byte_adapters::ByteAlignedBitReader>(input)),
         output_(std::move(output)),
         config_(std::move(config)) {
     auto root = ReadTreeInPrefixForm();

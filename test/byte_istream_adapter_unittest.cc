@@ -1,29 +1,29 @@
-#include "encoding/char_streams_adapters/char_aligned_bit_reader.h"
+#include "encoding/byte_streams_adapters/byte_aligned_bit_reader.h"
 #include "gtest/gtest.h"
 
 #include <memory>
 #include <sstream>
 
-TEST(CharAlignedBitReader, SevenUnusedBits) {
+TEST(ByteAlignedBitReader, SevenUnusedBits) {
   auto istring_stream = std::make_shared<std::istringstream>("\x87");
-  char_adapters::CharAlignedBitReader bit_reader{std::move(istring_stream)};
+  byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
 
   EXPECT_TRUE(*bit_reader.ReadBit());
   EXPECT_FALSE(bit_reader.ReadBit());
 }
 
-TEST(CharAlignedBitReader, SixUnusedBits) {
+TEST(ByteAlignedBitReader, SixUnusedBits) {
   auto istring_stream = std::make_shared<std::istringstream>("\xc6");
-  char_adapters::CharAlignedBitReader bit_reader{std::move(istring_stream)};
+  byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
 
   EXPECT_TRUE(*bit_reader.ReadBit());
   EXPECT_TRUE(*bit_reader.ReadBit());
   EXPECT_FALSE(bit_reader.ReadBit());
 }
 
-TEST(CharAlignedBitReader, FiveUnusedBits) {
+TEST(ByteAlignedBitReader, FiveUnusedBits) {
   auto istring_stream = std::make_shared<std::istringstream>("\xa5");
-  char_adapters::CharAlignedBitReader bit_reader{std::move(istring_stream)};
+  byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
 
   EXPECT_TRUE(*bit_reader.ReadBit());
   EXPECT_FALSE(*bit_reader.ReadBit());
@@ -32,9 +32,9 @@ TEST(CharAlignedBitReader, FiveUnusedBits) {
   EXPECT_FALSE(bit_reader.ReadBit());
 }
 
-TEST(CharAlignedBitReader, FourUnusedBits) {
+TEST(ByteAlignedBitReader, FourUnusedBits) {
   auto istring_stream = std::make_shared<std::istringstream>("\xb4");
-  char_adapters::CharAlignedBitReader bit_reader{std::move(istring_stream)};
+  byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
 
   EXPECT_TRUE(*bit_reader.ReadBit());
   EXPECT_FALSE(*bit_reader.ReadBit());
@@ -44,9 +44,9 @@ TEST(CharAlignedBitReader, FourUnusedBits) {
   EXPECT_FALSE(bit_reader.ReadBit());
 }
 
-TEST(CharAlignedBitReader, ThreeUnusedBits) {
+TEST(ByteAlignedBitReader, ThreeUnusedBits) {
   auto istring_stream = std::make_shared<std::istringstream>("\x5b");
-  char_adapters::CharAlignedBitReader bit_reader{std::move(istring_stream)};
+  byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
 
   EXPECT_FALSE(*bit_reader.ReadBit());
   EXPECT_TRUE(*bit_reader.ReadBit());
@@ -57,9 +57,9 @@ TEST(CharAlignedBitReader, ThreeUnusedBits) {
   EXPECT_FALSE(bit_reader.ReadBit());
 }
 
-TEST(CharAlignedBitReader, TwoUnusedBits) {
+TEST(ByteAlignedBitReader, TwoUnusedBits) {
   auto istring_stream = std::make_shared<std::istringstream>("\xa8\x02");
-  char_adapters::CharAlignedBitReader bit_reader{std::move(istring_stream)};
+  byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
 
   EXPECT_TRUE(*bit_reader.ReadBit());
   EXPECT_FALSE(*bit_reader.ReadBit());
@@ -71,9 +71,9 @@ TEST(CharAlignedBitReader, TwoUnusedBits) {
   EXPECT_FALSE(bit_reader.ReadBit());
 }
 
-TEST(CharAlignedBitReader, OneUnusedBits) {
+TEST(ByteAlignedBitReader, OneUnusedBits) {
   auto istring_stream = std::make_shared<std::istringstream>("\xaa\x01");
-  char_adapters::CharAlignedBitReader bit_reader{std::move(istring_stream)};
+  byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
 
   EXPECT_TRUE(*bit_reader.ReadBit());
   EXPECT_FALSE(*bit_reader.ReadBit());
@@ -86,10 +86,10 @@ TEST(CharAlignedBitReader, OneUnusedBits) {
   EXPECT_FALSE(bit_reader.ReadBit());
 }
 
-TEST(CharAlignedBitReader, ZeroUnusedBits) {
+TEST(ByteAlignedBitReader, ZeroUnusedBits) {
   auto istring_stream =
       std::make_shared<std::istringstream>(std::string("\xaa\x00", 2));
-  char_adapters::CharAlignedBitReader bit_reader{std::move(istring_stream)};
+  byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
 
   EXPECT_TRUE(*bit_reader.ReadBit());
   EXPECT_FALSE(*bit_reader.ReadBit());

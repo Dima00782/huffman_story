@@ -1,5 +1,5 @@
-#ifndef ENCODING_CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
-#define ENCODING_CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
+#ifndef ENCODING_BYTE_STREAMS_ADAPTERS_BYTE_ISTREAM_ADAPTER_H_
+#define ENCODING_BYTE_STREAMS_ADAPTERS_BYTE_ISTREAM_ADAPTER_H_
 
 #include <deque>
 #include <istream>
@@ -7,13 +7,13 @@
 
 #include "bit_io/bit_reader.h"
 
-namespace char_adapters {
+namespace byte_adapters {
 
-class CharAlignedBitReader : public bit_io::BitReader {
+class ByteAlignedBitReader : public bit_io::BitReader {
  public:
-  explicit CharAlignedBitReader(
+  explicit ByteAlignedBitReader(
       std::shared_ptr<std::istream> underlying_reader);
-  ~CharAlignedBitReader() override = default;
+  ~ByteAlignedBitReader() override = default;
 
   std::optional<bool> ReadBit() override;
 
@@ -27,6 +27,6 @@ class CharAlignedBitReader : public bit_io::BitReader {
   bool is_last_bit_met_{false};
 };
 
-}  // namespace char_adapters
+}  // namespace byte_adapters
 
-#endif  // ENCODING_CHAR_STREAMS_ADAPTERS_CHAR_ISTREAM_ADAPTER_H_
+#endif  // ENCODING_BYTE_STREAMS_ADAPTERS_BYTE_ISTREAM_ADAPTER_H_

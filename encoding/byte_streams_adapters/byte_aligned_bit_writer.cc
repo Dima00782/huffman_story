@@ -1,26 +1,26 @@
-#include "encoding/char_streams_adapters/char_aligned_bit_writer.h"
+#include "encoding/byte_streams_adapters/byte_aligned_bit_writer.h"
 
 #include <cassert>
 #include <climits>
 #include <cmath>
 #include <cstdint>
 
-namespace char_adapters {
+namespace byte_adapters {
 
 namespace {
 constexpr uint8_t kNumBitsForStoringAlignment =
     static_cast<uint8_t>(std::log2(CHAR_BIT));
 }
 
-CharAlignedBitWriter::CharAlignedBitWriter(
+ByteAlignedBitWriter::ByteAlignedBitWriter(
     std::shared_ptr<std::ostream> ostream)
     : underlying_writer_{ostream} {}
 
-CharAlignedBitWriter::~CharAlignedBitWriter() {
+ByteAlignedBitWriter::~ByteAlignedBitWriter() {
   assert(has_footer_was_written_);
 }
 
-bool CharAlignedBitWriter::WriteFooter() {
+bool ByteAlignedBitWriter::WriteFooter() {
   assert(!has_footer_was_written_);
   has_footer_was_written_ = true;
 
@@ -55,7 +55,7 @@ bool CharAlignedBitWriter::WriteFooter() {
   return true;
 }
 
-bool CharAlignedBitWriter::WriteBit(bool enabled) {
+bool ByteAlignedBitWriter::WriteBit(bool enabled) {
   has_any_bits_written_ = true;
   if (bitset_.SizeInBits() * CHAR_BIT == kBufferSizeInBytes) {
     if (!FlushBuffer()) {
@@ -68,7 +68,7 @@ bool CharAlignedBitWriter::WriteBit(bool enabled) {
   return true;
 }
 
-bool CharAlignedBitWriter::FlushBuffer() {
+bool ByteAlignedBitWriter::FlushBuffer() {
   assert(bitset_.SizeInBits() % CHAR_BIT == 0);
   if (!underlying_writer_->write(bitset_.GetAsCharArray(),
                                  bitset_.SizeInBits() / CHAR_BIT)) {
@@ -78,4 +78,4 @@ bool CharAlignedBitWriter::FlushBuffer() {
   return true;
 }
 
-}  // namespace char_adapters
+}  // namespace byte_adapters

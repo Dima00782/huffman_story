@@ -1,4 +1,4 @@
-#include "encoding/char_streams_adapters/char_aligned_bit_reader.h"
+#include "encoding/byte_streams_adapters/byte_aligned_bit_reader.h"
 
 #include <cassert>
 #include <climits>
@@ -7,7 +7,7 @@
 
 #include "bits_manipulation/bits_manipulation.h"
 
-namespace char_adapters {
+namespace byte_adapters {
 
 namespace {
 constexpr uint8_t kNumBitsForStoringAlignment =
@@ -15,13 +15,13 @@ constexpr uint8_t kNumBitsForStoringAlignment =
 constexpr uint32_t kMinimumQueueSizeInBytes = 1024u;
 }  // namespace
 
-CharAlignedBitReader::CharAlignedBitReader(
+ByteAlignedBitReader::ByteAlignedBitReader(
     std::shared_ptr<std::istream> underlying_reader)
     : underlying_reader_{underlying_reader} {
   ConsumeBytes(kMinimumQueueSizeInBytes);
 }
 
-void CharAlignedBitReader::ConsumeBytes(uint32_t num_bytes) {
+void ByteAlignedBitReader::ConsumeBytes(uint32_t num_bytes) {
   for (uint32_t i = 0u; i < num_bytes; ++i) {
     char byte = '\0';
     if (underlying_reader_->get(byte)) {
@@ -37,7 +37,7 @@ void CharAlignedBitReader::ConsumeBytes(uint32_t num_bytes) {
   }
 }
 
-std::optional<bool> CharAlignedBitReader::ReadBit() {
+std::optional<bool> ByteAlignedBitReader::ReadBit() {
   if (look_ahead_queue_.empty()) {
     return std::nullopt;
   }
@@ -52,7 +52,7 @@ std::optional<bool> CharAlignedBitReader::ReadBit() {
   return bit_value;
 }
 
-void CharAlignedBitReader::RemoveUnusedBitsInLastByte() {
+void ByteAlignedBitReader::RemoveUnusedBitsInLastByte() {
   uint8_t num_unused_bits_in_last_byte = 0u;
   for (uint8_t bit_pos = 1; bit_pos <= kNumBitsForStoringAlignment; ++bit_pos) {
     const bool bit_enabled = look_ahead_queue_.back();
@@ -74,9 +74,9 @@ void CharAlignedBitReader::RemoveUnusedBitsInLastByte() {
   }
 }
 
-bool CharAlignedBitReader::HasAdditionalByteUsed(
+bool ByteAlignedBitReader::HasAdditionalByteUsed(
     uint8_t num_unused_bits_in_last_byte) {
   return num_unused_bits_in_last_byte < kNumBitsForStoringAlignment;
 }
 
-}  // namespace char_adapters
+}  // namespace byte_adapters

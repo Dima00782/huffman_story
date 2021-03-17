@@ -1,33 +1,33 @@
-#include "encoding/char_streams_adapters/char_aligned_bit_writer.h"
+#include "encoding/byte_streams_adapters/byte_aligned_bit_writer.h"
 #include "gtest/gtest.h"
 
 #include <memory>
 #include <sstream>
 
-TEST(CharAlignedBitWriter, EmptyBits) {
+TEST(ByteAlignedBitWriter, EmptyBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    byte_adapters::ByteAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteFooter());
   }
 
   EXPECT_TRUE(ostring_stream->str().empty());
 }
 
-TEST(CharAlignedBitWriter, SevenUnusedBits) {
+TEST(ByteAlignedBitWriter, SevenUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    byte_adapters::ByteAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteFooter());
   }
   EXPECT_EQ(ostring_stream->str(), "\x87");
 }
 
-TEST(CharAlignedBitWriter, SixUnusedBits) {
+TEST(ByteAlignedBitWriter, SixUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    byte_adapters::ByteAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteFooter());
@@ -36,10 +36,10 @@ TEST(CharAlignedBitWriter, SixUnusedBits) {
   EXPECT_EQ(ostring_stream->str(), "\x46");
 }
 
-TEST(CharAlignedBitWriter, FiveUnusedBits) {
+TEST(ByteAlignedBitWriter, FiveUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    byte_adapters::ByteAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(false));
@@ -48,10 +48,10 @@ TEST(CharAlignedBitWriter, FiveUnusedBits) {
   EXPECT_EQ(ostring_stream->str(), "\xc5");
 }
 
-TEST(CharAlignedBitWriter, FourUnusedBits) {
+TEST(ByteAlignedBitWriter, FourUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    byte_adapters::ByteAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(true));
@@ -61,10 +61,10 @@ TEST(CharAlignedBitWriter, FourUnusedBits) {
   EXPECT_EQ(ostring_stream->str(), "\xb4");
 }
 
-TEST(CharAlignedBitWriter, ThreeUnusedBits) {
+TEST(ByteAlignedBitWriter, ThreeUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    byte_adapters::ByteAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(true));
@@ -75,10 +75,10 @@ TEST(CharAlignedBitWriter, ThreeUnusedBits) {
   EXPECT_EQ(ostring_stream->str(), "\xb3");
 }
 
-TEST(CharAlignedBitWriter, TwoUnusedBits) {
+TEST(ByteAlignedBitWriter, TwoUnusedBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    byte_adapters::ByteAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(true));
@@ -92,10 +92,10 @@ TEST(CharAlignedBitWriter, TwoUnusedBits) {
             "\x02");
 }
 
-TEST(CharAlignedBitWriter, OneUnusedBit) {
+TEST(ByteAlignedBitWriter, OneUnusedBit) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
-    char_adapters::CharAlignedBitWriter bit_writer{ostring_stream};
+    byte_adapters::ByteAlignedBitWriter bit_writer{ostring_stream};
     ASSERT_TRUE(bit_writer.WriteBit(true));
     ASSERT_TRUE(bit_writer.WriteBit(false));
     ASSERT_TRUE(bit_writer.WriteBit(true));
