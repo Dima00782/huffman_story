@@ -24,7 +24,6 @@ class ByteLetterParser final {
 
   std::optional<std::byte> Parse() {
     char byte = '\0';
-    // TODO: too slow, need to bufferize it.
     if (input_->get(byte)) {
       return static_cast<std::byte>(byte);
     }
