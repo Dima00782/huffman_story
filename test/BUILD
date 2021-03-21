@@ -9,6 +9,7 @@ cc_test(
         "text_splitter_unittest.cc",
         "trie_unittest.cc",
         "single_byte_letter_unittest.cc",
+        "fixed_alphabet_letter_unittest.cc",
     ],
     deps = [
         "//bits_manipulation:bits_manipulation",
@@ -17,6 +18,7 @@ cc_test(
         "//encoding/text_splitter:text_splitter",
         "//letter:letter",
         "//letter/single_byte_letter:single_byte_letter",
+        "//letter/fixed_alphabet_letter:fixed_alphabet_letter",
         "@googletest//:gtest_main",
     ],
 )
