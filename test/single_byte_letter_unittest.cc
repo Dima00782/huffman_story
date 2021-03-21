@@ -61,19 +61,20 @@ class StringBasedBitWriter : public bit_io::BitWriter {
 
 namespace single_byte_letter {
 
-TEST(SingleByteLetter, Lexer) {
+TEST(SingleByteLetter, Parser) {
   auto input = std::make_shared<std::istringstream>(" abc defg ");
-  ByteLetterParser lexer(std::move(input));
-  EXPECT_EQ(*lexer.Parse(), std::byte(' '));
-  EXPECT_EQ(*lexer.Parse(), std::byte('a'));
-  EXPECT_EQ(*lexer.Parse(), std::byte('b'));
-  EXPECT_EQ(*lexer.Parse(), std::byte('c'));
-  EXPECT_EQ(*lexer.Parse(), std::byte(' '));
-  EXPECT_EQ(*lexer.Parse(), std::byte('d'));
-  EXPECT_EQ(*lexer.Parse(), std::byte('e'));
-  EXPECT_EQ(*lexer.Parse(), std::byte('f'));
-  EXPECT_EQ(*lexer.Parse(), std::byte('g'));
-  EXPECT_EQ(*lexer.Parse(), std::byte(' '));
+  ByteLetterParser parser(std::move(input));
+  EXPECT_EQ(*parser.Parse(), std::byte(' '));
+  EXPECT_EQ(*parser.Parse(), std::byte('a'));
+  EXPECT_EQ(*parser.Parse(), std::byte('b'));
+  EXPECT_EQ(*parser.Parse(), std::byte('c'));
+  EXPECT_EQ(*parser.Parse(), std::byte(' '));
+  EXPECT_EQ(*parser.Parse(), std::byte('d'));
+  EXPECT_EQ(*parser.Parse(), std::byte('e'));
+  EXPECT_EQ(*parser.Parse(), std::byte('f'));
+  EXPECT_EQ(*parser.Parse(), std::byte('g'));
+  EXPECT_EQ(*parser.Parse(), std::byte(' '));
+  EXPECT_FALSE(parser.Parse());
 }
 
 TEST(SingleByteLetter, SerializerRead) {
