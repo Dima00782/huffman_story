@@ -188,8 +188,8 @@ class HuffmanDecoder {
 
     assert(*bit == kInnerNodeBitLabel);
     auto node = std::make_unique<TreeNode>(LetterType(), 0, nullptr, nullptr);
-    node->left_ = std::move(ReadTreeInPrefixForm());
-    node->right_ = std::move(ReadTreeInPrefixForm());
+    node->left_ = ReadTreeInPrefixForm();
+    node->right_ = ReadTreeInPrefixForm();
     return node;
   }
 
