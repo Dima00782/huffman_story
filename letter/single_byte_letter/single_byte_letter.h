@@ -17,7 +17,6 @@
 
 namespace single_byte_letter {
 
-// TODO: should be in unnamed namespace.
 class ByteLetterParser final {
  public:
   explicit ByteLetterParser(std::shared_ptr<std::istream> input)

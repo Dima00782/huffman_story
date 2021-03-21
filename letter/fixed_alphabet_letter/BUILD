@@ -4,7 +4,6 @@ cc_library(
         "fixed_alphabet_letter.h",
     ],
     deps = [
-        "//letter:letter",
         "//letter/fixed_alphabet_letter:trie",
     ],
     visibility = ["//visibility:public"],

@@ -3,8 +3,5 @@ cc_library(
     hdrs = [
         "single_byte_letter.h",
     ],
-    deps = [
-        "//letter:letter",
-    ],
     visibility = ["//visibility:public"],
 )
