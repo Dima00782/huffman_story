@@ -11,7 +11,7 @@
 #include "bit_io/bit_writer.h"
 #include "letter/fixed_alphabet_letter/trie.h"
 
-namespace letter {
+namespace fixed_alpha_letter {
 
 class FixedAlphabetLetterParser final {
  public:
@@ -65,6 +65,6 @@ class FixedAlphabetLetterConfig {
   std::set<std::string> alphabet_;
 };
 
-}  // namespace letter
+}  // namespace fixed_alpha_letter
 
 #endif  // LETTER_FIXED_ALPHABET_LETTER_H_

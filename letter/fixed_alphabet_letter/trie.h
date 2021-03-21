@@ -6,8 +6,7 @@
 #include <string_view>
 #include <unordered_map>
 
-// TODO: should be fixed_alphabet_letter
-namespace letter {
+namespace fixed_alpha_letter {
 class Trie {
  public:
   struct Node {
@@ -34,6 +33,6 @@ class Trie {
   std::size_t max_word_lenght_;
   std::unique_ptr<Node> root_;
 };
-}  // namespace letter
+}  // namespace fixed_alpha_letter
 
 #endif  // LETTER_FIXED_ALPHABET_LETTER_TRIE_H_

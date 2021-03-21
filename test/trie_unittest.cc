@@ -1,7 +1,7 @@
 #include "letter/fixed_alphabet_letter/trie.h"
 #include "gtest/gtest.h"
 
-namespace letter {
+namespace fixed_alpha_letter {
 
 TEST(Trie, AddTrivial) {
   Trie trie;
@@ -35,4 +35,4 @@ TEST(Trie, AddMany) {
   EXPECT_EQ(trie.GetLongestMatchingWord("bbb"), "bbb");
 }
 
-}  // namespace trie
+}  // namespace fixed_alpha_letter

@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <utility>
 
-namespace letter {
+namespace fixed_alpha_letter {
 
 TEST(FixedAlphabetLetter, Parser) {
   const std::set<std::string> alphabet = {"ab", "def"};
@@ -15,4 +15,4 @@ TEST(FixedAlphabetLetter, Parser) {
   FixedAlphabetLetterParser parser(std::move(alphabet), std::move(input));
 }
 
-}  // namespace letter
+}  // namespace fixed_alpha_letter
