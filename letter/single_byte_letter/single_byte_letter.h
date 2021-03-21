@@ -1,5 +1,5 @@
-#ifndef SYMBOL_ONE_BYTE_SYMBOL_H_
-#define SYMBOL_ONE_BYTE_SYMBOL_H_
+#ifndef LETTER_SINGLE_BYTE_LETTER_SINGLE_BYTE_LETTER_H_
+#define LETTER_SINGLE_BYTE_LETTER_SINGLE_BYTE_LETTER_H_
 
 #include <cassert>
 #include <cstddef>
@@ -61,7 +61,7 @@ class ByteLetterSerializer final {
   }
 };
 
-class OneByteLetterConfig {
+class SingleByteLetterConfig {
  public:
   using LetterType = std::byte;
   using LetterParser = ByteLetterParser;
@@ -89,4 +89,4 @@ class OneByteLetterConfig {
 
 }  // namespace letter
 
-#endif  // SYMBOL_ONE_BYTE_SYMBOL_H_
+#endif  // LETTER_SINGLE_BYTE_LETTER_SINGLE_BYTE_LETTER_H_

@@ -2,7 +2,7 @@
 
 #include "encoding/huffman_tree/huffman_tree_builder.h"
 #include "gtest/gtest.h"
-#include "letter/one_byte_letter.h"
+#include "letter/single_byte_letter/single_byte_letter.h"
 
 namespace huffman_tree {
 

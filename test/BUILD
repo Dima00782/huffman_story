@@ -8,7 +8,7 @@ cc_test(
         "huffman_tree_builder_unittest.cc",
         "text_splitter_unittest.cc",
         "trie_unittest.cc",
-        "one_byte_letter_unittest.cc",
+        "single_byte_letter_unittest.cc",
     ],
     deps = [
         "//bits_manipulation:bits_manipulation",
@@ -16,7 +16,7 @@ cc_test(
         "//encoding/byte_streams_adapters:byte_streams_adapters",
         "//encoding/text_splitter:text_splitter",
         "//letter:letter",
-        "//letter:one_byte_letter",
+        "//letter/single_byte_letter:single_byte_letter",
         "@googletest//:gtest_main",
     ],
 )

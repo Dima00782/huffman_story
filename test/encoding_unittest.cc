@@ -10,7 +10,7 @@
 #include "encoding/byte_streams_adapters/byte_aligned_bit_reader.h"
 #include "encoding/byte_streams_adapters/byte_aligned_bit_writer.h"
 #include "encoding/huffman_encoding.h"
-#include "letter/one_byte_letter.h"
+#include "letter/single_byte_letter/single_byte_letter.h"
 
 template <letter::LetterConfig Config>
 std::string EncryptTextBase(const std::string& text,
@@ -39,18 +39,18 @@ class EncodingAcceptanceTestOneByteLetter
     : public ::testing::TestWithParam<TestCase> {
  public:
   void SetUp() override {
-    config_ = std::make_shared<letter::OneByteLetterConfig>();
+    config_ = std::make_shared<letter::SingleByteLetterConfig>();
   }
 
   std::string Encrypt(const std::string& text) {
-    return EncryptTextBase<letter::OneByteLetterConfig>(text, config_);
+    return EncryptTextBase<letter::SingleByteLetterConfig>(text, config_);
   }
 
   std::string Decrypt(const std::string& text) {
-    return DecryptTextBase<letter::OneByteLetterConfig>(text, config_);
+    return DecryptTextBase<letter::SingleByteLetterConfig>(text, config_);
   }
 
-  std::shared_ptr<letter::OneByteLetterConfig> config_;
+  std::shared_ptr<letter::SingleByteLetterConfig> config_;
 };
 
 TEST_P(EncodingAcceptanceTestOneByteLetter, EncryptAndDecrypt) {

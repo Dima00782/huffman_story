@@ -7,7 +7,7 @@
 
 #include "CLI11/CLI11.hpp"
 #include "encoding/huffman_encoding.h"
-#include "letter/one_byte_letter.h"
+#include "letter/single_byte_letter/single_byte_letter.h"
 
 namespace {
 
@@ -47,7 +47,7 @@ void Decompress(std::shared_ptr<Config> config,
                 const std::filesystem::path& output_path) {
   auto input = std::make_shared<std::ifstream>(input_path, std::ios::binary);
   auto output = std::make_shared<std::ofstream>(output_path, std::ios::binary);
-  encoding::HuffmanDecoder<letter::OneByteLetterConfig>(
+  encoding::HuffmanDecoder<letter::SingleByteLetterConfig>(
       std::move(config), std::move(input), std::move(output));
 }
 
@@ -82,7 +82,7 @@ void InstallDecompressSubcommand(CLI::App* app,
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  auto config = std::make_shared<letter::OneByteLetterConfig>();
+  auto config = std::make_shared<letter::SingleByteLetterConfig>();
   CLI::App app{"Huffman archiver"};
   app.require_subcommand(1);
   InstallCompressSubcommand(&app, config);

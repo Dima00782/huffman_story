@@ -1,10 +1,10 @@
 cc_library(
-    name = "letter",
+    name = "single_byte_letter",
     hdrs = [
-        "letter.h",
+        "single_byte_letter.h",
     ],
     deps = [
-        "//bit_io:bit_io",
+        "//letter:letter",
     ],
     visibility = ["//visibility:public"],
 )

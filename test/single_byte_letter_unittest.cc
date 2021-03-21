@@ -1,4 +1,4 @@
-#include "letter/one_byte_letter.h"
+#include "letter/single_byte_letter/single_byte_letter.h"
 #include "bits_manipulation/bits_manipulation.h"
 #include "gtest/gtest.h"
 
@@ -61,7 +61,7 @@ class StringBasedBitWriter : public bit_io::BitWriter {
 
 namespace letter {
 
-TEST(OneByteLetter, Lexer) {
+TEST(SingleByteLetter, Lexer) {
   auto input = std::make_shared<std::istringstream>(" abc defg ");
   ByteLetterParser lexer(std::move(input));
   EXPECT_EQ(*lexer.Parse(), std::byte(' '));
@@ -76,7 +76,7 @@ TEST(OneByteLetter, Lexer) {
   EXPECT_EQ(*lexer.Parse(), std::byte(' '));
 }
 
-TEST(OneByteLetter, SerializerRead) {
+TEST(SingleByteLetter, SerializerRead) {
   ByteLetterSerializer serializer;
   StringBasedBitReader input("abc");
   EXPECT_EQ(*serializer.ReadSerialized(input), std::byte('a'));
@@ -85,7 +85,7 @@ TEST(OneByteLetter, SerializerRead) {
   EXPECT_FALSE(serializer.ReadSerialized(input));
 }
 
-TEST(OneByteLetter, SerializerWrite) {
+TEST(SingleByteLetter, SerializerWrite) {
   ByteLetterSerializer serializer;
   StringBasedBitWriter output;
   ASSERT_TRUE(serializer.WriteSerialized(output, std::byte{'a'}));
