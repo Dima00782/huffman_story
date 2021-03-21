@@ -35,32 +35,32 @@ struct TestCase {
   std::string expected_output;
 };
 
-class EncodingAcceptanceTestOneByteLetter
+class EncodingAcceptanceTestSingleByteLetter
     : public ::testing::TestWithParam<TestCase> {
  public:
-  void SetUp() override {
-    config_ = std::make_shared<letter::SingleByteLetterConfig>();
-  }
+  using ConfigType = single_byte_letter::SingleByteLetterConfig;
+
+  void SetUp() override { config_ = std::make_shared<ConfigType>(); }
 
   std::string Encrypt(const std::string& text) {
-    return EncryptTextBase<letter::SingleByteLetterConfig>(text, config_);
+    return EncryptTextBase<ConfigType>(text, config_);
   }
 
   std::string Decrypt(const std::string& text) {
-    return DecryptTextBase<letter::SingleByteLetterConfig>(text, config_);
+    return DecryptTextBase<ConfigType>(text, config_);
   }
 
-  std::shared_ptr<letter::SingleByteLetterConfig> config_;
+  std::shared_ptr<ConfigType> config_;
 };
 
-TEST_P(EncodingAcceptanceTestOneByteLetter, EncryptAndDecrypt) {
+TEST_P(EncodingAcceptanceTestSingleByteLetter, EncryptAndDecrypt) {
   EXPECT_EQ(Encrypt(GetParam().input), GetParam().expected_output);
   EXPECT_EQ(Decrypt(GetParam().expected_output), GetParam().input);
 }
 
 INSTANTIATE_TEST_SUITE_P(
     AcceptanceTests,
-    EncodingAcceptanceTestOneByteLetter,
+    EncodingAcceptanceTestSingleByteLetter,
     ::testing::Values(
         TestCase{"aaaaaaa",
                  std::string("\xb0\x80\x00", 3)},  // Zero unused bits.
@@ -75,16 +75,3 @@ INSTANTIATE_TEST_SUITE_P(
         TestCase{"aaaaa bbb", std::string("\x24\x16\x2b\x0f\xc5\x46", 6)},
         TestCase{"aaabb", std::string("\x58\xac\x3c\x00", 4)},
         TestCase{"aaaabbc", std::string("\x2c\x76\x2b\x0f\xa8\x01", 6)}));
-
-/*
-TODO: need to implement multiple byte letter
-class EncodingAcceptanceTestCustomAlphabet
-    : public EncodingAcceptanceTestBase {};
-
-TEST_F(EncodingAcceptanceTestCustomAlphabet, OneLetterAlphabet) {
-  SetAlphabet({"aa"});
-  constexpr char kText[] = "aaaaaa";
-  const std::string expected_output{"\x81\x30\xb0\x84", 4};
-  EXPECT_EQ(EncryptText(kText), expected_output);
-}
-*/

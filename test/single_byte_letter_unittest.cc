@@ -59,7 +59,7 @@ class StringBasedBitWriter : public bit_io::BitWriter {
 };
 }  // namespace
 
-namespace letter {
+namespace single_byte_letter {
 
 TEST(SingleByteLetter, Lexer) {
   auto input = std::make_shared<std::istringstream>(" abc defg ");
@@ -94,4 +94,4 @@ TEST(SingleByteLetter, SerializerWrite) {
   EXPECT_EQ(output.getContent(), "abc");
 }
 
-}  // namespace letter
+}  // namespace single_byte_letter

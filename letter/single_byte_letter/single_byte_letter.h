@@ -15,8 +15,9 @@
 #include "bit_io/bit_reader.h"
 #include "bit_io/bit_writer.h"
 
-namespace letter {
+namespace single_byte_letter {
 
+// TODO: should be in unnamed namespace.
 class ByteLetterParser final {
  public:
   explicit ByteLetterParser(std::shared_ptr<std::istream> input)
@@ -87,6 +88,6 @@ class SingleByteLetterConfig {
   ByteLetterSerializer serializer_;
 };
 
-}  // namespace letter
+}  // namespace single_byte_letter
 
 #endif  // LETTER_SINGLE_BYTE_LETTER_SINGLE_BYTE_LETTER_H_

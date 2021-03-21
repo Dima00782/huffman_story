@@ -47,8 +47,8 @@ void Decompress(std::shared_ptr<Config> config,
                 const std::filesystem::path& output_path) {
   auto input = std::make_shared<std::ifstream>(input_path, std::ios::binary);
   auto output = std::make_shared<std::ofstream>(output_path, std::ios::binary);
-  encoding::HuffmanDecoder<letter::SingleByteLetterConfig>(
-      std::move(config), std::move(input), std::move(output));
+  encoding::HuffmanDecoder<Config>(std::move(config), std::move(input),
+                                   std::move(output));
 }
 
 template <letter::LetterConfig Config>
@@ -82,7 +82,7 @@ void InstallDecompressSubcommand(CLI::App* app,
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  auto config = std::make_shared<letter::SingleByteLetterConfig>();
+  auto config = std::make_shared<single_byte_letter::SingleByteLetterConfig>();
   CLI::App app{"Huffman archiver"};
   app.require_subcommand(1);
   InstallCompressSubcommand(&app, config);
