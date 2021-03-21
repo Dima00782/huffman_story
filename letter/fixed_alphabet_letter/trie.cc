@@ -1,8 +1,8 @@
-#include "letter/fixed_alphabet_letter/trie/trie.h"
+#include "letter/fixed_alphabet_letter/trie.h"
 
 #include <algorithm>
 
-namespace trie {
+namespace letter {
 
 Trie::Trie() : root_{std::make_unique<Node>(Node{{}, false})} {}
 
@@ -42,4 +42,4 @@ std::string Trie::GetLongestMatchingWord(std::string_view text) {
   return longest_word;
 }
 
-}  // namespace trie
+}  // namespace letter

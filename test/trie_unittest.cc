@@ -1,7 +1,7 @@
-#include "letter/fixed_alphabet_letter/trie/trie.h"
+#include "letter/fixed_alphabet_letter/trie.h"
 #include "gtest/gtest.h"
 
-namespace trie {
+namespace letter {
 
 TEST(Trie, AddTrivial) {
   Trie trie;

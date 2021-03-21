@@ -9,7 +9,7 @@
 
 #include "bit_io/bit_reader.h"
 #include "bit_io/bit_writer.h"
-#include "letter/fixed_alphabet_letter/trie/trie.h"
+#include "letter/fixed_alphabet_letter/trie.h"
 
 namespace letter {
 
@@ -29,7 +29,7 @@ class FixedAlphabetLetterParser final {
   bool HasNext() const { return input_->rdbuf()->in_avail() > 0; }
 
  private:
-  trie::Trie trie_;
+  Trie trie_;
   std::shared_ptr<std::istream> input_;
 };
 

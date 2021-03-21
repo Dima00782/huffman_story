@@ -1,13 +1,13 @@
-#ifndef LETTER_TEXT_SPLITTER_TRIE_H_
-#define LETTER_TEXT_SPLITTER_TRIE_H_
+#ifndef LETTER_FIXED_ALPHABET_LETTER_TRIE_H_
+#define LETTER_FIXED_ALPHABET_LETTER_TRIE_H_
 
 #include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 
-// TODO: should be in unnamed namespace
-namespace trie {
+// TODO: should be fixed_alphabet_letter
+namespace letter {
 class Trie {
  public:
   struct Node {
@@ -34,6 +34,6 @@ class Trie {
   std::size_t max_word_lenght_;
   std::unique_ptr<Node> root_;
 };
-}  // namespace trie
+}  // namespace letter
 
-#endif  // LETTER_TEXT_SPLITTER_TEXT_SPLITTER_H_
+#endif  // LETTER_FIXED_ALPHABET_LETTER_TRIE_H_

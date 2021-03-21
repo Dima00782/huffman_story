@@ -17,6 +17,7 @@ cc_test(
         "//letter:letter",
         "//letter/single_byte_letter:single_byte_letter",
         "//letter/fixed_alphabet_letter:fixed_alphabet_letter",
+        "//letter/fixed_alphabet_letter:trie",
         "@googletest//:gtest_main",
     ],
 )
