@@ -1,7 +1,7 @@
-#include "encoding/text_splitter/trie.h"
+#include "letter/fixed_alphabet_letter/trie/trie.h"
 #include "gtest/gtest.h"
 
-namespace text_splitter {
+namespace trie {
 
 TEST(Trie, AddTrivial) {
   Trie trie;
@@ -35,4 +35,4 @@ TEST(Trie, AddMany) {
   EXPECT_EQ(trie.GetLongestMatchingWord("bbb"), "bbb");
 }
 
-}  // namespace text_splitter
+}  // namespace trie

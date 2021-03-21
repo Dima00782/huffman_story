@@ -17,7 +17,6 @@
 #include "encoding/byte_streams_adapters/byte_aligned_bit_reader.h"
 #include "encoding/byte_streams_adapters/byte_aligned_bit_writer.h"
 #include "encoding/huffman_tree/huffman_tree_builder.h"
-#include "encoding/text_splitter/text_splitter.h"
 #include "letter/letter.h"
 
 namespace {

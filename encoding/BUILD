@@ -8,7 +8,6 @@ cc_library(
         "//bit_io:bit_io",
         "//encoding/byte_streams_adapters:byte_streams_adapters",
         "//encoding/huffman_tree:huffman_tree",
-        "//encoding/text_splitter:text_splitter",
     ],
     visibility = ["//visibility:public"],
 )

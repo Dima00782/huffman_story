@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 // TODO: should be in unnamed namespace
-namespace text_splitter {
+namespace trie {
 class Trie {
  public:
   struct Node {
@@ -34,6 +34,6 @@ class Trie {
   std::size_t max_word_lenght_;
   std::unique_ptr<Node> root_;
 };
-}  // namespace text_splitter
+}  // namespace trie
 
 #endif  // LETTER_TEXT_SPLITTER_TEXT_SPLITTER_H_

@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace text_splitter {
+namespace trie {
 
 Trie::Trie() : root_{std::make_unique<Node>(Node{{}, false})} {}
 
@@ -42,4 +42,4 @@ std::string Trie::GetLongestMatchingWord(std::string_view text) {
   return longest_word;
 }
 
-}  // namespace text_splitter
+}  // namespace trie

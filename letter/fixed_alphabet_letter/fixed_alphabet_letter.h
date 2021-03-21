@@ -29,7 +29,7 @@ class FixedAlphabetLetterParser final {
   bool HasNext() const { return input_->rdbuf()->in_avail() > 0; }
 
  private:
-  text_splitter::Trie trie_;
+  trie::Trie trie_;
   std::shared_ptr<std::istream> input_;
 };
 
