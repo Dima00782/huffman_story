@@ -1,15 +1,21 @@
 #ifndef LETTER_FIXED_ALPHABET_LETTER_H_
 #define LETTER_FIXED_ALPHABET_LETTER_H_
 
+#include <algorithm>
+#include <array>
 #include <cassert>
+#include <climits>
 #include <istream>
 #include <memory>
 #include <set>
-#include <string>
 
 #include "bit_io/bit_reader.h"
 #include "bit_io/bit_writer.h"
 #include "letter/fixed_alphabet_letter/trie.h"
+
+namespace {
+constexpr std::size_t kParserBufferSizeInBytes = 1024;
+}
 
 namespace fixed_alpha_letter {
 
@@ -21,17 +27,63 @@ class FixedAlphabetLetterParser final {
     for (const auto& letter : alphabet) {
       trie_.Add(letter);
     }
-    // TODO: add all characters too.
+    assert(kParserBufferSizeInBytes > trie_.MaxWordLenght());
   }
 
-  std::optional<std::string> Parse() { return std::nullopt; }
+  std::optional<std::string> Parse() {
+    if (BufferSize() < trie_.MaxWordLenght()) {
+      if (!FillBuffer()) {
+        return std::nullopt;
+      }
+    }
+
+    auto max = trie_.GetLongestMatchingWord(&buffer_[buffer_start_pos_]);
+    if (max.empty()) {
+      return std::string(1u, buffer_[buffer_start_pos_++]);
+    }
+    buffer_start_pos_ += max.size();
+    return max;
+  }
 
   bool HasNext() const { return input_->rdbuf()->in_avail() > 0; }
 
  private:
+  std::size_t BufferSize() const { return buffer_end_pos_ - buffer_start_pos_; }
+
+  bool FillBuffer() {
+    if (has_input_ended_) {
+      // Nothing to do here.
+      return false;
+    }
+
+    std::copy(std::begin(buffer_) + buffer_start_pos_,
+              std::begin(buffer_) + buffer_end_pos_, std::begin(buffer_));
+    buffer_end_pos_ = BufferSize();
+    buffer_start_pos_ = 0u;
+
+    const std::size_t num_bytes_to_read =
+        kParserBufferSizeInBytes - BufferSize();
+    input_->read(&buffer_[0] + buffer_end_pos_, num_bytes_to_read);
+    const std::size_t num_bytes_read = input_->gcount();
+    if (num_bytes_read == 0 || input_->bad()) {
+      return false;
+    }
+
+    if (input_->fail() || num_bytes_read != num_bytes_to_read) {
+      has_input_ended_ = true;
+    }
+
+    buffer_end_pos_ += num_bytes_read;
+    return true;
+  }
+
   Trie trie_;
+  bool has_input_ended_{false};
+  std::array<char, kParserBufferSizeInBytes> buffer_;
+  std::size_t buffer_start_pos_{0};
+  std::size_t buffer_end_pos_{0};
   std::shared_ptr<std::istream> input_;
-};
+};  // namespace fixed_alpha_letter
 
 class FixedAlphabetLetterConfig {
  public:

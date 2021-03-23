@@ -30,7 +30,7 @@ class Trie {
   std::size_t MaxWordLenght() const { return max_word_lenght_; }
 
  private:
-  std::size_t max_word_lenght_;
+  std::size_t max_word_lenght_{0u};
   std::unique_ptr<Node> root_;
 };
 }  // namespace fixed_alpha_letter
