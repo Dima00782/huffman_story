@@ -62,8 +62,10 @@ class StringBasedBitWriter : public bit_io::BitWriter {
 namespace single_byte_letter {
 
 TEST(SingleByteLetter, Parser) {
+  using Parser = SingleByteLetterConfig::LetterParser;
+
   auto input = std::make_shared<std::istringstream>(" abc defg ");
-  ByteLetterParser parser(std::move(input));
+  Parser parser(std::move(input));
   EXPECT_EQ(*parser.Parse(), std::byte(' '));
   EXPECT_EQ(*parser.Parse(), std::byte('a'));
   EXPECT_EQ(*parser.Parse(), std::byte('b'));
