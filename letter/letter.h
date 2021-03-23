@@ -20,8 +20,8 @@ namespace letter {
 template <typename T>
 concept LetterConfig = Hashable<typename T::LetterType>&& requires(
     T config,
-    typename T::LetterType letter,
-    typename T::LetterParser letter_parser,
+    T::LetterType letter,
+    T::LetterParser letter_parser,
     std::shared_ptr<std::istream> input,
     std::ostream& output,
     bit_io::BitWriter& bit_output,
