@@ -1,3 +1,6 @@
+#ifndef LETTER_LETTER_H_
+#define LETTER_LETTER_H_
+
 #include <functional>
 #include <istream>
 #include <memory>
@@ -43,3 +46,5 @@ concept LetterConfig = Hashable<typename T::LetterType>&& requires(
 };
 
 }  // namespace letter
+
+#endif  // LETTER_LETTER_H_
