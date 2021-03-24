@@ -80,20 +80,20 @@ TEST(SingleByteLetter, Parser) {
 }
 
 TEST(SingleByteLetter, SerializerRead) {
-  ByteLetterSerializer serializer;
+  SingleByteLetterConfig config;
   StringBasedBitReader input("abc");
-  EXPECT_EQ(*serializer.ReadSerialized(input), std::byte('a'));
-  EXPECT_EQ(*serializer.ReadSerialized(input), std::byte('b'));
-  EXPECT_EQ(*serializer.ReadSerialized(input), std::byte('c'));
-  EXPECT_FALSE(serializer.ReadSerialized(input));
+  EXPECT_EQ(*config.ReadSerialized(input), std::byte('a'));
+  EXPECT_EQ(*config.ReadSerialized(input), std::byte('b'));
+  EXPECT_EQ(*config.ReadSerialized(input), std::byte('c'));
+  EXPECT_FALSE(config.ReadSerialized(input));
 }
 
 TEST(SingleByteLetter, SerializerWrite) {
-  ByteLetterSerializer serializer;
+  SingleByteLetterConfig config;
   StringBasedBitWriter output;
-  ASSERT_TRUE(serializer.WriteSerialized(output, std::byte{'a'}));
-  ASSERT_TRUE(serializer.WriteSerialized(output, std::byte{'b'}));
-  ASSERT_TRUE(serializer.WriteSerialized(output, std::byte{'c'}));
+  ASSERT_TRUE(config.WriteSerialized(output, std::byte{'a'}));
+  ASSERT_TRUE(config.WriteSerialized(output, std::byte{'b'}));
+  ASSERT_TRUE(config.WriteSerialized(output, std::byte{'c'}));
   EXPECT_EQ(output.getContent(), "abc");
 }
 
