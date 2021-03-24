@@ -109,8 +109,21 @@ class FixedAlphabetLetterConfig {
   }
 
   std::optional<LetterType> ReadSerialized(bit_io::BitReader& bit_reader) {
-    // TODO: implement me.
-    return std::nullopt;
+    auto size_byte = bit_reader.ReadByte();
+    if (!size_byte) {
+      return std::nullopt;
+    }
+
+    const auto result_size = std::to_integer<std::size_t>(*size_byte);
+    LetterType letter(result_size, '\0');
+    for (std::size_t num_byte = 0; num_byte < result_size; ++num_byte) {
+      auto byte = bit_reader.ReadByte();
+      if (!byte) {
+        return std::nullopt;
+      }
+      letter[num_byte] = static_cast<char>(*byte);
+    }
+    return letter;
   }
 
  private:
