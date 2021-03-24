@@ -1,3 +1,11 @@
+cc_library(
+    name = "string_bit_io",
+    hdrs = [
+        "string_bit_io.h",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 cc_test(
     name = "unittest",
     srcs = [
@@ -11,6 +19,7 @@ cc_test(
         "fixed_alphabet_letter_unittest.cc",
     ],
     deps = [
+        "//test:string_bit_io",
         "//bits_manipulation:bits_manipulation",
         "//encoding:huffman_encoding",
         "//encoding/byte_streams_adapters:byte_streams_adapters",
