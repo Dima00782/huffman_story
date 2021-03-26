@@ -100,8 +100,7 @@ class FixedAlphabetLetterConfig {
   }
 
   bool Write(std::ostream& output, LetterType letter) {
-    // TODO: implement me.
-    return false;
+    return static_cast<bool>(output << letter);
   }
 
   bool WriteSerialized(bit_io::BitWriter& bit_output, LetterType letter) {

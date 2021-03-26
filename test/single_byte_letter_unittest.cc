@@ -46,4 +46,6 @@ TEST(SingleByteLetter, SerializerWrite) {
   EXPECT_EQ(output.getContent(), "abc");
 }
 
+// TODO: test Write method!
+
 }  // namespace single_byte_letter

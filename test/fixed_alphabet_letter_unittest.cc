@@ -18,18 +18,18 @@ TEST(FixedAlphabetLetter, Parser) {
   auto input = std::make_shared<std::istringstream>(" abc def abcdefggg");
   auto parser = config.CreateParser(std::move(input));
 
-  EXPECT_EQ(*parser->Parse(), " "s);
-  EXPECT_EQ(*parser->Parse(), "ab"s);
-  EXPECT_EQ(*parser->Parse(), "c"s);
-  EXPECT_EQ(*parser->Parse(), " "s);
-  EXPECT_EQ(*parser->Parse(), "def"s);
-  EXPECT_EQ(*parser->Parse(), " "s);
-  EXPECT_EQ(*parser->Parse(), "ab"s);
-  EXPECT_EQ(*parser->Parse(), "c"s);
-  EXPECT_EQ(*parser->Parse(), "def"s);
-  EXPECT_EQ(*parser->Parse(), "g"s);
-  EXPECT_EQ(*parser->Parse(), "g"s);
-  EXPECT_EQ(*parser->Parse(), "g"s);
+  EXPECT_EQ(*parser->Parse(), Letter{" "});
+  EXPECT_EQ(*parser->Parse(), Letter{"ab"});
+  EXPECT_EQ(*parser->Parse(), Letter{"c"});
+  EXPECT_EQ(*parser->Parse(), Letter{" "});
+  EXPECT_EQ(*parser->Parse(), Letter{"def"});
+  EXPECT_EQ(*parser->Parse(), Letter{" "});
+  EXPECT_EQ(*parser->Parse(), Letter{"ab"});
+  EXPECT_EQ(*parser->Parse(), Letter{"c"});
+  EXPECT_EQ(*parser->Parse(), Letter{"def"});
+  EXPECT_EQ(*parser->Parse(), Letter{"g"});
+  EXPECT_EQ(*parser->Parse(), Letter{"g"});
+  EXPECT_EQ(*parser->Parse(), Letter{"g"});
   EXPECT_FALSE(parser->Parse());
 }
 
@@ -84,6 +84,17 @@ TEST(FixedAlphabetLetter, SerializerWrite) {
             "ggg"
             "\x1"
             " ");
+}
+
+TEST(FixedAlphabetLetter, Write) {
+  FixedAlphabetLetterConfig config({""});
+  std::ostringstream output;
+
+  ASSERT_TRUE(config.Write(output, Letter{"abc"}));
+  ASSERT_TRUE(config.Write(output, Letter{" def"}));
+  ASSERT_TRUE(config.Write(output, Letter{"ggg"}));
+  ASSERT_TRUE(config.Write(output, Letter{" "}));
+  EXPECT_EQ(output.str(), "abc defggg ");
 }
 
 }  // namespace fixed_alpha_letter
