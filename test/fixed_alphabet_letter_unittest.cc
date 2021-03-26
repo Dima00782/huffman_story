@@ -11,27 +11,26 @@ using namespace std::string_literals;
 
 namespace fixed_alpha_letter {
 
+using Letter = FixedAlphabetLetterConfig::LetterType;
+
 TEST(FixedAlphabetLetter, Parser) {
-  // TODO: rewrite via config.
-  using Parser = FixedAlphabetLetterConfig::LetterParser;
-
-  const std::set<std::string> alphabet = {"ab", "def"};
+  FixedAlphabetLetterConfig config({"ab", "def"});
   auto input = std::make_shared<std::istringstream>(" abc def abcdefggg");
-  Parser parser(std::move(alphabet), std::move(input));
+  auto parser = config.CreateParser(std::move(input));
 
-  EXPECT_EQ(*parser.Parse(), " "s);
-  EXPECT_EQ(*parser.Parse(), "ab"s);
-  EXPECT_EQ(*parser.Parse(), "c"s);
-  EXPECT_EQ(*parser.Parse(), " "s);
-  EXPECT_EQ(*parser.Parse(), "def"s);
-  EXPECT_EQ(*parser.Parse(), " "s);
-  EXPECT_EQ(*parser.Parse(), "ab"s);
-  EXPECT_EQ(*parser.Parse(), "c"s);
-  EXPECT_EQ(*parser.Parse(), "def"s);
-  EXPECT_EQ(*parser.Parse(), "g"s);
-  EXPECT_EQ(*parser.Parse(), "g"s);
-  EXPECT_EQ(*parser.Parse(), "g"s);
-  EXPECT_FALSE(parser.Parse());
+  EXPECT_EQ(*parser->Parse(), " "s);
+  EXPECT_EQ(*parser->Parse(), "ab"s);
+  EXPECT_EQ(*parser->Parse(), "c"s);
+  EXPECT_EQ(*parser->Parse(), " "s);
+  EXPECT_EQ(*parser->Parse(), "def"s);
+  EXPECT_EQ(*parser->Parse(), " "s);
+  EXPECT_EQ(*parser->Parse(), "ab"s);
+  EXPECT_EQ(*parser->Parse(), "c"s);
+  EXPECT_EQ(*parser->Parse(), "def"s);
+  EXPECT_EQ(*parser->Parse(), "g"s);
+  EXPECT_EQ(*parser->Parse(), "g"s);
+  EXPECT_EQ(*parser->Parse(), "g"s);
+  EXPECT_FALSE(parser->Parse());
 }
 
 TEST(FixedAlphabetLetter, SerializerRead) {
@@ -56,20 +55,19 @@ TEST(FixedAlphabetLetter, SerializerRead) {
                   "\x01"
                   "g",
                   25));
-  EXPECT_EQ(*config.ReadSerialized(input), " "s);
-  EXPECT_EQ(*config.ReadSerialized(input), "ab"s);
-  EXPECT_EQ(*config.ReadSerialized(input), " "s);
-  EXPECT_EQ(*config.ReadSerialized(input), "def"s);
-  EXPECT_EQ(*config.ReadSerialized(input), " "s);
-  EXPECT_EQ(*config.ReadSerialized(input), "ab"s);
-  EXPECT_EQ(*config.ReadSerialized(input), "def"s);
-  EXPECT_EQ(*config.ReadSerialized(input), "gg"s);
-  EXPECT_EQ(*config.ReadSerialized(input), "g"s);
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{" "});
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{"ab"});
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{" "});
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{"def"});
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{" "});
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{"ab"});
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{"def"});
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{"gg"});
+  EXPECT_EQ(*config.ReadSerialized(input), Letter{"g"});
   EXPECT_FALSE(config.ReadSerialized(input));
 }
 
 TEST(FixedAlphabetLetter, SerializerWrite) {
-  using Letter = FixedAlphabetLetterConfig::LetterType;
   FixedAlphabetLetterConfig config({""});
   test::StringBasedBitWriter output;
 

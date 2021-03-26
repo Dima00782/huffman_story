@@ -9,38 +9,40 @@
 
 namespace single_byte_letter {
 
+using Letter = SingleByteLetterConfig::LetterType;
+
 TEST(SingleByteLetter, Parser) {
-  using Parser = SingleByteLetterConfig::LetterParser;
+  SingleByteLetterConfig config;
   auto input = std::make_shared<std::istringstream>(" abc defg ");
-  Parser parser(std::move(input));
-  EXPECT_EQ(*parser.Parse(), std::byte(' '));
-  EXPECT_EQ(*parser.Parse(), std::byte('a'));
-  EXPECT_EQ(*parser.Parse(), std::byte('b'));
-  EXPECT_EQ(*parser.Parse(), std::byte('c'));
-  EXPECT_EQ(*parser.Parse(), std::byte(' '));
-  EXPECT_EQ(*parser.Parse(), std::byte('d'));
-  EXPECT_EQ(*parser.Parse(), std::byte('e'));
-  EXPECT_EQ(*parser.Parse(), std::byte('f'));
-  EXPECT_EQ(*parser.Parse(), std::byte('g'));
-  EXPECT_EQ(*parser.Parse(), std::byte(' '));
-  EXPECT_FALSE(parser.Parse());
+  auto parser = config.CreateParser(std::move(input));
+  EXPECT_EQ(*parser->Parse(), Letter(' '));
+  EXPECT_EQ(*parser->Parse(), Letter('a'));
+  EXPECT_EQ(*parser->Parse(), Letter('b'));
+  EXPECT_EQ(*parser->Parse(), Letter('c'));
+  EXPECT_EQ(*parser->Parse(), Letter(' '));
+  EXPECT_EQ(*parser->Parse(), Letter('d'));
+  EXPECT_EQ(*parser->Parse(), Letter('e'));
+  EXPECT_EQ(*parser->Parse(), Letter('f'));
+  EXPECT_EQ(*parser->Parse(), Letter('g'));
+  EXPECT_EQ(*parser->Parse(), Letter(' '));
+  EXPECT_FALSE(parser->Parse());
 }
 
 TEST(SingleByteLetter, SerializerRead) {
   SingleByteLetterConfig config;
   test::StringBasedBitReader input("abc");
-  EXPECT_EQ(*config.ReadSerialized(input), std::byte('a'));
-  EXPECT_EQ(*config.ReadSerialized(input), std::byte('b'));
-  EXPECT_EQ(*config.ReadSerialized(input), std::byte('c'));
+  EXPECT_EQ(*config.ReadSerialized(input), Letter('a'));
+  EXPECT_EQ(*config.ReadSerialized(input), Letter('b'));
+  EXPECT_EQ(*config.ReadSerialized(input), Letter('c'));
   EXPECT_FALSE(config.ReadSerialized(input));
 }
 
 TEST(SingleByteLetter, SerializerWrite) {
   SingleByteLetterConfig config;
   test::StringBasedBitWriter output;
-  ASSERT_TRUE(config.WriteSerialized(output, std::byte{'a'}));
-  ASSERT_TRUE(config.WriteSerialized(output, std::byte{'b'}));
-  ASSERT_TRUE(config.WriteSerialized(output, std::byte{'c'}));
+  ASSERT_TRUE(config.WriteSerialized(output, Letter{'a'}));
+  ASSERT_TRUE(config.WriteSerialized(output, Letter{'b'}));
+  ASSERT_TRUE(config.WriteSerialized(output, Letter{'c'}));
   EXPECT_EQ(output.getContent(), "abc");
 }
 
