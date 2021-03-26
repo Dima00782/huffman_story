@@ -46,6 +46,13 @@ TEST(SingleByteLetter, SerializerWrite) {
   EXPECT_EQ(output.getContent(), "abc");
 }
 
-// TODO: test Write method!
+TEST(SingleByteLetter, Write) {
+  SingleByteLetterConfig config;
+  std::ostringstream output;
+  ASSERT_TRUE(config.Write(output, Letter{'a'}));
+  ASSERT_TRUE(config.Write(output, Letter{'b'}));
+  ASSERT_TRUE(config.Write(output, Letter{'c'}));
+  EXPECT_EQ(output.str(), "abc");
+}
 
 }  // namespace single_byte_letter
