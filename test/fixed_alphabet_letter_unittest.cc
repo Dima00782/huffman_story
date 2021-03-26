@@ -68,4 +68,24 @@ TEST(FixedAlphabetLetter, SerializerRead) {
   EXPECT_FALSE(config.ReadSerialized(input));
 }
 
+TEST(FixedAlphabetLetter, SerializerWrite) {
+  using Letter = FixedAlphabetLetterConfig::LetterType;
+  FixedAlphabetLetterConfig config({""});
+  test::StringBasedBitWriter output;
+
+  ASSERT_TRUE(config.WriteSerialized(output, Letter{"abc"}));
+  ASSERT_TRUE(config.WriteSerialized(output, Letter{" def"}));
+  ASSERT_TRUE(config.WriteSerialized(output, Letter{"ggg"}));
+  ASSERT_TRUE(config.WriteSerialized(output, Letter{" "}));
+  EXPECT_EQ(output.getContent(),
+            "\x03"
+            "abc"
+            "\x04"
+            " def"
+            "\x3"
+            "ggg"
+            "\x1"
+            " ");
+}
+
 }  // namespace fixed_alpha_letter

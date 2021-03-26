@@ -15,7 +15,8 @@
 
 namespace {
 constexpr std::size_t kParserBufferSizeInBytes = 1024;
-}
+constexpr std::size_t kMaxLetterSize = 255;
+}  // namespace
 
 namespace fixed_alpha_letter {
 
@@ -104,8 +105,17 @@ class FixedAlphabetLetterConfig {
   }
 
   bool WriteSerialized(bit_io::BitWriter& bit_output, LetterType letter) {
-    // TODO: implement me.
-    return false;
+    assert(letter.size() < kMaxLetterSize);
+    const auto size = static_cast<std::byte>(letter.size());
+    if (!bit_output.WriteByte(size)) {
+      return false;
+    }
+    for (const auto symbol : letter) {
+      if (!bit_output.WriteByte(static_cast<std::byte>(symbol))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   std::optional<LetterType> ReadSerialized(bit_io::BitReader& bit_reader) {
