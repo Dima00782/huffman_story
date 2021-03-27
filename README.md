@@ -1,7 +1,7 @@
 Project Huffman
 ================
 
-First class c++ project to demonstrate state of the art programming.
+Handmade c++ project to demonstrate state-of-the-art programming.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/nht8ih7mml2s6sk9/branch/master?svg=true)](https://ci.appveyor.com/project/dbezhetskov49849/huffman-story/branch/master)
 
