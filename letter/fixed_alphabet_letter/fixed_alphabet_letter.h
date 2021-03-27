@@ -32,10 +32,14 @@ class FixedAlphabetLetterParser final {
   }
 
   std::optional<std::string> Parse() {
-    if (BufferSize() < trie_.MaxWordLenght()) {
+    if (!has_input_ended_ && BufferSize() < trie_.MaxWordLenght()) {
       if (!FillBuffer()) {
         return std::nullopt;
       }
+    }
+
+    if (IsBufferEmpty()) {
+      return std::nullopt;
     }
 
     auto max = trie_.GetLongestMatchingWord(&buffer_[buffer_start_pos_]);
@@ -50,6 +54,7 @@ class FixedAlphabetLetterParser final {
 
  private:
   std::size_t BufferSize() const { return buffer_end_pos_ - buffer_start_pos_; }
+  std::size_t IsBufferEmpty() const { return BufferSize() == 0u; }
 
   bool FillBuffer() {
     if (has_input_ended_) {

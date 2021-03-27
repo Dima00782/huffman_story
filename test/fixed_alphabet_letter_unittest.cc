@@ -15,7 +15,7 @@ using Letter = FixedAlphabetLetterConfig::LetterType;
 
 TEST(FixedAlphabetLetter, Parser) {
   FixedAlphabetLetterConfig config({"ab", "def"});
-  auto input = std::make_shared<std::istringstream>(" abc def abcdefggg");
+  auto input = std::make_shared<std::istringstream>(" abc def abcdefgggz");
   auto parser = config.CreateParser(std::move(input));
 
   EXPECT_EQ(*parser->Parse(), Letter{" "});
@@ -30,6 +30,7 @@ TEST(FixedAlphabetLetter, Parser) {
   EXPECT_EQ(*parser->Parse(), Letter{"g"});
   EXPECT_EQ(*parser->Parse(), Letter{"g"});
   EXPECT_EQ(*parser->Parse(), Letter{"g"});
+  EXPECT_EQ(*parser->Parse(), Letter{"z"});
   EXPECT_FALSE(parser->Parse());
 }
 
