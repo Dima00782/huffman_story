@@ -21,20 +21,20 @@ class EncodingAcceptanceTestSingleByteLetter
 
   void SetUp() override { config_ = std::make_shared<ConfigType>(); }
 
-  std::string Encrypt(const std::string& text) {
-    return test::EncryptTextBase<ConfigType>(text, config_);
+  std::string Encode(const std::string& text) {
+    return test::EncodeTextBase<ConfigType>(text, config_);
   }
 
-  std::string Decrypt(const std::string& text) {
-    return test::DecryptTextBase<ConfigType>(text, config_);
+  std::string Decode(const std::string& text) {
+    return test::DecodeTextBase<ConfigType>(text, config_);
   }
 
   std::shared_ptr<ConfigType> config_;
 };
 
-TEST_P(EncodingAcceptanceTestSingleByteLetter, EncryptAndDecrypt) {
-  EXPECT_EQ(Encrypt(GetParam().input), GetParam().expected_output);
-  EXPECT_EQ(Decrypt(GetParam().expected_output), GetParam().input);
+TEST_P(EncodingAcceptanceTestSingleByteLetter, EncodeAndDecode) {
+  EXPECT_EQ(Encode(GetParam().input), GetParam().expected_output);
+  EXPECT_EQ(Decode(GetParam().expected_output), GetParam().input);
 }
 
 INSTANTIATE_TEST_SUITE_P(

@@ -13,8 +13,8 @@
 namespace test {
 
 template <letter::LetterConfig Config>
-std::string EncryptTextBase(const std::string& text,
-                            std::shared_ptr<Config> config) {
+std::string EncodeTextBase(const std::string& text,
+                           std::shared_ptr<Config> config) {
   auto input = std::make_shared<std::istringstream>(text);
   auto output = std::make_shared<std::ostringstream>();
   encoding::HuffmanEncoder<Config>(std::move(config), input, output);
@@ -22,8 +22,8 @@ std::string EncryptTextBase(const std::string& text,
 }
 
 template <letter::LetterConfig Config>
-std::string DecryptTextBase(const std::string& text,
-                            std::shared_ptr<Config> config) {
+std::string DecodeTextBase(const std::string& text,
+                           std::shared_ptr<Config> config) {
   auto input = std::make_shared<std::istringstream>(text);
   auto output = std::make_shared<std::ostringstream>();
   encoding::HuffmanDecoder<Config>(std::move(config), input, output);
