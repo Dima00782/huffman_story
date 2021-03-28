@@ -50,7 +50,9 @@ class FixedAlphabetLetterParser final {
     return max;
   }
 
-  bool HasNext() const { return input_->rdbuf()->in_avail() > 0; }
+  bool HasNext() const {
+    return BufferSize() > 0 || input_->rdbuf()->in_avail() > 0;
+  }
 
  private:
   std::size_t BufferSize() const { return buffer_end_pos_ - buffer_start_pos_; }

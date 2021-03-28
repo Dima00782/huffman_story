@@ -13,6 +13,7 @@ cc_test(
         "byte_istream_adapter_unittest.cc",
         "byte_ostream_adapter_unittest.cc",
         "encoding_single_byte_letter_unittest.cc",
+        "encoding_fixed_alphabet_letter_unittest.cc",
         "huffman_tree_builder_unittest.cc",
         "trie_unittest.cc",
         "single_byte_letter_unittest.cc",
