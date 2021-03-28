@@ -12,6 +12,8 @@
 #include "encoding/huffman_encoding.h"
 #include "letter/single_byte_letter/single_byte_letter.h"
 
+namespace {
+
 template <letter::LetterConfig Config>
 std::string EncryptTextBase(const std::string& text,
                             std::shared_ptr<Config> config) {
@@ -75,3 +77,5 @@ INSTANTIATE_TEST_SUITE_P(
         TestCase{"aaaaa bbb", std::string("\x24\x16\x2b\x0f\xc5\x46", 6)},
         TestCase{"aaabb", std::string("\x58\xac\x3c\x00", 4)},
         TestCase{"aaaabbc", std::string("\x2c\x76\x2b\x0f\xa8\x01", 6)}));
+
+}  // namespace

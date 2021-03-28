@@ -4,6 +4,8 @@
 #include <memory>
 #include <sstream>
 
+namespace {
+
 TEST(ByteAlignedBitReader, SevenUnusedBits) {
   auto istring_stream = std::make_shared<std::istringstream>("\x87");
   byte_adapters::ByteAlignedBitReader bit_reader{std::move(istring_stream)};
@@ -102,3 +104,5 @@ TEST(ByteAlignedBitReader, ZeroUnusedBits) {
 
   EXPECT_FALSE(bit_reader.ReadBit());
 }
+
+}  // namespace

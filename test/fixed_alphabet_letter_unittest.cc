@@ -10,6 +10,7 @@
 using namespace std::string_literals;
 
 namespace fixed_alpha_letter {
+namespace {
 
 using Letter = FixedAlphabetLetterConfig::LetterType;
 
@@ -98,4 +99,5 @@ TEST(FixedAlphabetLetter, Write) {
   EXPECT_EQ(output.str(), "abc defggg ");
 }
 
+}  // namespace
 }  // namespace fixed_alpha_letter

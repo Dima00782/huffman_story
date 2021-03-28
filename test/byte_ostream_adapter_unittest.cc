@@ -4,6 +4,8 @@
 #include <memory>
 #include <sstream>
 
+namespace {
+
 TEST(ByteAlignedBitWriter, EmptyBits) {
   auto ostring_stream = std::make_shared<std::ostringstream>();
   {
@@ -109,3 +111,5 @@ TEST(ByteAlignedBitWriter, OneUnusedBit) {
             "\xb2"
             "\x01");
 }
+
+}  // namespace

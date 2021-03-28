@@ -5,6 +5,7 @@
 #include "letter/single_byte_letter/single_byte_letter.h"
 
 namespace huffman_tree {
+namespace {
 
 class HuffmanTreeBuilderTest : public ::testing::Test {
  public:
@@ -72,4 +73,5 @@ TEST_F(HuffmanTreeBuilderTest, ThreeSymbols) {
   EXPECT_EQ(left_right->frequency_, 2u);
 }
 
+}  // namespace
 }  // namespace huffman_tree

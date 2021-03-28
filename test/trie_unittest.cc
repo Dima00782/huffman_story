@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 
 namespace fixed_alpha_letter {
+namespace {
 
 TEST(Trie, AddTrivial) {
   Trie trie;
@@ -35,4 +36,5 @@ TEST(Trie, AddMany) {
   EXPECT_EQ(trie.GetLongestMatchingWord("bbb"), "bbb");
 }
 
+}  // namespace
 }  // namespace fixed_alpha_letter

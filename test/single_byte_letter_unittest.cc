@@ -8,6 +8,7 @@
 #include <utility>
 
 namespace single_byte_letter {
+namespace {
 
 using Letter = SingleByteLetterConfig::LetterType;
 
@@ -55,4 +56,5 @@ TEST(SingleByteLetter, Write) {
   EXPECT_EQ(output.str(), "abc");
 }
 
+}  // namespace
 }  // namespace single_byte_letter
