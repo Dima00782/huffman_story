@@ -6,6 +6,14 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "encoding_base",
+    hdrs = [
+        "encoding_test_base.h",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 cc_test(
     name = "unittest",
     srcs = [
@@ -21,6 +29,7 @@ cc_test(
     ],
     deps = [
         "//test:string_bit_io",
+        "//test:encoding_base",
         "//bits_manipulation:bits_manipulation",
         "//encoding:huffman_encoding",
         "//encoding/byte_streams_adapters:byte_streams_adapters",

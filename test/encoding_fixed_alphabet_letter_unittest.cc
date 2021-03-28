@@ -1,36 +1,14 @@
 #include "gtest/gtest.h"
 
-#include <iterator>
 #include <memory>
 #include <set>
 #include <sstream>
 #include <string>
 
-#include "bits_manipulation/bits_manipulation.h"
-#include "encoding/byte_streams_adapters/byte_aligned_bit_reader.h"
-#include "encoding/byte_streams_adapters/byte_aligned_bit_writer.h"
-#include "encoding/huffman_encoding.h"
 #include "letter/fixed_alphabet_letter/fixed_alphabet_letter.h"
+#include "test/encoding_test_base.h"
 
 namespace {
-
-template <letter::LetterConfig Config>
-std::string EncryptTextBase(const std::string& text,
-                            std::shared_ptr<Config> config) {
-  auto input = std::make_shared<std::istringstream>(text);
-  auto output = std::make_shared<std::ostringstream>();
-  encoding::HuffmanEncoder<Config>(std::move(config), input, output);
-  return output->str();
-}
-
-template <letter::LetterConfig Config>
-std::string DecryptTextBase(const std::string& text,
-                            std::shared_ptr<Config> config) {
-  auto input = std::make_shared<std::istringstream>(text);
-  auto output = std::make_shared<std::ostringstream>();
-  encoding::HuffmanDecoder<Config>(std::move(config), input, output);
-  return output->str();
-}
 
 struct TestCase {
   std::set<std::string> alphabet;
@@ -48,11 +26,11 @@ class EncodingAcceptanceTestFixedAlphabetLetter
   }
 
   std::string Encrypt(const std::string& text) {
-    return EncryptTextBase<ConfigType>(text, config_);
+    return test::EncryptTextBase<ConfigType>(text, config_);
   }
 
   std::string Decrypt(const std::string& text) {
-    return DecryptTextBase<ConfigType>(text, config_);
+    return test::DecryptTextBase<ConfigType>(text, config_);
   }
 
   std::shared_ptr<ConfigType> config_;
