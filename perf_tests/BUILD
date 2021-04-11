@@ -3,7 +3,8 @@ py_binary(
     srcs = ["benchmark.py"],
     data = [
         "//main:main",
+        "//perf_tests:example.cc",
+        "//perf_tests:sample_alphabet.txt",
         "//perf_tests:war_and_peace.txt",
-        "//perf_tests:lorem_ipsum.txt",
     ],
 )
