@@ -9,7 +9,7 @@ def single_byte_letter_benchmark():
 
     # compress the input file
     start_time = time.time()
-    subprocess.run(['main/main', 'compress', input_file],
+    subprocess.run(['main/main', 'compress', input_file, "-o", output_file],
                     stdout=subprocess.PIPE,
                     universal_newlines=True)
     end_time = time.time()
@@ -17,7 +17,7 @@ def single_byte_letter_benchmark():
 
     # decompress the output file
     start_time = time.time()
-    subprocess.run(['main/main', 'decompress', output_file],
+    subprocess.run(['main/main', 'decompress', output_file, "-o", new_input_file],
                     stdout=subprocess.PIPE, 
                     universal_newlines=True)
     end_time = time.time()
@@ -37,7 +37,7 @@ def alphabet_letter_benchmark():
 
     # compress the input file
     start_time = time.time()
-    subprocess.run(['main/main', 'compress', input_file, '--alphabet', alphabet_file],
+    subprocess.run(['main/main', 'compress', input_file, '--alphabet', alphabet_file, "-o", output_file],
                     stdout=subprocess.PIPE,
                     universal_newlines=True)
     end_time = time.time()
@@ -45,7 +45,7 @@ def alphabet_letter_benchmark():
 
     # decompress the output file
     start_time = time.time()
-    subprocess.run(['main/main', 'decompress', output_file, '--alphabet'],
+    subprocess.run(['main/main', 'decompress', output_file, '--alphabet', "-o", new_input_file],
                     stdout=subprocess.PIPE, 
                     universal_newlines=True)
     end_time = time.time()

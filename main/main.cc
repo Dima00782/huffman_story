@@ -39,19 +39,25 @@ void InstallCompressSubcommand(CLI::App* app) {
   auto compress_command =
       app->add_subcommand("compress", "Compress passed file.");
   auto file_to_compress = std::make_shared<std::string>();
+  auto output_file = std::make_shared<std::string>();
   auto alphabet_file = std::make_shared<std::string>();
   compress_command->add_option("file", *file_to_compress, "File to compress.");
+  compress_command->add_option("-o,--output", *output_file, "Output file.");
   compress_command->add_option("-a,--alphabet", *alphabet_file,
                                "File with alphabet.");
-  compress_command->callback([file_to_compress, alphabet_file]() {
+  compress_command->callback([file_to_compress, output_file, alphabet_file]() {
     const std::filesystem::path file_to_compress_path{*file_to_compress};
     if (!std::filesystem::is_regular_file(file_to_compress_path)) {
       std::cerr << "It isn't a regular file : " << file_to_compress_path
                 << std::endl;
       return;
     }
-    std::filesystem::path compressed_file_path{
-        file_to_compress_path.filename().string() + kExtenstion};
+
+    std::filesystem::path compressed_file_path{*output_file};
+    if (compressed_file_path.empty()) {
+      compressed_file_path = std::filesystem::path{
+          file_to_compress_path.filename().string() + kExtenstion};
+    }
 
     if (alphabet_file->empty()) {
       Compress(std::make_shared<single_byte_letter::SingleByteLetterConfig>(),
@@ -84,32 +90,27 @@ void Decompress(std::shared_ptr<Config> config,
 }
 
 void InstallDecompressSubcommand(CLI::App* app) {
-  auto decompress_command = app->add_subcommand(
-      "decompress", "Decompress passed file. File must have .huf extension.");
+  auto decompress_command =
+      app->add_subcommand("decompress", "Decompress passed file.");
   auto file_to_decompress = std::make_shared<std::string>();
+  auto output_file = std::make_shared<std::string>();
   auto is_alphabet = std::make_shared<bool>();
   decompress_command->add_option("file", *file_to_decompress,
                                  "File to decompress.");
+  decompress_command->add_option("-o,--output", *output_file, "Output file.");
   decompress_command->add_flag(
       "-a,--alphabet", *is_alphabet,
       "Decompress the file that was previously compressed with alphabet.");
-  decompress_command->callback([file_to_decompress, is_alphabet]() {
+  decompress_command->callback([file_to_decompress, output_file,
+                                is_alphabet]() {
     const std::filesystem::path file_to_decompress_path{*file_to_decompress};
     if (!std::filesystem::is_regular_file(file_to_decompress_path)) {
       std::cerr << "It isn't a regular file : " << file_to_decompress_path
                 << std::endl;
       return;
     }
-    if (!file_to_decompress_path.has_extension() ||
-        file_to_decompress_path.extension() != kExtenstion) {
-      std::cerr << "wrong extension of file: " << file_to_decompress_path
-                << std::endl;
-      return;
-    }
 
-    std::filesystem::path uncompressed_file_name =
-        file_to_decompress_path.filename().replace_extension("");
-
+    const std::filesystem::path uncompressed_file_name{*output_file};
     if (!*is_alphabet) {
       Decompress(std::make_shared<single_byte_letter::SingleByteLetterConfig>(),
                  file_to_decompress_path, uncompressed_file_name);
