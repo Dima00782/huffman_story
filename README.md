@@ -9,15 +9,15 @@ Handmade c++ project to demonstrate state-of-the-art programming.
 
 ### basic mode
 ```bash
-huffman compress /path/to/your/file
-huffman decompress /path/to/your/file.huf
+huffman compress /path/to/your/file -o /path/to/your/compressed_file
+huffman decompress /path/to/your/compressed_file --output /path/to/your/decompressed_file
 ```
 The archiver will use ascii alphabet to count frequencies, for example: `"aabbde"` -> `{a: 2, b: 2, d: 1, e: 1}`
 
-### aplahbet mode:
+### alphabet mode:
 ```bash
-huffman compress /path/to/your/file --alphabet /path/to/your/alphabet_file 
-huffman decompress /path/to/your/file.huf --alphabet
+huffman compress /path/to/your/file --alphabet /path/to/your/alphabet_file -o /path/to/your/compressed_file
+huffman decompress /path/to/your/compressed_file --alphabet --output /path/to/your/decompressed_file
 ```
 Here you can specify your own letters as words in alphabet_file
 and the archiver will use the union of your alphabet and the ascii alphabet to count frequencies.
