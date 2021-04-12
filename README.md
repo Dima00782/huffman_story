@@ -14,7 +14,7 @@ huffman decompress /path/to/your/file.huf
 ```
 The archiver will use ascii alphabet to count frequencies, for example: `"aabbde"` -> `{a: 2, b: 2, d: 1, e: 1}`
 
-### aplahbet mode:
+### alphabet mode:
 ```bash
 huffman compress /path/to/your/file --alphabet /path/to/your/alphabet_file 
 huffman decompress /path/to/your/file.huf --alphabet
